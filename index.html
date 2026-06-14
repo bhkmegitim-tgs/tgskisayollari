@@ -53,6 +53,18 @@
             font-size: 14px;
         }
 
+        /* Bölüm Başlıkları */
+        .section-title {
+            color: #1a365d;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: left;
+            margin-top: 25px;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 5px;
+        }
+
         /* İletişim Alt Başlık */
         .contact-title {
             color: #4a5568;
@@ -82,6 +94,9 @@
         }
 
         /* BUTON RENK GRUPLARI */
+        .btn-driver { background-color: #2e7d32; } /* Şoförler için yeşil */
+        .btn-driver:hover { background-color: #1b5e20; }
+
         .btn-blue { background-color: #0d47a1; }
         .btn-blue:hover { background-color: #0a357a; }
 
@@ -126,16 +141,20 @@
 
     <div class="container">
         
-        <!-- LOGO ALANI -->
         <div class="logo-container">
             <img src="https://i.ibb.co/5hCG7H26/tgs-duyuru-2048x1258.jpg" alt="TGS Logo">
         </div>
 
-        <!-- SAYFA BAŞLIĞI -->
         <h1>TGS BHKM EĞİTİM</h1>
         <p>Lütfen işlem yapmak istediğiniz bağlantıyı seçiniz:</p>
 
-        <!-- YÖNLENDİRME BUTONLARI -->
+        <div class="section-title">İşçi Şoför Belgeleri</div>
+        <a href="https://drive.google.com/drive/folders/1PB_pbmhg4CHR-F4jmSOeU4gHA-QoLNMN?usp=sharing" target="_blank" class="btn btn-driver">
+            📁 Şoför Güncel Resim & PDF Belgeleri
+        </a>
+
+        <div class="section-title">Genel Bağlantılar & Kılavuzlar</div>
+
         <a href="https://www.tgsakademi.com/Home/Login" target="_blank" class="btn btn-blue">
             TGS Akademi Girişi
         </a>
@@ -148,7 +167,6 @@
             E-Learning Kullanımı Kılavuzu
         </a>
 
-        <!-- YENİ EKLENEN: KDM KULLANIMI BUTONU -->
         <a href="https://drive.google.com/file/d/1R14vdl6QG9ebMA3K0RhvJSnLPIJlasdq/view?usp=sharing" target="_blank" class="btn btn-navy">
             KDM Kullanımı Kılavuzu
         </a>
@@ -185,7 +203,6 @@
             Barkod ve Bagglobe Şifre İşlemleri
         </a>
 
-        <!-- İLETİŞİM VE E-POSTA ALANI -->
         <div class="contact-title">Destek ve İletişim Hattı</div>
         
         <a href="mailto:bhkmegitim@gmail.com" class="btn btn-email">
