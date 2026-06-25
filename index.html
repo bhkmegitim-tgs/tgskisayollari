@@ -10,34 +10,57 @@ body{
     font-family:Segoe UI;
     margin:0;
     background:#f4f6f9;
+    scroll-behavior:smooth;
 }
 
+/* HEADER */
 header{
     position:fixed;
     top:0;
+    left:0;
     width:100%;
-    background:#0d2b52;
-    color:white;
-    text-align:center;
-    padding:12px;
-    font-weight:bold;
+    background:#1a365d;
     z-index:1000;
+    box-shadow:0 2px 10px rgba(0,0,0,.2);
 }
 
+.nav{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    padding:10px;
+}
+
+.nav a{
+    color:white;
+    text-decoration:none;
+    padding:8px 14px;
+    font-weight:600;
+    font-size:13px;
+}
+
+.nav a:hover{
+    color:#ffb300;
+}
+
+/* CONTAINER */
 .container{
-    max-width:850px;
+    max-width:900px;
     margin:auto;
-    padding:100px 20px 40px;
+    padding:110px 20px 40px;
 }
 
+/* SECTIONS */
 .section-title{
     font-weight:bold;
-    color:#0d2b52;
+    color:#1a365d;
     margin-top:25px;
     border-bottom:2px solid #ddd;
     padding-bottom:5px;
+    scroll-margin-top:80px;
 }
 
+/* BUTTONS */
 .btn{
     display:block;
     padding:12px;
@@ -54,8 +77,8 @@ header{
 .blue{background:#1565c0;}
 .navy{background:#0d47a1;}
 .purple{background:#6a1b9a;}
-.teal{background:#00796b;}
 .red{background:#c62828;}
+.teal{background:#00796b;}
 .orange{background:#f57f17;}
 .dark{background:#37474f;}
 .indigo{background:#1e3a8a;}
@@ -67,12 +90,21 @@ header{
 
 <body>
 
-<header>TGS BHKM EĞİTİM PORTALI</header>
+<!-- HEADER -->
+<header>
+<div class="nav">
+    <a href="#egitim">Eğitim</a>
+    <a href="#sifre">Şifreler</a>
+    <a href="#mail">Mail</a>
+    <a href="#giris">Giriş</a>
+    <a href="#dokuman">Dokümanlar</a>
+</div>
+</header>
 
 <div class="container">
 
 <!-- EĞİTİM -->
-<div class="section-title">Eğitim</div>
+<div id="egitim" class="section-title">Eğitim</div>
 
 <a class="btn blue" href="https://kdmorg.shgm.gov.tr/giris" target="_blank">KDM Giriş Sistemi</a>
 <a class="btn navy" href="https://www.tgsakademi.com/Home/Login" target="_blank">TGS Akademi Giriş</a>
@@ -82,31 +114,31 @@ header{
 <a class="btn purple" href="https://drive.google.com/file/d/16AX8stURSrkZojB0Ladv8GGyJEhxkLSU/view?usp=sharing" target="_blank">E-Learning Kullanım Kılavuzu</a>
 
 
-<!-- ŞİFRELER -->
-<div class="section-title">Şifre İşlemleri</div>
+<!-- ŞİFRE -->
+<div id="sifre" class="section-title">Şifre İşlemleri</div>
 
-<a class="btn red" href="https://parola.thy.com" target="_blank">Bagglobe & Barkod Şifre İşlemleri</a>
-<a class="btn teal" href="https://parola.tgs.aero/" target="_blank">Mail & QDMS Şifre İşlemleri</a>
+<a class="btn red" href="https://parola.thy.com" target="_blank">Bagglobe & Barkod</a>
+<a class="btn teal" href="https://parola.tgs.aero/" target="_blank">Mail & QDMS</a>
 
 
 <!-- MAIL -->
-<div class="section-title">Mail Kurulum</div>
+<div id="mail" class="section-title">Mail Kurulum</div>
 
-<a class="btn orange" href="https://drive.google.com/file/d/1E1pgUIKC_VxEAWxGPGD99ZwlycBdwnBC/view?usp=sharing" target="_blank">Android Mail Kurulum</a>
+<a class="btn orange" href="https://drive.google.com/file/d/1E1pgUIKC_VxEAWxGPGD99ZwlycBdwnBC/view?usp=sharing" target="_blank">Android Kurulum</a>
 
-<a class="btn orange" href="https://drive.google.com/file/d/1V9mqqMiIlATnp05jOaZ0Ia9Nu9eTt6U3/view?usp=sharing" target="_blank">iPhone Mail Kurulum</a>
+<a class="btn orange" href="https://drive.google.com/file/d/1V9mqqMiIlATnp05jOaZ0Ia9Nu9eTt6U3/view?usp=sharing" target="_blank">iPhone Kurulum</a>
 
 
 <!-- GİRİŞ -->
-<div class="section-title">Giriş Sistemleri</div>
+<div id="giris" class="section-title">Giriş Sistemleri</div>
 
-<a class="btn dark" href="https://mypass.thy.com/#/login/index" target="_blank">MyPass Girişi</a>
+<a class="btn dark" href="https://mypass.thy.com/#/login/index" target="_blank">MyPass</a>
 
 <a class="btn indigo" href="https://mobil.tgs.aero/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html?sap-client=100&sap-language=TR" target="_blank">Fiori Sistem</a>
 
 
 <!-- DOKÜMAN -->
-<div class="section-title">Dokümanlar & Listeler</div>
+<div id="dokuman" class="section-title">Dokümanlar & Listeler</div>
 
 <a class="btn cyan" href="https://drive.google.com/drive/folders/1DFuOdTpMMreWGFmvbRfQTrqKVUF9uCy6?usp=sharing" target="_blank">Yabancı Havayolları Güncel Liste</a>
 
