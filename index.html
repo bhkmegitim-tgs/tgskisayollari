@@ -1,287 +1,124 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tgskisayollar</title>
-    <style>
-        /* Genel Sayfa Düzeni */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth; /* Menüye basınca yumuşak kayma efekti */
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TGS BHKM Eğitim Portalı</title>
 
-        /* SABİT HEADER TASARIMI */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #1a365d;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
+<style>
+body{
+    font-family:Segoe UI;
+    margin:0;
+    background:#f4f6f9;
+}
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 10px;
-        }
+header{
+    position:fixed;
+    top:0;
+    width:100%;
+    background:#0d2b52;
+    color:white;
+    text-align:center;
+    padding:12px;
+    font-weight:bold;
+    z-index:1000;
+}
 
-        .nav-link {
-            color: #ffffff;
-            text-decoration: none;
-            padding: 8px 15px;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: color 0.3s ease;
-        }
+.container{
+    max-width:850px;
+    margin:auto;
+    padding:100px 20px 40px;
+}
 
-        .nav-link:hover {
-            color: #ff9800;
-        }
+.section-title{
+    font-weight:bold;
+    color:#0d2b52;
+    margin-top:25px;
+    border-bottom:2px solid #ddd;
+    padding-bottom:5px;
+}
 
-        /* Ana İçerik Alanı */
-        .page-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding-top: 80px; /* Header'ın altında kalmaması için pay */
-            padding-bottom: 40px;
-        }
+.btn{
+    display:block;
+    padding:12px;
+    margin:8px 0;
+    text-decoration:none;
+    color:white;
+    border-radius:8px;
+    font-weight:600;
+    transition:0.2s;
+}
 
-        /* Kart Konteyner */
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 460px;
-            width: 100%;
-            margin: 20px;
-        }
+.btn:hover{transform:scale(1.02);}
 
-        /* Logo Tasarımı */
-        .logo-container {
-            margin-bottom: 20px;
-        }
-        .logo-container img {
-            max-width: 150px; 
-            height: auto;
-            border-radius: 8px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+.blue{background:#1565c0;}
+.navy{background:#0d47a1;}
+.purple{background:#6a1b9a;}
+.teal{background:#00796b;}
+.red{background:#c62828;}
+.orange{background:#f57f17;}
+.dark{background:#37474f;}
+.indigo{background:#1e3a8a;}
+.cyan{background:#00838f;}
+.green{background:#2e7d32;}
 
-        h1 {
-            color: #1a365d; 
-            margin-bottom: 5px;
-            font-size: 26px;
-            letter-spacing: 0.5px;
-        }
-
-        p {
-            color: #718096;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-
-        /* Bölüm Başlıkları (Menü Hedefleri) */
-        .section-title {
-            color: #1a365d;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: left;
-            margin-top: 35px;
-            margin-bottom: 12px;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 5px;
-            scroll-margin-top: 70px; /* Menüye tıklandığında başlığın tam görünmesi için pay */
-        }
-
-        /* İletişim Alt Başlık */
-        .contact-title {
-            color: #4a5568;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 35px;
-            margin-bottom: 5px;
-            border-top: 1px dashed #e2e8f0;
-            padding-top: 15px;
-        }
-
-        /* Buton Ana Tasarımı */
-        .btn {
-            display: block;
-            color: white;
-            text-decoration: none; 
-            padding: 14px 20px;
-            margin: 14px 0;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-        }
-
-        /* Hover Efekti */
-        .btn:hover {
-            transform: translateY(-2px); 
-        }
-
-        /* BUTON RENK GRUPLARI */
-        .btn-blue { background-color: #0d47a1; }
-        .btn-blue:hover { background-color: #0a357a; }
-
-        .btn-navy { background-color: #1565c0; }
-        .btn-navy:hover { background-color: #0e4aa0; }
-
-        .btn-purple { background-color: #6a1b9a; }
-        .btn-purple:hover { background-color: #4a148c; }
-
-        .btn-tgs-pass { background-color: #00796b; }
-        .btn-tgs-pass:hover { background-color: #004d40; }
-
-        .btn-thy { background-color: #d32f2f; }
-        .btn-thy:hover { background-color: #b71c1c; }
-
-        .btn-android { background-color: #f57f17; }
-        .btn-android:hover { background-color: #bc5100; }
-
-        .btn-iphone { background-color: #ff9800; }
-        .btn-iphone:hover { background-color: #e65100; }
-
-        .btn-mypass { background-color: #880e4f; }
-        .btn-mypass:hover { background-color: #560027; }
-
-        .btn-fiori { background-color: #1e3a8a; }
-        .btn-fiori:hover { background-color: #172554; }
-
-        .btn-driver { background-color: #2e7d32; }
-        .btn-driver:hover { background-color: #1b5e20; }
-
-        .btn-iga { background-color: #00838f; }
-        .btn-iga:hover { background-color: #005662; }
-
-        .btn-3rd-party { background-color: #37474f; }
-        .btn-3rd-party:hover { background-color: #263238; }
-
-        .btn-email { background-color: #2c3e50; }
-        .btn-email:hover { background-color: #1a252f; }
-
-        /* Mobil Cihazlar İçin Menü Düzenlemesi */
-        @media (max-width: 480px) {
-            .nav-container { padding: 5px; }
-            .nav-link { padding: 6px 10px; font-size: 11px; }
-            .page-wrapper { padding-top: 110px; }
-        }
-    </style>
+</style>
 </head>
+
 <body>
 
-    <header>
-        <div class="nav-container">
-            <a href="#egitim" class="nav-link">Eğitim</a>
-            <a href="#sifreler" class="nav-link">Şifreler</a>
-            <a href="#mail-kurulum" class="nav-link">Mail Kurulum</a>
-            <a href="#sistem-girisleri" class="nav-link">Giriş Linkleri</a>
-            <a href="#dokumanlar" class="nav-link">Dokümanlar</a>
-        </div>
-    </header>
+<header>TGS BHKM EĞİTİM PORTALI</header>
 
-    <div class="page-wrapper">
-        <div class="container">
-            
-            <div class="logo-container">
-                <img src="https://i.ibb.co/5hCG7H26/tgs-duyuru-2048x1258.jpg" alt="TGS Logo">
-            </div>
+<div class="container">
 
-            <h1>TGS BHKM EĞİTİM</h1>
-            <p>Lütfen işlem yapmak istediğiniz bağlantıyı seçiniz:</p>
+<!-- EĞİTİM -->
+<div class="section-title">Eğitim</div>
 
-            <div id="egitim" class="section-title">Eğitim Bölümü</div>
-            
-            <a href="https://kdmorg.shgm.gov.tr/giris" target="_blank" class="btn btn-blue">
-                KDM Giriş Sistemi
-            </a>
-            
-            <a href="https://www.tgsakademi.com/Home/Login" target="_blank" class="btn btn-navy">
-                TGS Akademi Girişi
-            </a>
+<a class="btn blue" href="https://kdmorg.shgm.gov.tr/giris" target="_blank">KDM Giriş Sistemi</a>
+<a class="btn navy" href="https://www.tgsakademi.com/Home/Login" target="_blank">TGS Akademi Giriş</a>
 
-            <a href="https://drive.google.com/file/d/1R14vdl6QG9ebMA3K0RhvJSnLPIJlasdq/view?usp=sharing" target="_blank" class="btn btn-purple">
-                KDM Kullanımı Kılavuzu
-            </a>
+<a class="btn purple" href="https://drive.google.com/file/d/1R14vdl6QG9ebMA3K0RhvJSnLPIJlasdq/view?usp=sharing" target="_blank">KDM Kullanım Kılavuzu</a>
 
-            <a href="https://drive.google.com/file/d/16AX8stURSrkZojB0Ladv8GGyJEhxkLSU/view?usp=sharing" target="_blank" class="btn btn-purple">
-                E-Learning Kullanımı Kılavuzu
-            </a>
+<a class="btn purple" href="https://drive.google.com/file/d/16AX8stURSrkZojB0Ladv8GGyJEhxkLSU/view?usp=sharing" target="_blank">E-Learning Kullanım Kılavuzu</a>
 
 
-            <div id="sifreler" class="section-title">Şifre İşlemleri</div>
+<!-- ŞİFRELER -->
+<div class="section-title">Şifre İşlemleri</div>
 
-            <a href="https://parola.thy.com" target="_blank" class="btn btn-thy">
-                Bagglobe ve Barkod Şifre İşlemleri
-            </a>
-
-            <a href="https://parola.tgs.aero/" target="_blank" class="btn btn-tgs-pass">
-                Mail ve QDMS Şifre İşlemleri
-            </a>
+<a class="btn red" href="https://parola.thy.com" target="_blank">Bagglobe & Barkod Şifre İşlemleri</a>
+<a class="btn teal" href="https://parola.tgs.aero/" target="_blank">Mail & QDMS Şifre İşlemleri</a>
 
 
-            <div id="mail-kurulum" class="section-title">Mail Kurulum Kılavuzları</div>
+<!-- MAIL -->
+<div class="section-title">Mail Kurulum</div>
 
-            <a href="https://drive.google.com/file/d/1E1pgUIKC_VxEAWxGPGD99ZwlycBdwnBC/view?usp=drive_link" target="_blank" class="btn btn-android">
-                Android Mail Kurulum Kılavuzu
-            </a>
+<a class="btn orange" href="https://drive.google.com/file/d/1E1pgUIKC_VxEAWxGPGD99ZwlycBdwnBC/view?usp=sharing" target="_blank">Android Mail Kurulum</a>
 
-            <a href="https://drive.google.com/file/d/1V9mqqMiIlATnp05jOaZ0Ia9Nu9eTt6U3/view?usp=drive_link" target="_blank" class="btn btn-iphone">
-                iPhone Mail Kurulum Kılavuzu
-            </a>
+<a class="btn orange" href="https://drive.google.com/file/d/1V9mqqMiIlATnp05jOaZ0Ia9Nu9eTt6U3/view?usp=sharing" target="_blank">iPhone Mail Kurulum</a>
 
 
-            <div id="sistem-girisleri" class="section-title">Giriş Linkleri</div>
+<!-- GİRİŞ -->
+<div class="section-title">Giriş Sistemleri</div>
 
-            <a href="https://mypass.thy.com/#/login/index" target="_blank" class="btn btn-mypass">
-                CED Bilet & MyPass Girişi
-            </a>
+<a class="btn dark" href="https://mypass.thy.com/#/login/index" target="_blank">MyPass Girişi</a>
 
-            <a href="https://mobil.tgs.aero/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html?sap-client=100&sap-language=TR" target="_blank" class="btn btn-fiori">
-                Fiori Araç Kontrol Sistemi
-            </a>
+<a class="btn indigo" href="https://mobil.tgs.aero/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html?sap-client=100&sap-language=TR" target="_blank">Fiori Sistem</a>
 
 
-            <div id="dokumanlar" class="section-title">Dokümanlar & Listeler</div>
+<!-- DOKÜMAN -->
+<div class="section-title">Dokümanlar & Listeler</div>
 
-            <a href="https://drive.google.com/file/d/1CocFsGjU5GSAaE9zIFENcXtlJTbXtA6t/view?usp=sharing" target="_blank" class="btn btn-3rd-party">
-                📁 YABANCI HAVAYOLLARI GÜNCEL LİSTE
-            </a>
+<a class="btn cyan" href="https://drive.google.com/drive/folders/1DFuOdTpMMreWGFmvbRfQTrqKVUF9uCy6?usp=sharing" target="_blank">Yabancı Havayolları Güncel Liste</a>
 
-            <a href="https://drive.google.com/file/d/11q4KWWPj5zxs-uhvz7d285qAZDegezZG/view?usp=sharing" target="_blank" class="btn btn-iga">
-                📄 İGA APRON PROSEDÜRÜ
-            </a>
+<a class="btn green" href="https://drive.google.com/file/d/11q4KWWPj5zxs-uhvz7d285qAZDegezZG/view?usp=sharing" target="_blank">İGA Apron Prosedürü</a>
 
-            <a href="https://drive.google.com/drive/folders/1PB_pbmhg4CHR-F4jmSOeU4gHA-QoLNMN?usp=sharing" target="_blank" class="btn btn-driver">
-                📁 ŞOFÖR EĞİTİMİ EL KİTABI
-            </a>
+<a class="btn green" href="https://drive.google.com/drive/folders/1PB_pbmhg4CHR-F4jmSOeU4gHA-QoLNMN?usp=sharing" target="_blank">Şoför Eğitim Kitabı</a>
 
+<a class="btn indigo" href="https://drive.google.com/file/d/1sk75nOqslocKmo7uEtxWkzB_uIE9x76P/view?usp=sharing" target="_blank">FIORI Kullanım Talimatı</a>
 
-            <div class="contact-title">Destek ve İletişim Hattı</div>
-            
-            <a href="mailto:bhkmegitim@gmail.com" class="btn btn-email">
-                ✉ Mail Gönder: bhkmegitim@gmail.com
-            </a>
-            
-        </div>
-    </div>
+<a class="btn cyan" href="https://drive.google.com/file/d/1GB4SowXRe_pn1w_dxHjXbyrOli8YDdQE/view?usp=sharing" target="_blank">Gümrüklü / Gümrüksüz İstasyonlar</a>
+
+</div>
 
 </body>
 </html>
