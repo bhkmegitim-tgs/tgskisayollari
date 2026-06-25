@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TGS BHKM Eğitim Portalı</title>
+<title>TGS Eğitim Portalı</title>
 
 <style>
 body{
-    font-family:Segoe UI;
+    font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
     margin:0;
-    background:#f4f6f9;
+    background:linear-gradient(135deg,#eef2f7,#ffffff);
     scroll-behavior:smooth;
 }
 
@@ -17,7 +17,6 @@ body{
 header{
     position:fixed;
     top:0;
-    left:0;
     width:100%;
     background:#1a365d;
     z-index:1000;
@@ -40,7 +39,7 @@ header{
 }
 
 .nav a:hover{
-    color:#ffb300;
+    color:#ffd54f;
 }
 
 /* CONTAINER */
@@ -50,7 +49,7 @@ header{
     padding:110px 20px 40px;
 }
 
-/* SECTIONS */
+/* TITLE */
 .section-title{
     font-weight:bold;
     color:#1a365d;
@@ -60,95 +59,97 @@ header{
     scroll-margin-top:80px;
 }
 
-/* BUTTONS */
+/* BASE BUTTON */
 .btn{
     display:block;
-    padding:12px;
-    margin:8px 0;
+    padding:14px;
+    margin:10px 0;
     text-decoration:none;
     color:white;
-    border-radius:8px;
+    border-radius:12px;
     font-weight:600;
-    transition:0.2s;
+    transition:0.25s;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
 
-.btn:hover{transform:scale(1.02);}
+.btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 18px rgba(0,0,0,0.15);
+}
 
-.blue{background:#1565c0;}
-.navy{background:#0d47a1;}
-.purple{background:#6a1b9a;}
-.red{background:#c62828;}
-.teal{background:#00796b;}
-.orange{background:#f57f17;}
-.dark{background:#37474f;}
-.indigo{background:#1e3a8a;}
-.cyan{background:#00838f;}
-.green{background:#2e7d32;}
+/* 🎨 YENİ VE CANLI RENK PALETİ */
+
+/* Giriş Sistemleri */
+.c-my-pass { background: linear-gradient(135deg, #FF6F00, #FF3D00); } /* MyPass Girişi - Portakal */
+.c-fiori-sist { background: linear-gradient(135deg, #1A237E, #283593); } /* Fiori Sistem - Lacivert */
+
+/* Dokümanlar & Listeler */
+.c-havayollari { background: linear-gradient(135deg, #009688, #004D40); } /* Yabancı Havayolları - Turkuaz */
+.c-iga { background: linear-gradient(135deg, #388E3C, #1B5E20); }         /* İGA Prosedürü - Yeşil */
+.c-sofor { background: linear-gradient(135deg, #FFC107, #FFA000); color: #222; } /* Şoför Kitabı - Sarı/Turuncu (Koyu Yazı) */
+.c-fiori-tal { background: linear-gradient(135deg, #1565C0, #0D47A1); } /* FIORI Talimatı - Mavi */
+.c-gumruk { background: linear-gradient(135deg, #EC407A, #AD1457); }      /* Gümrüklü/Gümrüksüz - Pembe/Kırmızı */
+
+/* Eski Renk Paleti (Diğer bölümler için çeşitlilik korundu) */
+.c1{background:linear-gradient(135deg,#ff5252,#ff1744);}
+.c2{background:linear-gradient(135deg,#ff9800,#ff5722);}
+.c3{background:linear-gradient(135deg,#ffeb3b,#fbc02d); color:#222;}
+.c4{background:linear-gradient(135deg,#4caf50,#2e7d32);}
+.c5{background:linear-gradient(135deg,#00bcd4,#0097a7);}
+.c6{background:linear-gradient(135deg,#3f51b5,#1a237e);}
+.c7{background:linear-gradient(135deg,#9c27b0,#6a1b9a);}
+.c8{background:linear-gradient(135deg,#607d8b,#37474f);}
 
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <header>
 <div class="nav">
-    <a href="#egitim">Eğitim</a>
-    <a href="#sifre">Şifreler</a>
-    <a href="#mail">Mail</a>
-    <a href="#giris">Giriş</a>
-    <a href="#dokuman">Dokümanlar</a>
+<a href="#egitim">Eğitim</a>
+<a href="#sifre">Şifre</a>
+<a href="#mail">Mail</a>
+<a href="#giris">Giriş</a>
+<a href="#dokuman">Doküman</a>
 </div>
 </header>
 
 <div class="container">
 
-<!-- EĞİTİM -->
 <div id="egitim" class="section-title">Eğitim</div>
 
-<a class="btn blue" href="https://kdmorg.shgm.gov.tr/giris" target="_blank">KDM Giriş Sistemi</a>
-<a class="btn navy" href="https://www.tgsakademi.com/Home/Login" target="_blank">TGS Akademi Giriş</a>
-
-<a class="btn purple" href="https://drive.google.com/file/d/1R14vdl6QG9ebMA3K0RhvJSnLPIJlasdq/view?usp=sharing" target="_blank">KDM Kullanım Kılavuzu</a>
-
-<a class="btn purple" href="https://drive.google.com/file/d/16AX8stURSrkZojB0Ladv8GGyJEhxkLSU/view?usp=sharing" target="_blank">E-Learning Kullanım Kılavuzu</a>
+<a class="btn c1" href="https://kdmorg.shgm.gov.tr/giris" target="_blank">KDM Giriş Sistemi</a>
+<a class="btn c2" href="https://www.tgsakademi.com/Home/Login" target="_blank">TGS Akademi Giriş</a>
+<a class="btn c3" href="https://drive.google.com/file/d/1R14vdl6QG9ebMA3K0RhvJSnLPIJlasdq/view?usp=sharing" target="_blank">KDM Kılavuzu</a>
+<a class="btn c4" href="https://drive.google.com/file/d/16AX8stURSrkZojB0Ladv8GGyJEhxkLSU/view?usp=sharing" target="_blank">E-Learning Kılavuzu</a>
 
 
-<!-- ŞİFRE -->
 <div id="sifre" class="section-title">Şifre İşlemleri</div>
 
-<a class="btn red" href="https://parola.thy.com" target="_blank">Bagglobe & Barkod</a>
-<a class="btn teal" href="https://parola.tgs.aero/" target="_blank">Mail & QDMS</a>
+<a class="btn c5" href="https://parola.thy.com" target="_blank">Bagglobe & Barkod</a>
+<a class="btn c6" href="https://parola.tgs.aero/" target="_blank">Mail & QDMS</a>
 
 
-<!-- MAIL -->
 <div id="mail" class="section-title">Mail Kurulum</div>
 
-<a class="btn orange" href="https://drive.google.com/file/d/1E1pgUIKC_VxEAWxGPGD99ZwlycBdwnBC/view?usp=sharing" target="_blank">Android Kurulum</a>
+<a class="btn c7" href="https://drive.google.com/file/d/1E1pgUIKC_VxEAWxGPGD99ZwlycBdwnBC/view?usp=sharing" target="_blank">Android Kurulum</a>
+<a class="btn c8" href="https://drive.google.com/file/d/1V9mqqMiIlATnp05jOaZ0Ia9Nu9eTt6U3/view?usp=sharing" target="_blank">iPhone Kurulum</a>
 
-<a class="btn orange" href="https://drive.google.com/file/d/1V9mqqMiIlATnp05jOaZ0Ia9Nu9eTt6U3/view?usp=sharing" target="_blank">iPhone Kurulum</a>
 
-
-<!-- GİRİŞ -->
 <div id="giris" class="section-title">Giriş Sistemleri</div>
 
-<a class="btn dark" href="https://mypass.thy.com/#/login/index" target="_blank">MyPass</a>
+<a class="btn c-my-pass" href="https://mypass.thy.com/#/login/index" target="_blank">MyPass Girişi</a>
+<a class="btn c-fiori-sist" href="https://mobil.tgs.aero/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html?sap-client=100&sap-language=TR" target="_blank">Fiori Sistem</a>
 
-<a class="btn indigo" href="https://mobil.tgs.aero/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html?sap-client=100&sap-language=TR" target="_blank">Fiori Sistem</a>
 
-
-<!-- DOKÜMAN -->
 <div id="dokuman" class="section-title">Dokümanlar & Listeler</div>
 
-<a class="btn cyan" href="https://drive.google.com/drive/folders/1DFuOdTpMMreWGFmvbRfQTrqKVUF9uCy6?usp=sharing" target="_blank">Yabancı Havayolları Güncel Liste</a>
-
-<a class="btn green" href="https://drive.google.com/file/d/11q4KWWPj5zxs-uhvz7d285qAZDegezZG/view?usp=sharing" target="_blank">İGA Apron Prosedürü</a>
-
-<a class="btn green" href="https://drive.google.com/drive/folders/1PB_pbmhg4CHR-F4jmSOeU4gHA-QoLNMN?usp=sharing" target="_blank">Şoför Eğitim Kitabı</a>
-
-<a class="btn indigo" href="https://drive.google.com/file/d/1sk75nOqslocKmo7uEtxWkzB_uIE9x76P/view?usp=sharing" target="_blank">FIORI Kullanım Talimatı</a>
-
-<a class="btn cyan" href="https://drive.google.com/file/d/1GB4SowXRe_pn1w_dxHjXbyrOli8YDdQE/view?usp=sharing" target="_blank">Gümrüklü / Gümrüksüz İstasyonlar</a>
+<a class="btn c-havayollari" href="https://drive.google.com/drive/folders/1DFuOdTpMMreWGFmvbRfQTrqKVUF9uCy6?usp=sharing" target="_blank">Yabancı Havayolları Güncel Liste</a>
+<a class="btn c-iga" href="https://drive.google.com/file/d/11q4KWWPj5zxs-uhvz7d285qAZDegezZG/view?usp=sharing" target="_blank">İGA Apron Prosedürü</a>
+<a class="btn c-sofor" href="https://drive.google.com/drive/folders/1PB_pbmhg4CHR-F4jmSOeU4gHA-QoLNMN?usp=sharing" target="_blank">Şoför Eğitim Kitabı</a>
+<a class="btn c-fiori-tal" href="https://drive.google.com/file/d/1sk75nOqslocKmo7uEtxWkzB_uIE9x76P/view?usp=sharing" target="_blank">FIORI Kullanım Talimatı</a>
+<a class="btn c-gumruk" href="https://drive.google.com/file/d/1GB4SowXRe_pn1w_dxHjXbyrOli8YDdQE/view?usp=sharing" target="_blank">Gümrüklü / Gümrüksüz İstasyonlar</a>
 
 </div>
 
