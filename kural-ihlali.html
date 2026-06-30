@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHKM - Kural İhlal Takip Sistemi</title>
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- SheetJS (Excel Çıktısı İçin) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -136,7 +134,6 @@
     </div>
 
     <form id="kuralForm">
-        <!-- İHLAL EDEN PERSONEL -->
         <div class="section-title">İhlal Eden Personel Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
@@ -187,7 +184,6 @@
             </div>
         </div>
 
-        <!-- TESPİT EDEN PERSONEL -->
         <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
@@ -202,7 +198,7 @@
 
         <div class="btn-group">
             <button type="submit" class="btn-submit">Veritabanına Kaydet</button>
-            <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir</button>
+            <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir (Admin)</button>
         </div>
     </form>
 
@@ -213,16 +209,18 @@
     const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
     const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
 
+    // ADMİN ŞİFRESİ
+    const ADMIN_PASSWORD = "BHKM_admin_2026"; 
+
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const form = document.getElementById('kuralForm');
     const statusMsg = document.getElementById('statusMsg');
     const btnExcel = document.getElementById('btnExcel');
 
-    // Bugünün tarihini varsayılan yap
     document.getElementById('tarih').valueAsDate = new Date();
 
-    // 1. VERİTABANINA YAZMA VE GÜNCELLEME (UPSERT)
+    // 1. VERİTABANINA YAZMA (UPSERT)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         statusMsg.style.display = 'none';
@@ -251,7 +249,6 @@
             statusMsg.className = "status-msg status-success";
             statusMsg.style.display = 'block';
             
-            // Kolaylık olsun diye ihlal eden kısımlarını sıfırla, raporlayan kalsın
             document.getElementById('sicil').value = '';
             document.getElementById('isim_soyisim').value = '';
             document.getElementById('unvan').value = '';
@@ -259,8 +256,17 @@
         }
     });
 
-    // 2. ŞABLONA GÖRE EXCEL OLUŞTURMA VE İNDİRME
+    // 2. ŞİFRE KORUMALI EXCEL İNDİRME
     btnExcel.addEventListener('click', async () => {
+        const girilenSifre = prompt("Lütfen Excel raporunu indirmek için Admin Şifresini giriniz:");
+        
+        if (girilenSifre === null) return; 
+
+        if (girilenSifre !== ADMIN_PASSWORD) {
+            alert("Hatalı şifre girdiniz! Yetkiniz bulunmuyor.");
+            return;
+        }
+
         const { data, error } = await supabaseClient
             .from('kural_ihlalleri')
             .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_sicil, tespit_eden_isim')
@@ -276,9 +282,7 @@
             return;
         }
 
-        // image_80183c.png görselindeki şablon düzeni (Sıralama ve Ayrı Sütunlar)
         const excelData = data.map(row => {
-            // Tarihi GG.AA.YYYY formatına çevirelim (Örn: 17.06.2026)
             let formattedDate = row.tarih;
             if (row.tarih) {
                 const parts = row.tarih.split('-');
@@ -303,16 +307,8 @@
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
 
-        // Görseldeki şablona göre sütun genişlik ayarları
         const colWidths = [
-            {wch: 10}, // SİCİL
-            {wch: 22}, // İSİM SOYİSİM
-            {wch: 15}, // UNVAN
-            {wch: 10}, // EKİBİ
-            {wch: 55}, // KURAL İHLAL MADDESİ
-            {wch: 14}, // TARİH
-            {wch: 20}, // TESPİT EDEN SİCİL
-            {wch: 24}  // TESPİT EDEN PERSONEL
+            {wch: 10}, {wch: 22}, {wch: 15}, {wch: 10}, {wch: 55}, {wch: 14}, {wch: 20}, {wch: 24}
         ];
         worksheet['!cols'] = colWidths;
 
