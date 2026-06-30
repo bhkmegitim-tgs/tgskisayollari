@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHKM - Kural İhlal Takip Sistemi</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #e67e22; /* TGS Turuncu Tonu */
+            --dark-color: #2c3e50;
+            --light-bg: #f5f7fa;
+            --success-color: #27ae60;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-color);
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: var(--dark-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .header p {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 8px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        @media (max-width: 600px) {
+            .form-group.full-width { grid-column: span 1; }
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #34495e;
+        }
+        input, select, textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .btn-submit {
+            background-color: var(--success-color);
+            color: white;
+        }
+        .btn-excel {
+            background-color: var(--dark-color);
+            color: white;
+        }
+        .status-msg {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>TGS BHKM KURAL İHLAL TAKİP FORMU</h1>
+        <p>Operasyonel kurallara uyum ve personel bildirim ekranı</p>
+    </div>
+
+    <form id="kuralForm">
+        <div class="section-title">İhlal Eden Personel Bilgileri</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="sicil">Sicil Numarası</label>
+                <input type="text" id="sicil" required placeholder="Örn: 501234">
+            </div>
+            <div class="form-group">
+                <label for="isim_soyisim">İsim Soyisim</label>
+                <input type="text" id="isim_soyisim" required placeholder="Örn: Ahmet Yılmaz">
+            </div>
+            <div class="form-group">
+                <label for="unvan">Ünvanı</label>
+                <input type="text" id="unvan" required placeholder="Örn: İşçi, Şoför, Memur">
+            </div>
+            <div class="form-group">
+                <label for="ekibi">Ekibi / Postası</label>
+                <input type="text" id="ekibi" required placeholder="Örn: A Postası, Ramp Ekibi">
+            </div>
+            <div class="form-group">
+                <label for="tarih">İhlal Tarihi</label>
+                <input type="date" id="tarih" required>
+            </div>
+            <div class="form-group">
+                <label for="kural_ihlali">Kural İhlali Türü</label>
+                <select id="kural_ihlali" required>
+                    <option value="">-- Seçiniz --</option>
+                    <option value="KKD Kullanımı İhlali">KKD Kullanımı İhlali (Yelek/Kulaklık vb.)</option>
+                    <option value="Hız Sınırı İhlali">Apronda Hız Sınırı İhlali</option>
+                    <option value="Ekipman Kullanım Hatası">Ekipman Yanlış Kullanım Hatası</option>
+                    <option value="Dikkatsizlik / Emniyetsiz Davranış">Dikkatsizlik / Emniyetsiz Davranış</option>
+                    <option value="Diğer Operasyonel İhlaller">Diğer Operasyonel İhlaller</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="tespit_eden_sicil">Sizin Siciliniz</label>
+                <input type="text" id="tespit_eden_sicil" required placeholder="Örn: 500987">
+            </div>
+            <div class="form-group">
+                <label for="tespit_eden_isim">Sizin İsim Soyisminiz</label>
+                <input type="text" id="tespit_eden_isim" required placeholder="Örn: Mehmet Demir">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn-submit">Veritabanına Kaydet</button>
+            <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir</button>
+        </div>
+    </form>
+
+    <div id="statusMsg" class="status-msg"></div>
+</div>
+
+<script>
+    // Supabase Kimlik Bilgileri Entegre Edildi
+    const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById('kuralForm');
+    const statusMsg = document.getElementById('statusMsg');
+    const btnExcel = document.getElementById('btnExcel');
+
+    // Bugünün tarihini varsayılan olarak seçtir
+    document.getElementById('tarih').valueAsDate = new Date();
+
+    // 1. VERİTABANINA YAZMA VE GÜNCELLEME (UPSERT) MANTIĞI
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        statusMsg.style.display = 'none';
+
+        const formData = {
+            sicil: document.getElementById('sicil').value.trim(),
+            isim_soyisim: document.getElementById('isim_soyisim').value.trim(),
+            unvan: document.getElementById('unvan').value.trim(),
+            ekibi: document.getElementById('ekibi').value.trim(),
+            kural_ihlali: document.getElementById('kural_ihlali').value,
+            tarih: document.getElementById('tarih').value,
+            tespit_eden_sicil: document.getElementById('tespit_eden_sicil').value.trim(),
+            tespit_eden_isim: document.getElementById('tespit_eden_isim').value.trim()
+        };
+
+        // Eğer aynı gün aynı sicile ait bir kayıt varsa, eskisini günceller (Üzerine yazar). Yoksa yeni satır açar.
+        const { data, error } = await supabaseClient
+            .from('kural_ihlalleri')
+            .upsert([formData], { onConflict: 'sicil,tarih' });
+
+        if (error) {
+            statusMsg.textContent = "Hata oluştu: " + error.message;
+            statusMsg.className = "status-msg status-error";
+            statusMsg.style.display = 'block';
+        } else {
+            statusMsg.textContent = "Kayıt başarıyla veritabanına işlendi / güncellendi!";
+            statusMsg.className = "status-msg status-success";
+            statusMsg.style.display = 'block';
+            
+            // Kolaylık olsun diye sadece ihlal eden alanlarını temizle, tespit edenin bilgileri kalsın
+            document.getElementById('sicil').value = '';
+            document.getElementById('isim_soyisim').value = '';
+            document.getElementById('unvan').value = '';
+            document.getElementById('ekibi').value = '';
+        }
+    });
+
+    // 2. EXCEL RAPORU OLUŞTURMA VE İNDİRME MANTIĞI
+    btnExcel.addEventListener('click', async () => {
+        // Veritabanındaki tüm kayıtları çek
+        const { data, error } = await supabaseClient
+            .from('kural_ihlalleri')
+            .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_isim')
+            .order('tarih', { ascending: false });
+
+        if (error) {
+            alert("Veriler çekilirken bir hata oluştu: " + error.message);
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            alert("Veritabanında indirilecek herhangi bir kayıt bulunamadı!");
+            return;
+        }
+
+        // Tablo başlıklarını senin tam istediğin formata çeviriyoruz
+        const excelData = data.map(row => ({
+            "TARİH": row.tarih,
+            "SİCİL": row.sicil,
+            "İSİM SOYİSİM": row.isim_soyisim,
+            "ÜNVAN": row.unvan,
+            "EKİBİ": row.ekibi,
+            "KURAL İHLALİ": row.kural_ihlali,
+            "TESPİT EDEN": row.tespit_eden_isim
+        }));
+
+        // Excel dosyasını derleme adımları
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
+
+        // Kolon genişliklerini okunabilir kılmak için otomatik boyutlandırıyoruz
+        const colWidths = [{wch: 12}, {wch: 10}, {wch: 22}, {wch: 15}, {wch: 15}, {wch: 35}, {wch: 22}];
+        worksheet['!cols'] = colWidths;
+
+        // Dosyayı tarayıcı üzerinden otomatik indir (Örn: kural_ihlalleri_2026-06-30.xlsx)
+        const dosyaAdi = `kural_ihlalleri_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(workbook, dosyaAdi);
+    });
+</script>
+
+</body>
+</html>
