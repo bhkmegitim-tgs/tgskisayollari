@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHKM - Kural İhlal Takip Sistemi</title>
+    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- SheetJS (Excel Çıktısı İçin) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -140,6 +142,7 @@
     </div>
 
     <form id="kuralForm">
+        <!-- İHLAL EDEN PERSONEL -->
         <div class="section-title">İhlal Eden Personel Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
@@ -166,15 +169,31 @@
                 <label for="kural_ihlali">Kural İhlali Türü</label>
                 <select id="kural_ihlali" required>
                     <option value="">-- Seçiniz --</option>
-                    <option value="KKD Kullanımı İhlali">KKD Kullanımı İhlali (Yelek/Kulaklık vb.)</option>
-                    <option value="Hız Sınırı İhlali">Apronda Hız Sınırı İhlali</option>
-                    <option value="Ekipman Kullanım Hatası">Ekipman Yanlış Kullanım Hatası</option>
-                    <option value="Dikkatsizlik / Emniyetsiz Davranış">Dikkatsizlik / Emniyetsiz Davranış</option>
-                    <option value="Diğer Operasyonel İhlaller">Diğer Operasyonel İhlaller</option>
+                    <option value="APRON EHLİYETİ VE SİVİL EHLİYETİ YANINDA BULUNDURMAMAK">APRON EHLİYETİ VE SİVİL EHLİYETİ YANINDA BULUNDURMAMAK</option>
+                    <option value="HASARLI EKİPMAN KULLANMAK">HASARLI EKİPMAN KULLANMAK</option>
+                    <option value="KANAT ALTI İHLALİ">KANAT ALTI İHLALİ</option>
+                    <option value="KAPASİTE FAZLASI EKİPMAN TAŞIMAK">KAPASİTE FAZLASI EKİPMAN TAŞIMAK</option>
+                    <option value="ARAÇ ÜZERİNDE ANAHTAR BIRAKMAK">ARAÇ ÜZERİNDE ANAHTAR BIRAKMAK</option>
+                    <option value="ÇEKİCİ SIRTINDA KAPASİTE FAZLASI YÜK TAŞIMAK">ÇEKİCİ SIRTINDA KAPASİTE FAZLASI YÜK TAŞIMAK</option>
+                    <option value="YELEKSİZ ARAÇ KULLANMAK">YELEKSİZ ARAÇ KULLANMAK</option>
+                    <option value="DÖNÜŞ VE GEÇİŞ KURALLARINA UYMAMAK">DÖNÜŞ VE GEÇİŞ KURALLARINA UYMAMAK</option>
+                    <option value="UYGUNSUZ MALZEME TAŞIMAK">UYGUNSUZ MALZEME TAŞIMAK</option>
+                    <option value="EMNİYETSİZ OPERASYON (BAGAJ-EKİPMAN BIRAKMAK)">EMNİYETSİZ OPERASYON (BAGAJ-EKİPMAN BIRAKMAK)</option>
+                    <option value="ÇALIŞIR VAZİYETTE ARAÇ BIRAKMAK">ÇALIŞIR VAZİYETTE ARAÇ BIRAKMAK</option>
+                    <option value="SEYİR HALİNDE TELEFON İLE GÖRÜŞME">SEYİR HALİNDE TELEFON İLE GÖRÜŞME</option>
+                    <option value="ARAÇ DEFTERİ YAZMAMAK">ARAÇ DEFTERİ YAZMAMAK</option>
+                    <option value="KAPISI AÇIK ARAÇ KULLANMAK">KAPISI AÇIK ARAÇ KULLANMAK</option>
+                    <option value="HIZ SINIR IHLALİ">HIZ SINIR IHLALİ</option>
+                    <option value="UYGUNSUZ ARAÇ PARK ETMEK">UYGUNSUZ ARAÇ PARK ETMEK</option>
+                    <option value="TERS YÖNDE ARAÇ KULLANMAK">TERS YÖNDE ARAÇ KULLANMAK</option>
+                    <option value="EMNİYET KEMERİ TAKMAMAK">EMNİYET KEMERİ TAKMAMAK</option>
+                    <option value="GERİ MANEVRADA MARSHALLING YARDIMI ALMAMAK">GERİ MANEVRADA MARSHALLING YARDIMI ALMAMAK</option>
+                    <option value="ARAÇ TERK ETME PROSEDÜRÜNE UYMAMAK">ARAÇ TERK ETME PROSEDÜRÜNE UYMAMAK</option>
                 </select>
             </div>
         </div>
 
+        <!-- TESPİT EDEN PERSONEL -->
         <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
@@ -197,7 +216,6 @@
 </div>
 
 <script>
-    // Supabase Kimlik Bilgileri Entegre Edildi
     const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
     const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
 
@@ -207,10 +225,10 @@
     const statusMsg = document.getElementById('statusMsg');
     const btnExcel = document.getElementById('btnExcel');
 
-    // Bugünün tarihini varsayılan olarak seçtir
+    // Bugünün tarihini varsayılan seçtir
     document.getElementById('tarih').valueAsDate = new Date();
 
-    // 1. VERİTABANINA YAZMA VE GÜNCELLEME (UPSERT) MANTIĞI
+    // 1. VERİTABANINA YAZMA VE GÜNCELLEME (UPSERT)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         statusMsg.style.display = 'none';
@@ -226,7 +244,6 @@
             tespit_eden_isim: document.getElementById('tespit_eden_isim').value.trim()
         };
 
-        // Eğer aynı gün aynı sicile ait bir kayıt varsa, eskisini günceller (Üzerine yazar). Yoksa yeni satır açar.
         const { data, error } = await supabaseClient
             .from('kural_ihlalleri')
             .upsert([formData], { onConflict: 'sicil,tarih' });
@@ -240,7 +257,7 @@
             statusMsg.className = "status-msg status-success";
             statusMsg.style.display = 'block';
             
-            // Kolaylık olsun diye sadece ihlal eden alanlarını temizle, tespit edenin bilgileri kalsın
+            // Sadece ihlal eden kısımları temizle
             document.getElementById('sicil').value = '';
             document.getElementById('isim_soyisim').value = '';
             document.getElementById('unvan').value = '';
@@ -248,9 +265,8 @@
         }
     });
 
-    // 2. EXCEL RAPORU OLUŞTURMA VE İNDİRME MANTIĞI
+    // 2. EXCEL İNDİRME
     btnExcel.addEventListener('click', async () => {
-        // Veritabanındaki tüm kayıtları çek
         const { data, error } = await supabaseClient
             .from('kural_ihlalleri')
             .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_isim')
@@ -266,7 +282,6 @@
             return;
         }
 
-        // Tablo başlıklarını senin tam istediğin formata çeviriyoruz
         const excelData = data.map(row => ({
             "TARİH": row.tarih,
             "SİCİL": row.sicil,
@@ -277,16 +292,14 @@
             "TESPİT EDEN": row.tespit_eden_isim
         }));
 
-        // Excel dosyasını derleme adımları
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
 
-        // Kolon genişliklerini okunabilir kılmak için otomatik boyutlandırıyoruz
-        const colWidths = [{wch: 12}, {wch: 10}, {wch: 22}, {wch: 15}, {wch: 15}, {wch: 35}, {wch: 22}];
+        // Kolon genişliği optimizasyonu
+        const colWidths = [{wch: 12}, {wch: 10}, {wch: 22}, {wch: 15}, {wch: 15}, {wch: 45}, {wch: 22}];
         worksheet['!cols'] = colWidths;
 
-        // Dosyayı tarayıcı üzerinden otomatik indir (Örn: kural_ihlalleri_2026-06-30.xlsx)
         const dosyaAdi = `kural_ihlalleri_${new Date().toISOString().slice(0,10)}.xlsx`;
         XLSX.writeFile(workbook, dosyaAdi);
     });
