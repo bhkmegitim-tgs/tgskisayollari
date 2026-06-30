@@ -72,19 +72,13 @@
             display: flex;
             flex-direction: column;
         }
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-        @media (max-width: 600px) {
-            .form-group.full-width { grid-column: span 1; }
-        }
         label {
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 5px;
             color: #34495e;
         }
-        input, select, textarea {
+        input, select {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
@@ -92,7 +86,7 @@
             outline: none;
             transition: border-color 0.2s;
         }
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             border-color: var(--primary-color);
         }
         .btn-group {
@@ -147,26 +141,26 @@
         <div class="form-grid">
             <div class="form-group">
                 <label for="sicil">Sicil Numarası</label>
-                <input type="text" id="sicil" required placeholder="Örn: 501234">
+                <input type="text" id="sicil" required placeholder="Örn: 29918">
             </div>
             <div class="form-group">
                 <label for="isim_soyisim">İsim Soyisim</label>
-                <input type="text" id="isim_soyisim" required placeholder="Örn: Ahmet Yılmaz">
+                <input type="text" id="isim_soyisim" required placeholder="Örn: Engin Çiğdem">
             </div>
             <div class="form-group">
-                <label for="unvan">Ünvanı</label>
-                <input type="text" id="unvan" required placeholder="Örn: İşçi, Şoför, Memur">
+                <label for="unvan">Unvanı</label>
+                <input type="text" id="unvan" required placeholder="Örn: POSTABAŞI">
             </div>
             <div class="form-group">
-                <label for="ekibi">Ekibi / Postası</label>
-                <input type="text" id="ekibi" required placeholder="Örn: A Postası, Ramp Ekibi">
+                <label for="ekibi">Ekibi</label>
+                <input type="text" id="ekibi" required placeholder="Örn: N">
             </div>
             <div class="form-group">
                 <label for="tarih">İhlal Tarihi</label>
                 <input type="date" id="tarih" required>
             </div>
             <div class="form-group">
-                <label for="kural_ihlali">Kural İhlali Türü</label>
+                <label for="kural_ihlali">Kural İhlal Maddesi</label>
                 <select id="kural_ihlali" required>
                     <option value="">-- Seçiniz --</option>
                     <option value="APRON EHLİYETİ VE SİVİL EHLİYETİ YANINDA BULUNDURMAMAK">APRON EHLİYETİ VE SİVİL EHLİYETİ YANINDA BULUNDURMAMAK</option>
@@ -197,12 +191,12 @@
         <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
-                <label for="tespit_eden_sicil">Sizin Siciliniz</label>
-                <input type="text" id="tespit_eden_sicil" required placeholder="Örn: 500987">
+                <label for="tespit_eden_sicil">Tespit Eden Sicil</label>
+                <input type="text" id="tespit_eden_sicil" required placeholder="Örn: 11995">
             </div>
             <div class="form-group">
-                <label for="tespit_eden_isim">Sizin İsim Soyisminiz</label>
-                <input type="text" id="tespit_eden_isim" required placeholder="Örn: Mehmet Demir">
+                <label for="tespit_eden_isim">Tespit Eden İsim Soyisim</label>
+                <input type="text" id="tespit_eden_isim" required placeholder="Örn: Göksel Çakırca">
             </div>
         </div>
 
@@ -225,7 +219,7 @@
     const statusMsg = document.getElementById('statusMsg');
     const btnExcel = document.getElementById('btnExcel');
 
-    // Bugünün tarihini varsayılan seçtir
+    // Bugünün tarihini varsayılan yap
     document.getElementById('tarih').valueAsDate = new Date();
 
     // 1. VERİTABANINA YAZMA VE GÜNCELLEME (UPSERT)
@@ -236,8 +230,8 @@
         const formData = {
             sicil: document.getElementById('sicil').value.trim(),
             isim_soyisim: document.getElementById('isim_soyisim').value.trim(),
-            unvan: document.getElementById('unvan').value.trim(),
-            ekibi: document.getElementById('ekibi').value.trim(),
+            unvan: document.getElementById('unvan').value.trim().toUpperCase(),
+            ekibi: document.getElementById('ekibi').value.trim().toUpperCase(),
             kural_ihlali: document.getElementById('kural_ihlali').value,
             tarih: document.getElementById('tarih').value,
             tespit_eden_sicil: document.getElementById('tespit_eden_sicil').value.trim(),
@@ -257,7 +251,7 @@
             statusMsg.className = "status-msg status-success";
             statusMsg.style.display = 'block';
             
-            // Sadece ihlal eden kısımları temizle
+            // Kolaylık olsun diye ihlal eden kısımlarını sıfırla, raporlayan kalsın
             document.getElementById('sicil').value = '';
             document.getElementById('isim_soyisim').value = '';
             document.getElementById('unvan').value = '';
@@ -265,11 +259,11 @@
         }
     });
 
-    // 2. EXCEL İNDİRME
+    // 2. ŞABLONA GÖRE EXCEL OLUŞTURMA VE İNDİRME
     btnExcel.addEventListener('click', async () => {
         const { data, error } = await supabaseClient
             .from('kural_ihlalleri')
-            .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_isim')
+            .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_sicil, tespit_eden_isim')
             .order('tarih', { ascending: false });
 
         if (error) {
@@ -282,25 +276,47 @@
             return;
         }
 
-        const excelData = data.map(row => ({
-            "TARİH": row.tarih,
-            "SİCİL": row.sicil,
-            "İSİM SOYİSİM": row.isim_soyisim,
-            "ÜNVAN": row.unvan,
-            "EKİBİ": row.ekibi,
-            "KURAL İHLALİ": row.kural_ihlali,
-            "TESPİT EDEN": row.tespit_eden_isim
-        }));
+        // image_80183c.png görselindeki şablon düzeni (Sıralama ve Ayrı Sütunlar)
+        const excelData = data.map(row => {
+            // Tarihi GG.AA.YYYY formatına çevirelim (Örn: 17.06.2026)
+            let formattedDate = row.tarih;
+            if (row.tarih) {
+                const parts = row.tarih.split('-');
+                if(parts.length === 3) {
+                    formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
+                }
+            }
+
+            return {
+                "SİCİL": row.sicil,
+                "İSİM SOYİSİM": row.isim_soyisim,
+                "UNVAN": row.unvan,
+                "EKİBİ": row.ekibi,
+                "KURAL İHLAL MADDESİ": row.kural_ihlali,
+                "TARİH": formattedDate,
+                "TESPİT EDEN SİCİL": row.tespit_eden_sicil,
+                "TESPİT EDEN PERSONEL": row.tespit_eden_isim
+            };
+        });
 
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
 
-        // Kolon genişliği optimizasyonu
-        const colWidths = [{wch: 12}, {wch: 10}, {wch: 22}, {wch: 15}, {wch: 15}, {wch: 45}, {wch: 22}];
+        // Görseldeki şablona göre sütun genişlik ayarları
+        const colWidths = [
+            {wch: 10}, // SİCİL
+            {wch: 22}, // İSİM SOYİSİM
+            {wch: 15}, // UNVAN
+            {wch: 10}, // EKİBİ
+            {wch: 55}, // KURAL İHLAL MADDESİ
+            {wch: 14}, // TARİH
+            {wch: 20}, // TESPİT EDEN SİCİL
+            {wch: 24}  // TESPİT EDEN PERSONEL
+        ];
         worksheet['!cols'] = colWidths;
 
-        const dosyaAdi = `kural_ihlalleri_${new Date().toISOString().slice(0,10)}.xlsx`;
+        const dosyaAdi = `kural_ihlalleri_raporu_${new Date().toISOString().slice(0,10)}.xlsx`;
         XLSX.writeFile(workbook, dosyaAdi);
     });
 </script>
