@@ -87,6 +87,11 @@
         input:focus, select:focus {
             border-color: var(--primary-color);
         }
+        input[readonly] {
+            background-color: #eaeded;
+            color: #7f8c8d;
+            cursor: not-allowed;
+        }
         .btn-group {
             display: flex;
             gap: 15px;
@@ -138,19 +143,19 @@
         <div class="form-grid">
             <div class="form-group">
                 <label for="sicil">Sicil Numarası</label>
-                <input type="text" id="sicil" required placeholder="Örn: 29918">
+                <input type="text" id="sicil" required placeholder="Sicil girince bilgiler otomatik dolar...">
             </div>
             <div class="form-group">
                 <label for="isim_soyisim">İsim Soyisim</label>
-                <input type="text" id="isim_soyisim" required placeholder="Örn: Engin Çiğdem">
+                <input type="text" id="isim_soyisim" required readonly placeholder="Otomatik dolacak">
             </div>
             <div class="form-group">
                 <label for="unvan">Unvanı</label>
-                <input type="text" id="unvan" required placeholder="Örn: POSTABAŞI">
+                <input type="text" id="unvan" required readonly placeholder="Otomatik dolacak">
             </div>
             <div class="form-group">
                 <label for="ekibi">Ekibi</label>
-                <input type="text" id="ekibi" required placeholder="Örn: N">
+                <input type="text" id="ekibi" required readonly placeholder="Otomatik dolacak">
             </div>
             <div class="form-group">
                 <label for="tarih">İhlal Tarihi</label>
@@ -206,116 +211,32 @@
 </div>
 
 <script>
-    const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
-
-    // ADMİN ŞİFRESİ
-    const ADMIN_PASSWORD = "BHKM_admin_2026"; 
-
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const form = document.getElementById('kuralForm');
-    const statusMsg = document.getElementById('statusMsg');
-    const btnExcel = document.getElementById('btnExcel');
-
-    document.getElementById('tarih').valueAsDate = new Date();
-
-    // 1. VERİTABANINA YAZMA (UPSERT)
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        statusMsg.style.display = 'none';
-
-        const formData = {
-            sicil: document.getElementById('sicil').value.trim(),
-            isim_soyisim: document.getElementById('isim_soyisim').value.trim(),
-            unvan: document.getElementById('unvan').value.trim().toUpperCase(),
-            ekibi: document.getElementById('ekibi').value.trim().toUpperCase(),
-            kural_ihlali: document.getElementById('kural_ihlali').value,
-            tarih: document.getElementById('tarih').value,
-            tespit_eden_sicil: document.getElementById('tespit_eden_sicil').value.trim(),
-            tespit_eden_isim: document.getElementById('tespit_eden_isim').value.trim()
-        };
-
-        const { data, error } = await supabaseClient
-            .from('kural_ihlalleri')
-            .upsert([formData], { onConflict: 'sicil,tarih' });
-
-        if (error) {
-            statusMsg.textContent = "Hata oluştu: " + error.message;
-            statusMsg.className = "status-msg status-error";
-            statusMsg.style.display = 'block';
-        } else {
-            statusMsg.textContent = "Kayıt başarıyla veritabanına işlendi / güncellendi!";
-            statusMsg.className = "status-msg status-success";
-            statusMsg.style.display = 'block';
-            
-            document.getElementById('sicil').value = '';
-            document.getElementById('isim_soyisim').value = '';
-            document.getElementById('unvan').value = '';
-            document.getElementById('ekibi').value = '';
-        }
-    });
-
-    // 2. ŞİFRE KORUMALI EXCEL İNDİRME
-    btnExcel.addEventListener('click', async () => {
-        const girilenSifre = prompt("Lütfen Excel raporunu indirmek için Admin Şifresini giriniz:");
-        
-        if (girilenSifre === null) return; 
-
-        if (girilenSifre !== ADMIN_PASSWORD) {
-            alert("Hatalı şifre girdiniz! Yetkiniz bulunmuyor.");
-            return;
-        }
-
-        const { data, error } = await supabaseClient
-            .from('kural_ihlalleri')
-            .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_sicil, tespit_eden_isim')
-            .order('tarih', { ascending: false });
-
-        if (error) {
-            alert("Veriler çekilirken bir hata oluştu: " + error.message);
-            return;
-        }
-
-        if (!data || data.length === 0) {
-            alert("Veritabanında indirilecek herhangi bir kayıt bulunamadı!");
-            return;
-        }
-
-        const excelData = data.map(row => {
-            let formattedDate = row.tarih;
-            if (row.tarih) {
-                const parts = row.tarih.split('-');
-                if(parts.length === 3) {
-                    formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
-                }
-            }
-
-            return {
-                "SİCİL": row.sicil,
-                "İSİM SOYİSİM": row.isim_soyisim,
-                "UNVAN": row.unvan,
-                "EKİBİ": row.ekibi,
-                "KURAL İHLAL MADDESİ": row.kural_ihlali,
-                "TARİH": formattedDate,
-                "TESPİT EDEN SİCİL": row.tespit_eden_sicil,
-                "TESPİT EDEN PERSONEL": row.tespit_eden_isim
-            };
-        });
-
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
-
-        const colWidths = [
-            {wch: 10}, {wch: 22}, {wch: 15}, {wch: 10}, {wch: 55}, {wch: 14}, {wch: 20}, {wch: 24}
-        ];
-        worksheet['!cols'] = colWidths;
-
-        const dosyaAdi = `kural_ihlalleri_raporu_${new Date().toISOString().slice(0,10)}.xlsx`;
-        XLSX.writeFile(workbook, dosyaAdi);
-    });
-</script>
-
-</body>
-</html>
+    // GÖMDÜĞÜMÜZ PERSONEL LİSTESİ VERİ KÜTÜPHANESİ
+    const PERSONEL_DATABASE = {
+        "16747": { isim: "Sinan Şahin", unvan: "KOORDİNASYON MÜDÜRÜ", ekip: "N" },
+        "10481": { isim: "Enes Sayan", unvan: "ŞEF", ekip: "N" },
+        "24799": { isim: "Enes Gazi Kılıç", unvan: "ŞEF", ekip: "N" },
+        "29727": { isim: "Veysel Başer", unvan: "MEMUR", ekip: "N" },
+        "29004": { isim: "Metin Akyazıcı", unvan: "MEMUR", ekip: "N" },
+        "33782": { isim: "Abdulkadir Deniz", unvan: "MEMUR", ekip: "N" },
+        "14364": { isim: "Günnur Beyaz Güney", unvan: "MEMUR", ekip: "N" },
+        "33988": { isim: "Mehmet Mahmutoğlu", unvan: "MEMUR", ekip: "N" },
+        "13923": { isim: "Hülya Telli", unvan: "MEMUR", ekip: "N" },
+        "37861": { isim: "Murat Eren", unvan: "MEMUR", ekip: "N" },
+        "37685": { isim: "Ali Kurt", unvan: "MEMUR", ekip: "N" },
+        "16208": { isim: "Serkan Otlatıcı", unvan: "MEMUR", ekip: "N" },
+        "15547": { isim: "AYŞEGÜL ÇETİNKAYA", unvan: "İŞÇİ", ekip: "N" },
+        "25176": { isim: "MERVE OKUMUŞ", unvan: "MEMUR", ekip: "N" },
+        "28377": { isim: "Sevinç Altın", unvan: "MEMUR", ekip: "N" },
+        "51531": { isim: "EMRAH KAZDAL", unvan: "MEMUR", ekip: "N" },
+        "48647": { isim: "Ebru Akyazıcı", unvan: "MEMUR", ekip: "N" },
+        "13584": { isim: "Yücel Yılmaz", unvan: "ŞEF", ekip: "N" },
+        "11432": { isim: "Mustafa Yanık", unvan: "ŞEF", ekip: "N" },
+        "22501": { isim: "Hüseyin Kılınç", unvan: "MEMUR", ekip: "N" },
+        "35946": { isim: "Adem Can", unvan: "MEMUR", ekip: "N" },
+        "17010": { isim: "Hilal Almendi", unvan: "MEMUR", ekip: "N" },
+        "11424": { isim: "Murat Yalılı", unvan: "POSTABAŞI", ekip: "N" },
+        "11785": { isim: "Bahadır Tekne", unvan: "POSTABAŞI", ekip: "N" },
+        "29918": { isim: "Engin Çiğdem", unvan: "POSTABAŞI", ekip: "N" },
+        "19885": { isim: "Hakan Ceylan", unvan: "POSTABAŞI", ekip: "N" },
+        "11995": { isim: "Göksel Çakı
