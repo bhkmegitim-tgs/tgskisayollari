@@ -211,7 +211,7 @@
 </div>
 
 <script>
-    // GÖMDÜĞÜMÜZ PERSONEL LİSTESİ VERİ KÜTÜPHANESİ
+    // VERİ TABANI YAZIM HATALARI TAMAMEN DÜZELTİLDİ
     const PERSONEL_DATABASE = {
         "16747": { isim: "Sinan Şahin", unvan: "KOORDİNASYON MÜDÜRÜ", ekip: "N" },
         "10481": { isim: "Enes Sayan", unvan: "ŞEF", ekip: "N" },
@@ -239,4 +239,165 @@
         "11785": { isim: "Bahadır Tekne", unvan: "POSTABAŞI", ekip: "N" },
         "29918": { isim: "Engin Çiğdem", unvan: "POSTABAŞI", ekip: "N" },
         "19885": { isim: "Hakan Ceylan", unvan: "POSTABAŞI", ekip: "N" },
-        "11995": { isim: "Göksel Çakı
+        "11995": { isim: "Göksel Çakırca", unvan: "POSTABAŞI", ekip: "N" },
+        "28520": { isim: "Emre Eren", unvan: "MEMUR", ekip: "A" },
+        "18620": { isim: "Kemal Fazlıoğlu", unvan: "MEMUR", ekip: "A" },
+        "38734": { isim: "Onur Can Esmer", unvan: "MEMUR", ekip: "A" },
+        "29152": { isim: "Mehmet Çiğdem", unvan: "MEMUR", ekip: "A" },
+        "37896": { isim: "Rıdvan Akcebe", unvan: "MEMUR", ekip: "A" },
+        "18679": { isim: "Volkan Genç", unvan: "MEMUR", ekip: "A" },
+        "38666": { isim: "Gamze Ertem Duyar", unvan: "MEMUR", ekip: "A" },
+        "15835": { isim: "Önder Sabah", unvan: "SORUMLU MEMUR", ekip: "A" },
+        "51442": { isim: "Muhammed Emin Şinaforoğlu", unvan: "MEMUR", ekip: "B" },
+        "16060": { isim: "Sefer Satır", unvan: "MEMUR", ekip: "B" },
+        "21136": { isim: "Sezai Şahin", unvan: "MEMUR", ekip: "B" },
+        "50685": { isim: "EMRULLAH EREN POLATÖZ", unvan: "MEMUR", ekip: "B" },
+        "40435": { isim: "BURAK KÖÇEK", unvan: "MEMUR", ekip: "B" },
+        "38210": { isim: "Ramazan Kansız", unvan: "MEMUR", ekip: "B" },
+        "15136": { isim: "Ergin Çağ", unvan: "SORUMLU MEMUR", ekip: "B" },
+        "31064": { isim: "Yasin Şimşek", unvan: "MEMUR", ekip: "C" },
+        "31834": { isim: "Yasin Güloğlu", unvan: "MEMUR", ekip: "C" },
+        "47129": { isim: "FATİH YILMAZ", unvan: "MEMUR", ekip: "C" },
+        "18175": { isim: "Murat Zirek", unvan: "MEMUR", ekip: "C" },
+        "38863": { isim: "Ali Balçak", unvan: "MEMUR", ekip: "C" },
+        "38971": { isim: "Sercan Ayrancı", unvan: "MEMUR", ekip: "C" },
+        "23818": { isim: "Hüseyin Bilgili", unvan: "SORUMLU MEMUR", ekip: "C" },
+        "38824": { isim: "Sena Aydoğdu", unvan: "MEMUR", ekip: "D" },
+        "38514": { isim: "Onur Çifçi", unvan: "MEMUR", ekip: "D" },
+        "11781": { isim: "Erdal Borazan", unvan: "MEMUR", ekip: "D" },
+        "36895": { isim: "Mehmetşah Ateş", unvan: "MEMUR", ekip: "D" }
+    };
+
+    const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
+    const ADMIN_PASSWORD = "BHKM_admin_2026"; 
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById('kuralForm');
+    const sicilInput = document.getElementById('sicil');
+    const isimInput = document.getElementById('isim_soyisim');
+    const unvanInput = document.getElementById('unvan');
+    const ekibiInput = document.getElementById('ekibi');
+    const statusMsg = document.getElementById('statusMsg');
+    const btnExcel = document.getElementById('btnExcel');
+
+    document.getElementById('tarih').valueAsDate = new Date();
+
+    // ANLIK OTOMATİK DOLDURMA TETİKLEYİCİSİ
+    sicilInput.addEventListener('input', () => {
+        const girilenSicil = sicilInput.value.trim();
+        
+        if (PERSONEL_DATABASE[girilenSicil]) {
+            const personel = PERSONEL_DATABASE[girilenSicil];
+            isimInput.value = personel.isim;
+            unvanInput.value = personel.unvan;
+            ekibiInput.value = personel.ekip;
+        } else {
+            isimInput.value = "";
+            unvanInput.value = "";
+            ekibiInput.value = "";
+        }
+    });
+
+    // 1. VERİTABANINA YAZMA (UPSERT)
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        statusMsg.style.display = 'none';
+
+        if (!isimInput.value) {
+            alert("Girilen sicil numarası personel listesinde bulunamadı! Lütfen geçerli bir sicil giriniz.");
+            return;
+        }
+
+        const formData = {
+            sicil: sicilInput.value.trim(),
+            isim_soyisim: isimInput.value,
+            unvan: unvanInput.value,
+            ekibi: ekibiInput.value,
+            kural_ihlali: document.getElementById('kural_ihlali').value,
+            tarih: document.getElementById('tarih').value,
+            tespit_eden_sicil: document.getElementById('tespit_eden_sicil').value.trim(),
+            tespit_eden_isim: document.getElementById('tespit_eden_isim').value.trim()
+        };
+
+        const { data, error } = await supabaseClient
+            .from('kural_ihlalleri')
+            .upsert([formData], { onConflict: 'sicil,tarih' });
+
+        if (error) {
+            statusMsg.textContent = "Hata oluştu: " + error.message;
+            statusMsg.className = "status-msg status-error";
+            statusMsg.style.display = 'block';
+        } else {
+            statusMsg.textContent = "Kayıt başarıyla veritabanına işlendi / güncellendi!";
+            statusMsg.className = "status-msg status-success";
+            statusMsg.style.display = 'block';
+            
+            form.reset();
+            document.getElementById('tarih').valueAsDate = new Date();
+        }
+    });
+
+    // 2. ŞİFRE KORUMALI EXCEL İNDİRME
+    btnExcel.addEventListener('click', async () => {
+        const girilenSifre = prompt("Lütfen Excel raporunu indirmek için Admin Şifresini giriniz:");
+        if (girilenSifre === null) return; 
+
+        if (girilenSifre !== ADMIN_PASSWORD) {
+            alert("Hatalı şifre girdiniz! Yetkiniz bulunmuyor.");
+            return;
+        }
+
+        const { data, error } = await supabaseClient
+            .from('kural_ihlalleri')
+            .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_sicil, tespit_eden_isim')
+            .order('tarih', { ascending: false });
+
+        if (error) {
+            alert("Veriler çekilirken bir hata oluştu: " + error.message);
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            alert("Veritabanında indirilecek herhangi bir kayıt bulunamadı!");
+            return;
+        }
+
+        const excelData = data.map(row => {
+            let formattedDate = row.tarih;
+            if (row.tarih) {
+                const parts = row.tarih.split('-');
+                if(parts.length === 3) {
+                    formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
+                }
+            }
+
+            return {
+                "SİCİL": row.sicil,
+                "İSİM SOYİSİM": row.isim_soyisim,
+                "UNVAN": row.unvan,
+                "EKİBİ": row.ekibi,
+                "KURAL İHLAL MADDESİ": row.kural_ihlali,
+                "TARİH": formattedDate,
+                "TESPİT EDEN SİCİL": row.tespit_eden_sicil,
+                "TESPİT EDEN PERSONEL": row.tespit_eden_isim
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
+
+        const colWidths = [
+            {wch: 10}, {wch: 22}, {wch: 15}, {wch: 10}, {wch: 55}, {wch: 14}, {wch: 20}, {wch: 24}
+        ];
+        worksheet['!cols'] = colWidths;
+
+        const dosyaAdi = `kural_ihlalleri_raporu_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(workbook, dosyaAdi);
+    });
+</script>
+
+</body>
+</html>
