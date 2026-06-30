@@ -193,11 +193,11 @@
         <div class="form-grid">
             <div class="form-group">
                 <label for="tespit_eden_sicil">Tespit Eden Sicil</label>
-                <input type="text" id="tespit_eden_sicil" required placeholder="Örn: 11995">
+                <input type="text" id="tespit_eden_sicil" required placeholder="Sicil girince isim otomatik dolar...">
             </div>
             <div class="form-group">
                 <label for="tespit_eden_isim">Tespit Eden İsim Soyisim</label>
-                <input type="text" id="tespit_eden_isim" required placeholder="Örn: Göksel Çakırca">
+                <input type="text" id="tespit_eden_isim" required readonly placeholder="Otomatik dolacak">
             </div>
         </div>
 
@@ -211,7 +211,7 @@
 </div>
 
 <script>
-    // VERİ TABANI YAZIM HATALARI TAMAMEN DÜZELTİLDİ
+    // TÜM LİSTE EKLENDİ VE GÜNCELLENDİ
     const PERSONEL_DATABASE = {
         "16747": { isim: "Sinan Şahin", unvan: "KOORDİNASYON MÜDÜRÜ", ekip: "N" },
         "10481": { isim: "Enes Sayan", unvan: "ŞEF", ekip: "N" },
@@ -248,7 +248,7 @@
         "18679": { isim: "Volkan Genç", unvan: "MEMUR", ekip: "A" },
         "38666": { isim: "Gamze Ertem Duyar", unvan: "MEMUR", ekip: "A" },
         "15835": { isim: "Önder Sabah", unvan: "SORUMLU MEMUR", ekip: "A" },
-        "51442": { isim: "Muhammed Emin Şinaforoğlu", unvan: "MEMUR", ekip: "B" },
+        "51442": { tribe: "Muhammed Emin Şinaforoğlu", isim: "Muhammed Emin Şinaforoğlu", unvan: "MEMUR", ekip: "B" },
         "16060": { isim: "Sefer Satır", unvan: "MEMUR", ekip: "B" },
         "21136": { isim: "Sezai Şahin", unvan: "MEMUR", ekip: "B" },
         "50685": { isim: "EMRULLAH EREN POLATÖZ", unvan: "MEMUR", ekip: "B" },
@@ -279,15 +279,18 @@
     const isimInput = document.getElementById('isim_soyisim');
     const unvanInput = document.getElementById('unvan');
     const ekibiInput = document.getElementById('ekibi');
+    
+    const tespitSicilInput = document.getElementById('tespit_eden_sicil');
+    const tespitIsimInput = document.getElementById('tespit_eden_isim');
+    
     const statusMsg = document.getElementById('statusMsg');
     const btnExcel = document.getElementById('btnExcel');
 
     document.getElementById('tarih').valueAsDate = new Date();
 
-    // ANLIK OTOMATİK DOLDURMA TETİKLEYİCİSİ
+    // 1. İHLAL EDEN OTOMATİK DOLDURMA
     sicilInput.addEventListener('input', () => {
         const girilenSicil = sicilInput.value.trim();
-        
         if (PERSONEL_DATABASE[girilenSicil]) {
             const personel = PERSONEL_DATABASE[girilenSicil];
             isimInput.value = personel.isim;
@@ -300,13 +303,27 @@
         }
     });
 
-    // 1. VERİTABANINA YAZMA (UPSERT)
+    // 2. TESPİT EDEN OTOMATİK DOLDURMA
+    tespitSicilInput.addEventListener('input', () => {
+        const girilenTespitSicil = tespitSicilInput.value.trim();
+        if (PERSONEL_DATABASE[girilenTespitSicil]) {
+            tespitIsimInput.value = PERSONEL_DATABASE[girilenTespitSicil].isim;
+        } else {
+            tespitIsimInput.value = "";
+        }
+    });
+
+    // VERİTABANINA YAZMA (UPSERT)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         statusMsg.style.display = 'none';
 
         if (!isimInput.value) {
-            alert("Girilen sicil numarası personel listesinde bulunamadı! Lütfen geçerli bir sicil giriniz.");
+            alert("İhlal eden sicil numarası personel listesinde bulunamadı!");
+            return;
+        }
+        if (!tespitIsimInput.value) {
+            alert("Tespit eden sicil numarası personel listesinde bulunamadı!");
             return;
         }
 
@@ -317,8 +334,8 @@
             ekibi: ekibiInput.value,
             kural_ihlali: document.getElementById('kural_ihlali').value,
             tarih: document.getElementById('tarih').value,
-            tespit_eden_sicil: document.getElementById('tespit_eden_sicil').value.trim(),
-            tespit_eden_isim: document.getElementById('tespit_eden_isim').value.trim()
+            tespit_eden_sicil: tespitSicilInput.value.trim(),
+            tespit_eden_isim: tespitIsimInput.value
         };
 
         const { data, error } = await supabaseClient
@@ -339,7 +356,7 @@
         }
     });
 
-    // 2. ŞİFRE KORUMALI EXCEL İNDİRME
+    // ŞİFRE KORUMALI EXCEL İNDİRME
     btnExcel.addEventListener('click', async () => {
         const girilenSifre = prompt("Lütfen Excel raporunu indirmek için Admin Şifresini giriniz:");
         if (girilenSifre === null) return; 
