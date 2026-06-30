@@ -2,11 +2,9 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BHKM - Kural İhlal Takip Sistemi</title>
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- SheetJS (Excel Çıktısı İçin) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -24,13 +22,14 @@
         body {
             background-color: var(--light-bg);
             color: var(--dark-color);
-            padding: 20px;
+            padding: 15px 10px;
         }
         .container {
+            width: 100%;
             max-width: 800px;
             margin: 0 auto;
             background: #fff;
-            padding: 30px;
+            padding: 25px 20px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
@@ -41,18 +40,19 @@
             margin-bottom: 25px;
         }
         .header h1 {
-            font-size: 24px;
+            font-size: 22px;
             color: var(--dark-color);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
         .header p {
-            font-size: 14px;
+            font-size: 13px;
             color: #7f8c8d;
             margin-top: 5px;
+            padding: 0 5px;
         }
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--primary-color);
             margin-bottom: 15px;
@@ -61,16 +61,15 @@
         }
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 15px;
             margin-bottom: 25px;
-        }
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
+            width: 100%;
         }
         .form-group {
             display: flex;
             flex-direction: column;
+            width: 100%;
         }
         label {
             font-size: 13px;
@@ -79,12 +78,25 @@
             color: #34495e;
         }
         input, select {
+            width: 100%; 
+            max-width: 100%; /* Dışarı fırlamayı kesinlikle engeller */
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 14px;
             outline: none;
             transition: border-color 0.2s;
+            background-color: #fff;
+            -webkit-appearance: none; /* iOS ve Android cihazlardaki ekstra taşma paylarını siler */
+            -moz-appearance: none;
+            appearance: none;
+        }
+        /* Seçim kutularına mobil uyumlu aşağı ok simgesi ekleme */
+        select {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%232c3e50' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: calc(100% - 12px) center;
+            padding-right: 35px;
         }
         input:focus, select:focus {
             border-color: var(--primary-color);
@@ -98,16 +110,18 @@
             display: flex;
             gap: 15px;
             margin-top: 20px;
+            width: 100%;
         }
         button {
             flex: 1;
             padding: 12px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             transition: opacity 0.2s;
+            white-space: nowrap;
         }
         button:hover {
             opacity: 0.9;
@@ -130,6 +144,30 @@
         }
         .status-success { background: #d4edda; color: #155724; }
         .status-error { background: #f8d7da; color: #721c24; }
+
+        /* MOBİL RESPONSIVE AYARLARI */
+        @media (max-width: 650px) {
+            body {
+                padding: 10px 5px;
+            }
+            .container {
+                padding: 20px 15px;
+            }
+            .header h1 {
+                font-size: 18px;
+            }
+            .form-grid { 
+                grid-template-columns: minmax(0, 1fr);
+                gap: 12px;
+            }
+            .btn-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -141,7 +179,6 @@
     </div>
 
     <form id="kuralForm">
-        <!-- İHLAL EDEN PERSONEL -->
         <div class="section-title">İhlal Eden Personel Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
@@ -192,7 +229,6 @@
             </div>
         </div>
 
-        <!-- TESPİT EDEN PERSONEL -->
         <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
@@ -215,7 +251,6 @@
 </div>
 
 <script>
-    // VERİ TABANI YAZIM HATALARI TAMAMEN TEMİZLENDİ
     const PERSONEL_DATABASE = {
         "16747": { isim: "Sinan Şahin", unvan: "KOORDİNASYON MÜDÜRÜ", ekip: "N" },
         "10481": { isim: "Enes Sayan", unvan: "ŞEF", ekip: "N" },
@@ -317,7 +352,7 @@
         }
     });
 
-    // VERİTABANINA YAZMA (UPSERT)
+    // VERİTABANINA YAZMA
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         statusMsg.style.display = 'none';
@@ -360,7 +395,7 @@
         }
     });
 
-    // ŞİFRE KORUMALI EXCEL İNDİRME
+    // EXCEL İNDİRME
     btnExcel.addEventListener('click', async () => {
         const girilenSifre = prompt("Lütfen Excel raporunu indirmek için Admin Şifresini giriniz:");
         if (girilenSifre === null) return; 
