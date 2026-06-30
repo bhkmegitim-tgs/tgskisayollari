@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHKM - Kural İhlal Takip Sistemi</title>
+    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- SheetJS (Excel Çıktısı İçin) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -139,6 +141,7 @@
     </div>
 
     <form id="kuralForm">
+        <!-- İHLAL EDEN PERSONEL -->
         <div class="section-title">İhlal Eden Personel Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
@@ -189,6 +192,7 @@
             </div>
         </div>
 
+        <!-- TESPİT EDEN PERSONEL -->
         <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
@@ -211,7 +215,7 @@
 </div>
 
 <script>
-    // TÜM LİSTE EKLENDİ VE GÜNCELLENDİ
+    // VERİ TABANI YAZIM HATALARI TAMAMEN TEMİZLENDİ
     const PERSONEL_DATABASE = {
         "16747": { isim: "Sinan Şahin", unvan: "KOORDİNASYON MÜDÜRÜ", ekip: "N" },
         "10481": { isim: "Enes Sayan", unvan: "ŞEF", ekip: "N" },
@@ -248,7 +252,7 @@
         "18679": { isim: "Volkan Genç", unvan: "MEMUR", ekip: "A" },
         "38666": { isim: "Gamze Ertem Duyar", unvan: "MEMUR", ekip: "A" },
         "15835": { isim: "Önder Sabah", unvan: "SORUMLU MEMUR", ekip: "A" },
-        "51442": { tribe: "Muhammed Emin Şinaforoğlu", isim: "Muhammed Emin Şinaforoğlu", unvan: "MEMUR", ekip: "B" },
+        "51442": { isim: "Muhammed Emin Şinaforoğlu", unvan: "MEMUR", ekip: "B" },
         "16060": { isim: "Sefer Satır", unvan: "MEMUR", ekip: "B" },
         "21136": { isim: "Sezai Şahin", unvan: "MEMUR", ekip: "B" },
         "50685": { isim: "EMRULLAH EREN POLATÖZ", unvan: "MEMUR", ekip: "B" },
