@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHKM - Kural İhlal Takip Sistemi</title>
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- SheetJS (Excel Çıktısı İçin) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -72,12 +70,6 @@
             display: flex;
             flex-direction: column;
         }
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-        @media (max-width: 600px) {
-            .form-group.full-width { grid-column: span 1; }
-        }
         label {
             font-size: 13px;
             font-weight: 600;
@@ -94,6 +86,11 @@
         }
         input:focus, select:focus, textarea:focus {
             border-color: var(--primary-color);
+        }
+        input[readonly] {
+            background-color: #f0f3f4;
+            color: #7f8c8d;
+            cursor: not-allowed;
         }
         .btn-group {
             display: flex;
@@ -142,24 +139,23 @@
     </div>
 
     <form id="kuralForm">
-        <!-- İHLAL EDEN PERSONEL -->
         <div class="section-title">İhlal Eden Personel Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
                 <label for="sicil">Sicil Numarası</label>
-                <input type="text" id="sicil" required placeholder="Örn: 501234">
+                <input type="text" id="sicil" required placeholder="Sicil yazıp bekleyin...">
             </div>
             <div class="form-group">
                 <label for="isim_soyisim">İsim Soyisim</label>
-                <input type="text" id="isim_soyisim" required placeholder="Örn: Ahmet Yılmaz">
+                <input type="text" id="isim_soyisim" required readonly placeholder="Otomatik dolacak">
             </div>
             <div class="form-group">
                 <label for="unvan">Ünvanı</label>
-                <input type="text" id="unvan" required placeholder="Örn: İşçi, Şoför, Memur">
+                <input type="text" id="unvan" required readonly placeholder="Otomatik dolacak">
             </div>
             <div class="form-group">
                 <label for="ekibi">Ekibi / Postası</label>
-                <input type="text" id="ekibi" required placeholder="Örn: A Postası, Ramp Ekibi">
+                <input type="text" id="ekibi" required readonly placeholder="Otomatik dolacak">
             </div>
             <div class="form-group">
                 <label for="tarih">İhlal Tarihi</label>
@@ -193,16 +189,15 @@
             </div>
         </div>
 
-        <!-- TESPİT EDEN PERSONEL -->
         <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
         <div class="form-grid">
             <div class="form-group">
                 <label for="tespit_eden_sicil">Sizin Siciliniz</label>
-                <input type="text" id="tespit_eden_sicil" required placeholder="Örn: 500987">
+                <input type="text" id="tespit_eden_sicil" required placeholder="Sicil yazıp bekleyin...">
             </div>
             <div class="form-group">
                 <label for="tespit_eden_isim">Sizin İsim Soyisminiz</label>
-                <input type="text" id="tespit_eden_isim" required placeholder="Örn: Mehmet Demir">
+                <input type="text" id="tespit_eden_isim" required readonly placeholder="Otomatik dolacak">
             </div>
         </div>
 
@@ -225,23 +220,82 @@
     const statusMsg = document.getElementById('statusMsg');
     const btnExcel = document.getElementById('btnExcel');
 
+    const sicilInput = document.getElementById('sicil');
+    const isimInput = document.getElementById('isim_soyisim');
+    const unvanInput = document.getElementById('unvan');
+    const ekibiInput = document.getElementById('ekibi');
+    const tespitSicilInput = document.getElementById('tespit_eden_sicil');
+    const tespitIsimInput = document.getElementById('tespit_eden_isim');
+
     // Bugünün tarihini varsayılan seçtir
     document.getElementById('tarih').valueAsDate = new Date();
 
-    // 1. VERİTABANINA YAZMA VE GÜNCELLEME (UPSERT)
+    // ========================================================
+    // OTOMATİK SİCİL SORGULAMA (EXCEL'DEKİ BÜYÜK HARFLERLE TAM UYUMLU)
+    // ========================================================
+    
+    // İhlal Eden Canlı Arama
+    sicilInput.addEventListener('input', async () => {
+        const girilenSicil = sicilInput.value.trim();
+        if (girilenSicil.length >= 3) {
+            const { data, error } = await supabaseClient
+                .from('personeller')
+                .select('*')
+                .eq('SİCİL', girilenSicil); // Sütun adını SİCİL yaptık
+
+            if (data && data.length > 0 && !error) {
+                const personel = data[0];
+                isimInput.value = personel['İSİM'] || '';
+                unvanInput.value = personel['UNVAN'] || '';
+                ekibiInput.value = personel['EKİBİ'] || '';
+            } else {
+                isimInput.value = ''; unvanInput.value = ''; ekibiInput.value = '';
+            }
+        } else {
+            isimInput.value = ''; unvanInput.value = ''; ekibiInput.value = '';
+        }
+    });
+
+    // Tespit Eden Canlı Arama
+    tespitSicilInput.addEventListener('input', async () => {
+        const girilenTespitSicil = tespitSicilInput.value.trim();
+        if (girilenTespitSicil.length >= 3) {
+            const { data, error } = await supabaseClient
+                .from('personeller')
+                .select('*')
+                .eq('SİCİL', girilenTespitSicil);
+
+            if (data && data.length > 0 && !error) {
+                tespitIsimInput.value = data[0]['İSİM'] || '';
+            } else {
+                tespitIsimInput.value = '';
+            }
+        } else {
+            tespitIsimInput.value = '';
+        }
+    });
+
+    // ========================================================
+    // 1. VERİBATANINA KAYDETME (KURAL İHLALLERİ TABLOSUNA)
+    // ========================================================
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         statusMsg.style.display = 'none';
 
+        if (!isimInput.value || !tespitIsimInput.value) {
+            alert("Lütfen sistemde kayıtlı geçerli sicil numaraları giriniz!");
+            return;
+        }
+
         const formData = {
-            sicil: document.getElementById('sicil').value.trim(),
-            isim_soyisim: document.getElementById('isim_soyisim').value.trim(),
-            unvan: document.getElementById('unvan').value.trim(),
-            ekibi: document.getElementById('ekibi').value.trim(),
+            sicil: sicilInput.value.trim(),
+            isim_soyisim: isimInput.value,
+            unvan: unvanInput.value,
+            ekibi: ekibiInput.value,
             kural_ihlali: document.getElementById('kural_ihlali').value,
             tarih: document.getElementById('tarih').value,
-            tespit_eden_sicil: document.getElementById('tespit_eden_sicil').value.trim(),
-            tespit_eden_isim: document.getElementById('tespit_eden_isim').value.trim()
+            tespit_eden_sicil: tespitSicilInput.value.trim(),
+            tespit_eden_isim: tespitIsimInput.value
         };
 
         const { data, error } = await supabaseClient
@@ -257,15 +311,17 @@
             statusMsg.className = "status-msg status-success";
             statusMsg.style.display = 'block';
             
-            // Sadece ihlal eden kısımları temizle
-            document.getElementById('sicil').value = '';
-            document.getElementById('isim_soyisim').value = '';
-            document.getElementById('unvan').value = '';
-            document.getElementById('ekibi').value = '';
+            // İhlal eden kısımlarını temizle
+            sicilInput.value = '';
+            isimInput.value = '';
+            unvanInput.value = '';
+            ekibiInput.value = '';
         }
     });
 
+    // ========================================================
     // 2. EXCEL İNDİRME
+    // ========================================================
     btnExcel.addEventListener('click', async () => {
         const { data, error } = await supabaseClient
             .from('kural_ihlalleri')
@@ -296,7 +352,6 @@
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
 
-        // Kolon genişliği optimizasyonu
         const colWidths = [{wch: 12}, {wch: 10}, {wch: 22}, {wch: 15}, {wch: 15}, {wch: 45}, {wch: 22}];
         worksheet['!cols'] = colWidths;
 
