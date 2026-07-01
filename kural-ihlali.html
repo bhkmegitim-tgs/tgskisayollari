@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BHKM - Kural İhlal Takip Sistemi</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -19,18 +19,25 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        body {
+        html, body {
             background-color: var(--light-bg);
             color: var(--dark-color);
-            padding: 20px;
+            padding: 10px;
+            overflow-x: hidden; /* Yatay kaymayı tamamen engeller */
+            width: 100%;
         }
         .container {
+            width: 100%;
             max-width: 800px;
             margin: 0 auto;
             background: #fff;
-            padding: 30px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        @media (min-width: 600px) {
+            body { padding: 20px; }
+            .container { padding: 30px; }
         }
         .header {
             text-align: center;
@@ -39,18 +46,21 @@
             margin-bottom: 25px;
         }
         .header h1 {
-            font-size: 24px;
+            font-size: 20px;
             color: var(--dark-color);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        @media (min-width: 600px) {
+            .header h1 { font-size: 24px; }
+        }
         .header p {
-            font-size: 14px;
+            font-size: 13px;
             color: #7f8c8d;
             margin-top: 5px;
         }
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--primary-color);
             margin-bottom: 15px;
@@ -59,16 +69,17 @@
         }
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr; /* Mobilde tek sütun */
             gap: 15px;
             margin-bottom: 25px;
         }
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
+        @media (min-width: 600px) {
+            .form-grid { grid-template-columns: 1fr 1fr; } /* Masaüstünde çift sütun */
         }
         .form-group {
             display: flex;
             flex-direction: column;
+            width: 100%;
         }
         label {
             font-size: 13px;
@@ -83,6 +94,8 @@
             font-size: 14px;
             outline: none;
             transition: border-color 0.2s;
+            width: 100%; /* Dışarı taşmayı önler */
+            max-width: 100%;
         }
         input:focus, select:focus, textarea:focus {
             border-color: var(--primary-color);
@@ -94,11 +107,18 @@
         }
         .btn-group {
             display: flex;
-            gap: 15px;
+            flex-direction: column; /* Mobilde butonlar alt alta */
+            gap: 10px;
             margin-top: 20px;
         }
+        @media (min-width: 600px) {
+            .btn-group {
+                flex-direction: row; /* Masaüstünde yan yana */
+                gap: 15px;
+            }
+        }
         button {
-            flex: 1;
+            width: 100%;
             padding: 12px;
             font-size: 15px;
             font-weight: bold;
@@ -125,6 +145,7 @@
             font-size: 14px;
             text-align: center;
             display: none;
+            word-break: break-word;
         }
         .status-success { background: #d4edda; color: #155724; }
         .status-error { background: #f8d7da; color: #721c24; }
@@ -183,190 +204,4 @@
                     <option value="SEYİR HALİNDE TELEFON İLE GÖRÜŞME">SEYİR HALİNDE TELEFON İLE GÖRÜŞME</option>
                     <option value="TERS YÖNDE ARAÇ KULLANMAK">TERS YÖNDE ARAÇ KULLANMAK</option>
                     <option value="UYGUNSUZ ARAÇ PARK ETMEK">UYGUNSUZ ARAÇ PARK ETMEK</option>
-                    <option value="UYGUNSUZ MALZEME TAŞIMAK">UYGUNSUZ MALZEME TAŞIMAK</option>
-                    <option value="YELEKSİZ ARAÇ KULLANMAK">YELEKSİZ ARAÇ KULLANMAK</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="tespit_eden_sicil">Sizin Siciliniz</label>
-                <input type="text" id="tespit_eden_sicil" required placeholder="Sicil yazıp bekleyin...">
-            </div>
-            <div class="form-group">
-                <label for="tespit_eden_isim">Sizin İsim Soyisminiz</label>
-                <input type="text" id="tespit_eden_isim" required readonly placeholder="Otomatik dolacak">
-            </div>
-        </div>
-
-        <div class="btn-group">
-            <button type="submit" class="btn-submit">Veritabanına Kaydet</button>
-            <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir (Şifreli)</button>
-        </div>
-    </form>
-
-    <div id="statusMsg" class="status-msg"></div>
-</div>
-
-<script>
-    const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
-
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const form = document.getElementById('kuralForm');
-    const statusMsg = document.getElementById('statusMsg');
-    const btnExcel = document.getElementById('btnExcel');
-
-    const sicilInput = document.getElementById('sicil');
-    const isimInput = document.getElementById('isim_soyisim');
-    const unvanInput = document.getElementById('unvan');
-    const ekibiInput = document.getElementById('ekibi');
-    const tespitSicilInput = document.getElementById('tespit_eden_sicil');
-    const tespitIsimInput = document.getElementById('tespit_eden_isim');
-
-    // Bugünün tarihini varsayılan seçtir
-    document.getElementById('tarih').valueAsDate = new Date();
-
-    // ========================================================
-    // OTOMATİK SİCİL SORGULAMA
-    // ========================================================
-    
-    // İhlal Eden Canlı Arama
-    sicilInput.addEventListener('input', async () => {
-        const girilenSicil = sicilInput.value.trim();
-        if (girilenSicil.length >= 3) {
-            const { data, error } = await supabaseClient
-                .from('personeller')
-                .select('*')
-                .eq('SİCİL', girilenSicil);
-
-            if (data && data.length > 0 && !error) {
-                const personel = data[0];
-                isimInput.value = personel['İSİM'] || '';
-                unvanInput.value = personel['UNVAN'] || '';
-                ekibiInput.value = personel['EKİBİ'] || '';
-            } else {
-                isimInput.value = ''; unvanInput.value = ''; ekibiInput.value = '';
-            }
-        } else {
-            isimInput.value = ''; unvanInput.value = ''; ekibiInput.value = '';
-        }
-    });
-
-    // Tespit Eden Canlı Arama
-    tespitSicilInput.addEventListener('input', async () => {
-        const girilenTespitSicil = tespitSicilInput.value.trim();
-        if (girilenTespitSicil.length >= 3) {
-            const { data, error } = await supabaseClient
-                .from('personeller')
-                .select('*')
-                .eq('SİCİL', girilenTespitSicil);
-
-            if (data && data.length > 0 && !error) {
-                tespitIsimInput.value = data[0]['İSİM'] || '';
-            } else {
-                tespitIsimInput.value = '';
-            }
-        } else {
-            tespitIsimInput.value = '';
-        }
-    });
-
-    // ========================================================
-    // 1. VERİBATANINA KAYDETME
-    // ========================================================
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        statusMsg.style.display = 'none';
-
-        if (!isimInput.value || !tespitIsimInput.value) {
-            alert("Lütfen sistemde kayıtlı geçerli sicil numaraları giriniz!");
-            return;
-        }
-
-        const formData = {
-            sicil: sicilInput.value.trim(),
-            isim_soyisim: isimInput.value,
-            unvan: unvanInput.value,
-            ekibi: ekibiInput.value,
-            kural_ihlali: document.getElementById('kural_ihlali').value,
-            tarih: document.getElementById('tarih').value,
-            tespit_eden_sicil: tespitSicilInput.value.trim(),
-            tespit_eden_isim: tespitIsimInput.value
-        };
-
-        const { data, error } = await supabaseClient
-            .from('kural_ihlalleri')
-            .upsert([formData], { onConflict: 'sicil,tarih' });
-
-        if (error) {
-            statusMsg.textContent = "Hata oluştu: " + error.message;
-            statusMsg.className = "status-msg status-error";
-            statusMsg.style.display = 'block';
-        } else {
-            statusMsg.textContent = "Kayıt başarıyla veritabanına işlendi / güncellendi!";
-            statusMsg.className = "status-msg status-success";
-            statusMsg.style.display = 'block';
-            
-            // Temizleme işlemleri
-            sicilInput.value = '';
-            isimInput.value = '';
-            unvanInput.value = '';
-            ekibiInput.value = '';
-        }
-    });
-
-    // ========================================================
-    // 2. EXCEL İNDİRME (ŞİFRE KORUMALI)
-    // ========================================================
-    btnExcel.addEventListener('click', async () => {
-        const sfre = prompt("Excel raporunu indirmek için yönetici şifresini giriniz:");
-        
-        // Şifre: bhkm2026
-        if (sfre !== "bhkm2026") {
-            alert("Hatalı şifre girdiniz! Yetkiniz yok.");
-            return;
-        }
-
-        const { data, error } = await supabaseClient
-            .from('kural_ihlalleri')
-            .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_isim')
-            .order('tarih', { ascending: false });
-
-        if (error) {
-            alert("Veriler çekilirken bir hata oluştu: " + error.message);
-            return;
-        }
-
-        if (!data || data.length === 0) {
-            alert("Veritabanında indirilecek herhangi bir kayıt bulunamadı!");
-            return;
-        }
-
-        const excelData = data.map(row => ({
-            "TARİH": row.tarih,
-            "SİCİL": row.sicil,
-            "İSİM SOYİSİM": row.isim_soyisim,
-            "ÜNVAN": row.unvan,
-            "EKİBİ": row.ekibi,
-            "KURAL İHLALİ": row.kural_ihlali,
-            "TESPİT EDEN": row.tespit_eden_isim
-        }));
-
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
-
-        const colWidths = [{wch: 12}, {wch: 10}, {wch: 22}, {wch: 15}, {wch: 15}, {wch: 45}, {wch: 22}];
-        worksheet['!cols'] = colWidths;
-
-        const dosyaAdi = `kural_ihlalleri_${new Date().toISOString().slice(0,10)}.xlsx`;
-        XLSX.writeFile(workbook, dosyaAdi);
-    });
-</script>
-
-</body>
-</html>
+                    <option value="UYGUNSUZ MALZEME TA
