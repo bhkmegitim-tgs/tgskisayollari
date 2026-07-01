@@ -203,7 +203,7 @@
 
         <div class="btn-group">
             <button type="submit" class="btn-submit">Veritabanına Kaydet</button>
-            <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir</button>
+            <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir (Şifreli)</button>
         </div>
     </form>
 
@@ -231,7 +231,7 @@
     document.getElementById('tarih').valueAsDate = new Date();
 
     // ========================================================
-    // OTOMATİK SİCİL SORGULAMA (EXCEL'DEKİ BÜYÜK HARFLERLE TAM UYUMLU)
+    // OTOMATİK SİCİL SORGULAMA (EXCEL'DEKİ YAPILARA TAM UYMLU)
     // ========================================================
     
     // İhlal Eden Canlı Arama
@@ -241,7 +241,7 @@
             const { data, error } = await supabaseClient
                 .from('personeller')
                 .select('*')
-                .eq('SİCİL', girilenSicil); // Sütun adını SİCİL yaptık
+                .eq('SİCİL', girilenSicil);
 
             if (data && data.length > 0 && !error) {
                 const personel = data[0];
@@ -276,7 +276,7 @@
     });
 
     // ========================================================
-    // 1. VERİBATANINA KAYDETME (KURAL İHLALLERİ TABLOSUNA)
+    // 1. VERİBATANINA KAYDETME
     // ========================================================
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -311,7 +311,7 @@
             statusMsg.className = "status-msg status-success";
             statusMsg.style.display = 'block';
             
-            // İhlal eden kısımlarını temizle
+            // Temizleme işlemleri
             sicilInput.value = '';
             isimInput.value = '';
             unvanInput.value = '';
@@ -320,9 +320,18 @@
     });
 
     // ========================================================
-    // 2. EXCEL İNDİRME
+    // 2. EXCEL İNDİRME (ŞİFRE KORUMALI)
     // ========================================================
     btnExcel.addEventListener('click', async () => {
+        // Kullanıcıya şifre soruluyor
+        const sfre = prompt("Excel raporunu indirmek için yönetici şifresini giriniz:");
+        
+        // BURADAKİ "bhkm2026" DEĞERİNİ İSTEDİĞİN ŞİFREYLE DEĞİŞTİREBİLİRSİN
+        if (sfre !== "bhkm2026") {
+            alert("Hatalı şifre girdiniz! Yetkiniz yok.");
+            return;
+        }
+
         const { data, error } = await supabaseClient
             .from('kural_ihlalleri')
             .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_isim')
