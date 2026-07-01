@@ -166,25 +166,25 @@
                 <select id="kural_ihlali" required>
                     <option value="">-- Seçiniz --</option>
                     <option value="APRON EHLİYETİ VE SİVİL EHLİYETİ YANINDA BULUNDURMAMAK">APRON EHLİYETİ VE SİVİL EHLİYETİ YANINDA BULUNDURMAMAK</option>
-                    <option value="HASARLI EKİPMAN KULLANMAK">HASARLI EKİPMAN KULLANMAK</option>
-                    <option value="KANAT ALTI İHLALİ">KANAT ALTI İHLALİ</option>
-                    <option value="KAPASİTE FAZLASI EKİPMAN TAŞIMAK">KAPASİTE FAZLASI EKİPMAN TAŞIMAK</option>
-                    <option value="ARAÇ ÜZERİNDE ANAHTAR BIRAKMAK">ARAÇ ÜZERİNDE ANAHTAR BIRAKMAK</option>
-                    <option value="ÇEKİCİ SIRTINDA KAPASİTE FAZLASI YÜK TAŞIMAK">ÇEKİCİ SIRTINDA KAPASİTE FAZLASI YÜK TAŞIMAK</option>
-                    <option value="YELEKSİZ ARAÇ KULLANMAK">YELEKSİZ ARAÇ KULLANMAK</option>
-                    <option value="DÖNÜŞ VE GEÇİŞ KURALLARINA UYMAMAK">DÖNÜŞ VE GEÇİŞ KURALLARINA UYMAMAK</option>
-                    <option value="UYGUNSUZ MALZEME TAŞIMAK">UYGUNSUZ MALZEME TAŞIMAK</option>
-                    <option value="EMNİYETSİZ OPERASYON (BAGAJ-EKİPMAN BIRAKMAK)">EMNİYETSİZ OPERASYON (BAGAJ-EKİPMAN BIRAKMAK)</option>
-                    <option value="ÇALIŞIR VAZİYETTE ARAÇ BIRAKMAK">ÇALIŞIR VAZİYETTE ARAÇ BIRAKMAK</option>
-                    <option value="SEYİR HALİNDE TELEFON İLE GÖRÜŞME">SEYİR HALİNDE TELEFON İLE GÖRÜŞME</option>
                     <option value="ARAÇ DEFTERİ YAZMAMAK">ARAÇ DEFTERİ YAZMAMAK</option>
-                    <option value="KAPISI AÇIK ARAÇ KULLANMAK">KAPISI AÇIK ARAÇ KULLANMAK</option>
-                    <option value="HIZ SINIR IHLALİ">HIZ SINIR IHLALİ</option>
-                    <option value="UYGUNSUZ ARAÇ PARK ETMEK">UYGUNSUZ ARAÇ PARK ETMEK</option>
-                    <option value="TERS YÖNDE ARAÇ KULLANMAK">TERS YÖNDE ARAÇ KULLANMAK</option>
-                    <option value="EMNİYET KEMERİ TAKMAMAK">EMNİYET KEMERİ TAKMAMAK</option>
-                    <option value="GERİ MANEVRADA MARSHALLING YARDIMI ALMAMAK">GERİ MANEVRADA MARSHALLING YARDIMI ALMAMAK</option>
                     <option value="ARAÇ TERK ETME PROSEDÜRÜNE UYMAMAK">ARAÇ TERK ETME PROSEDÜRÜNE UYMAMAK</option>
+                    <option value="ARAÇ ÜZERİNDE ANAHTAR BIRAKMAK">ARAÇ ÜZERİNDE ANAHTAR BIRAKMAK</option>
+                    <option value="ÇALIŞIR VAZİYETTE ARAÇ BIRAKMAK">ÇALIŞIR VAZİYETTE ARAÇ BIRAKMAK</option>
+                    <option value="ÇEKİCİ SIRTINDA KAPASİTE FAZLASI YÜK TAŞIMAK">ÇEKİCİ SIRTINDA KAPASİTE FAZLASI YÜK TAŞIMAK</option>
+                    <option value="DÖNÜŞ VE GEÇİŞ KURALLARINA UYMAMAK">DÖNÜŞ VE GEÇİŞ KURALLARINA UYMAMAK</option>
+                    <option value="EMNİYET KEMERİ TAKMAMAK">EMNİYET KEMERİ TAKMAMAK</option>
+                    <option value="EMNİYETSİZ OPERASYON (BAGAJ-EKİPMAN BIRAKMAK)">EMNİYETSİZ OPERASYON (BAGAJ-EKİPMAN BIRAKMAK)</option>
+                    <option value="GERİ MANEVRADA MARSHALLING YARDIMI ALMAMAK">GERİ MANEVRADA MARSHALLING YARDIMI ALMAMAK</option>
+                    <option value="HASARLI EKİPMAN KULLANMAK">HASARLI EKİPMAN KULLANMAK</option>
+                    <option value="HIZ SINIR IHLALİ">HIZ SINIR IHLALİ</option>
+                    <option value="KANAT ALTI İHLALİ">KANAT ALTI İHLALİ</option>
+                    <option value="KAPASI AÇIK ARAÇ KULLANMAK">KAPISI AÇIK ARAÇ KULLANMAK</option>
+                    <option value="KAPASİTE FAZLASI EKİPMAN TAŞIMAK">KAPASİTE FAZLASI EKİPMAN TAŞIMAK</option>
+                    <option value="SEYİR HALİNDE TELEFON İLE GÖRÜŞME">SEYİR HALİNDE TELEFON İLE GÖRÜŞME</option>
+                    <option value="TERS YÖNDE ARAÇ KULLANMAK">TERS YÖNDE ARAÇ KULLANMAK</option>
+                    <option value="UYGUNSUZ ARAÇ PARK ETMEK">UYGUNSUZ ARAÇ PARK ETMEK</option>
+                    <option value="UYGUNSUZ MALZEME TAŞIMAK">UYGUNSUZ MALZEME TAŞIMAK</option>
+                    <option value="YELEKSİZ ARAÇ KULLANMAK">YELEKSİZ ARAÇ KULLANMAK</option>
                 </select>
             </div>
         </div>
@@ -231,7 +231,7 @@
     document.getElementById('tarih').valueAsDate = new Date();
 
     // ========================================================
-    // OTOMATİK SİCİL SORGULAMA (EXCEL'DEKİ YAPILARA TAM UYMLU)
+    // OTOMATİK SİCİL SORGULAMA
     // ========================================================
     
     // İhlal Eden Canlı Arama
@@ -323,10 +323,9 @@
     // 2. EXCEL İNDİRME (ŞİFRE KORUMALI)
     // ========================================================
     btnExcel.addEventListener('click', async () => {
-        // Kullanıcıya şifre soruluyor
         const sfre = prompt("Excel raporunu indirmek için yönetici şifresini giriniz:");
         
-        // BURADAKİ "bhkm2026" DEĞERİNİ İSTEDİĞİN ŞİFREYLE DEĞİŞTİREBİLİRSİN
+        // Şifre: bhkm2026
         if (sfre !== "bhkm2026") {
             alert("Hatalı şifre girdiniz! Yetkiniz yok.");
             return;
