@@ -1,153 +1,24 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BHKM - Kural İhlal Takip Sistemi</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>
-        :root {
-            --primary-color: #e67e22;
-            --dark-color: #2c3e50;
-            --light-bg: #f5f7fa;
-            --success-color: #27ae60;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--light-bg); color: var(--dark-color); padding: 15px 10px; }
-        .container { width: 100%; max-width: 800px; margin: 0 auto; background: #fff; padding: 25px 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .header { text-align: center; border-bottom: 3px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 25px; }
-        .header h1 { font-size: 22px; text-transform: uppercase; }
-        .header p { font-size: 13px; color: #7f8c8d; margin-top: 5px; }
-        .section-title { font-size: 15px; font-weight: 600; color: var(--primary-color); margin-bottom: 15px; border-left: 4px solid var(--primary-color); padding-left: 8px; }
-        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; margin-bottom: 25px; width: 100%; }
-        .form-group { display: flex; flex-direction: column; width: 100%; }
-        label { font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #34495e; }
-        input, select { width: 100%; max-width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; background-color: #fff; }
-        input[readonly] { background-color: #eaeded; color: #7f8c8d; cursor: not-allowed; }
-        .btn-group { display: flex; gap: 15px; margin-top: 20px; width: 100%; }
-        button { flex: 1; padding: 12px; font-size: 14px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; }
-        .btn-submit { background-color: var(--success-color); color: white; }
-        .btn-excel { background-color: var(--dark-color); color: white; }
-        .status-msg { margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 14px; text-align: center; display: none; }
-        .status-success { background: #d4edda; color: #155724; }
-        .status-error { background: #f8d7da; color: #721c24; }
-        @media (max-width: 650px) { .form-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; } .btn-group { flex-direction: column; gap: 10px; } }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
-        <h1>TGS BHKM KURAL İHLAL TEPKİP FORMU</h1>
-        <p>Operasyonel kurallara uyum ve personel bildirim ekranı</p>
-    </div>
-
-    <form id="kuralForm">
-        <div class="section-title">İhlal Eden Personel Bilgileri</div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="sicil">Sicil Numarası</label>
-                <input type="text" id="sicil" required placeholder="Sicil yazıp bekleyin...">
-            </div>
-            <div class="form-group">
-                <label for="isim_soyisim">İsim Soyisim</label>
-                <input type="text" id="isim_soyisim" required readonly placeholder="Otomatik dolacak">
-            </div>
-            <div class="form-group">
-                <label for="unvan">Unvanı</label>
-                <input type="text" id="unvan" required readonly placeholder="Otomatik dolacak">
-            </div>
-            <div class="form-group">
-                <label for="ekibi">Ekibi</label>
-                <input type="text" id="ekibi" required readonly placeholder="Otomatik dolacak">
-            </div>
-            <div class="form-group">
-                <label for="tarih">İhlal Tarihi</label>
-                <input type="date" id="tarih" required>
-            </div>
-            <div class="form-group">
-                <label for="kural_ihlali">Kural İhlal Maddesi</label>
-                <select id="kural_ihlali" required>
-                    <option value="">-- Seçiniz --</option>
-                    <option value="APRON EHLİYETİ VE SİVİL EHLİYETİ YANINDA BULUNDURMAMAK">APRON EHLİYETİ VE SİVİL EHLİYETİ YANINDA BULUNDURMAMAK</option>
-                    <option value="HASARLI EKİPMAN KULLANMAK">HASARLI EKİPMAN KULLANMAK</option>
-                    <option value="KANAT ALTI İHLALİ">KANAT ALTI İHLALİ</option>
-                    <option value="KAPASİTE FAZLASI EKİPMAN TAŞIMAK">KAPASİTE FAZLASI EKİPMAN TAŞIMAK</option>
-                    <option value="ARAÇ ÜZERİNDE ANAHTAR BIRAKMAK">ARAÇ ÜZERİNDE ANAHTAR BIRAKMAK</option>
-                    <option value="ÇEKİCİ SIRTINDA KAPASİTE FAZLASI YÜK TAŞIMAK">ÇEKİCİ SIRTINDA KAPASİTE FAZLASI YÜK TAŞIMAK</option>
-                    <option value="YELEKSİZ ARAÇ KULLANMAK">YELEKSİZ ARAÇ KULLANMAK</option>
-                    <option value="DÖNÜŞ VE GEÇİŞ KURALLARINA UYMAMAK">DÖNÜŞ VE GEÇİŞ KURALLARINA UYMAMAK</option>
-                    <option value="UYGUNSUZ MALZEME TAŞIMAK">UYGUNSUZ MALZEME TAŞIMAK</option>
-                    <option value="EMNİYETSİZ OPERASYON (BAGAJ-EKİPMAN BIRAKMAK)">EMNİYETSİZ OPERASYON (BAGAJ-EKİPMAN BIRAKMAK)</option>
-                    <option value="ÇALIŞIR VAZİYETTE ARAÇ BIRAKMAK">ÇALIŞIR VAZİYETTE ARAÇ BIRAKMAK</option>
-                    <option value="SEYİR HALİNDE TELEFON İLE GÖRÜŞME">SEYİR HALİNDE TELEFON İLE GÖRÜŞME</option>
-                    <option value="ARAÇ DEFTERİ YAZMAMAK">ARAÇ DEFTERİ YAZMAMAK</option>
-                    <option value="KAPISI AÇIK ARAÇ KULLANMAK">KAPISI AÇIK ARAÇ KULLANMAK</option>
-                    <option value="HIZ SINIR İHLALİ">HIZ SINIR İHLALİ</option>
-                    <option value="UYGUNSUZ ARAÇ PARK ETMEK">UYGUNSUZ ARAÇ PARK ETMEK</option>
-                    <option value="TERS YÖNDE ARAÇ KULLANMAK">TERS YÖNDE ARAÇ KULLANMAK</option>
-                    <option value="EMNİYET KEMERİ TAKMAMAK">EMNİYET KEMERİ TAKMAMAK</option>
-                    <option value="GERİ MANEVRADA MARSHALLING YARDIMI ALMAMAK">GERİ MANEVRADA MARSHALLING YARDIMI ALMAMAK</option>
-                    <option value="ARAÇ TERK ETME PROSEDÜRÜNE UYMAMAK">ARAÇ TERK ETME PROSEDÜRÜNE UYMAMAK</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="tespit_eden_sicil">Tespit Eden Sicil</label>
-                <input type="text" id="tespit_eden_sicil" required placeholder="Sicil yazıp bekleyin...">
-            </div>
-            <div class="form-group">
-                <label for="tespit_eden_isim">Tespit Eden İsim Soyisim</label>
-                <input type="text" id="tespit_eden_isim" required readonly placeholder="Otomatik dolacak">
-            </div>
-        </div>
-
-        <div class="btn-group">
-            <button type="submit" class="btn-submit">Veritabanına Kaydet</button>
-            <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir (Admin)</button>
-        </div>
-    </form>
-
-    <div id="statusMsg" class="status-msg"></div>
-</div>
-
-<script>
-    const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
-    const ADMIN_PASSWORD = "BHKM_admin_2026"; 
-
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const form = document.getElementById('kuralForm');
-    const sicilInput = document.getElementById('sicil');
-    const isimInput = document.getElementById('isim_soyisim');
-    const unvanInput = document.getElementById('unvan');
-    const ekibiInput = document.getElementById('ekibi');
-    const tespitSicilInput = document.getElementById('tespit_eden_sicil');
-    const tespitIsimInput = document.getElementById('tespit_eden_isim');
-    const statusMsg = document.getElementById('statusMsg');
-    const btnExcel = document.getElementById('btnExcel');
-
-    document.getElementById('tarih').valueAsDate = new Date();
-
-    // Excel başlıklarına uyumlu canlı sorgulama (İhlal Eden)
+// Esnek Canlı Sorgulama Fonksiyonu (İhlal Eden)
     sicilInput.addEventListener('input', async () => {
         const girilenSicil = sicilInput.value.trim();
         if (girilenSicil.length >= 3) {
             const { data, error } = await supabaseClient
                 .from('personeller')
-                .select('*')
-                .eq('SİCİL', girilenSicil); // Sütun adını senin Excel'e göre SİCİL yaptık
+                .select('*');
 
-            if (data && data.length > 0 && !error) {
-                const p = data[0];
-                isimInput.value = p['İSİM'] || ''; // Excel'deki İSİM başlığı
-                unvanInput.value = p['UNVAN'] || ''; // Excel'deki UNVAN başlığı
-                ekibiInput.value = p['EKİBİ'] || ''; // Excel'deki EKİBİ başlığı
+            if (data && !error) {
+                // Sütun adı büyük SİCİL de olsa küçük sicil de olsa eşleştirir
+                const personel = data.find(p => 
+                    String(p['SİCİL'] || p['sicil'] || p['Sicil']).trim() === girilenSicil
+                );
+
+                if (personel) {
+                    isimInput.value = personel['İSİM'] || personel['isim'] || personel['isim_soyisim'] || '';
+                    unvanInput.value = personel['UNVAN'] || personel['unvan'] || '';
+                    ekibiInput.value = personel['EKİBİ'] || personel['ekibi'] || '';
+                } else {
+                    clearIhlalEden();
+                }
             } else {
                 clearIhlalEden();
             }
@@ -156,21 +27,24 @@
         }
     });
 
-    function clearIhlalEden() {
-        isimInput.value = ""; unvanInput.value = ""; ekibiInput.value = "";
-    }
-
-    // Excel başlıklarına uyumlu canlı sorgulama (Tespit Eden)
+    // Esnek Canlı Sorgulama Fonksiyonu (Tespit Eden)
     tespitSicilInput.addEventListener('input', async () => {
         const girilenTespitSicil = tespitSicilInput.value.trim();
         if (girilenTespitSicil.length >= 3) {
             const { data, error } = await supabaseClient
                 .from('personeller')
-                .select('*')
-                .eq('SİCİL', girilenTespitSicil);
+                .select('*');
 
-            if (data && data.length > 0 && !error) {
-                tespitIsimInput.value = data[0]['İSİM'] || '';
+            if (data && !error) {
+                const personel = data.find(p => 
+                    String(p['SİCİL'] || p['sicil'] || p['Sicil']).trim() === girilenTespitSicil
+                );
+
+                if (personel) {
+                    tespitIsimInput.value = personel['İSİM'] || personel['isim'] || personel['isim_soyisim'] || '';
+                } else {
+                    tespitIsimInput.value = "";
+                }
             } else {
                 tespitIsimInput.value = "";
             }
@@ -178,69 +52,3 @@
             tespitIsimInput.value = "";
         }
     });
-
-    // Kayıt Fonksiyonu
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        statusMsg.style.display = 'none';
-
-        if (!isimInput.value || !tespitIsimInput.value) {
-            alert("Lütfen geçerli ve sistemde kayıtlı sicil numaraları giriniz!");
-            return;
-        }
-
-        const formData = {
-            sicil: sicilInput.value.trim(),
-            isim_soyisim: isimInput.value,
-            unvan: unvanInput.value,
-            ekibi: ekibiInput.value,
-            kural_ihlali: document.getElementById('kural_ihlali').value,
-            tarih: document.getElementById('tarih').value,
-            tespit_eden_sicil: tespitSicilInput.value.trim(),
-            tespit_eden_isim: tespitIsimInput.value
-        };
-
-        const { data, error } = await supabaseClient
-            .from('kural_ihlalleri')
-            .upsert([formData], { onConflict: 'sicil,tarih' });
-
-        if (error) {
-            statusMsg.textContent = "Hata oluştu: " + error.message;
-            statusMsg.className = "status-msg status-error";
-            statusMsg.style.display = 'block';
-        } else {
-            statusMsg.textContent = "Kayıt başarıyla veritabanına işlendi!";
-            statusMsg.className = "status-msg status-success";
-            statusMsg.style.display = 'block';
-            form.reset();
-            document.getElementById('tarih').valueAsDate = new Date();
-        }
-    });
-
-    // Excel Çıktısı Alma
-    btnExcel.addEventListener('click', async () => {
-        const girilenSifre = prompt("Lütfen Excel raporunu indirmek için Admin Şifresini giriniz:");
-        if (girilenSifre !== ADMIN_PASSWORD) { alert("Hatalı şifre!"); return; }
-
-        const { data, error } = await supabaseClient
-            .from('kural_ihlalleri')
-            .select('*')
-            .order('tarih', { ascending: false });
-
-        if (error || !data) { alert("Hata oluştu."); return; }
-
-        const excelData = data.map(row => ({
-            "SİCİL": row.sicil, "İSİM SOYİSİM": row.isim_soyisim, "UNVAN": row.unvan, "EKİBİ": row.ekibi,
-            "KURAL İHLAL MADDESİ": row.kural_ihlali, "TARİH": row.tarih ? row.tarih.split('-').reverse().join('.') : '',
-            "TESPİT EDEN SİCİL": row.tespit_eden_sicil, "TESPİT EDEN PERSONEL": row.tespit_eden_isim
-        }));
-
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
-        worksheet['!cols'] = [{wch: 10}, {wch: 22}, {wch: 15}, {wch: 10}, {wch: 55}, {wch: 14}, {wch: 20}, {wch: 24}];
-        XLSX.writeFile(workbook, `kural_ihlalleri_raporu_${new Date().toISOString().slice(0,10)}.xlsx`);
-    });
-</script>
-</body>
-</html>
