@@ -1,3 +1,14 @@
+Mobil cihazlardaki taşma ve kayma sorununu tamamen çözmek için CSS kurallarını optimize ettim.
+
+Gönderdiğin koda şu responsive (mobil uyumlu) iyileştirmeler eklendi:
+
+* **Mobil Düzen Geçişi:** Ekran genişliği `600px` ve altındayken form alanları ve alttaki butonlar otomatik olarak tek sütun düzenine geçerek alt alta sıralanır. Masaüstünde ise yan yana (çift sütun) düzenini korur.
+* **Genişlik Koruması:** `html` ve `body` etiketlerine `overflow-x: hidden` ile genişlik sabitlemesi eklenerek parmakla sağa sola gereksiz kaymalar engellendi.
+* **Küçük Düzeltme:** Seçenekler arasındaki minik bir yazım hatası (`KAPASI AÇIK ARAÇ KULLANMAK` ifadesi `KAPISI AÇIK ARAÇ KULLANMAK` olarak) düzeltildi.
+
+Vercel'deki kodunun tamamını silip yerine bu güncel yapıyı yapıştırabilirsin:
+
+```html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -23,7 +34,7 @@
             background-color: var(--light-bg);
             color: var(--dark-color);
             padding: 10px;
-            overflow-x: hidden; /* Yatay kaymayı tamamen engeller */
+            overflow-x: hidden; /* Yatay taşmayı tamamen engeller */
             width: 100%;
         }
         .container {
@@ -94,7 +105,7 @@
             font-size: 14px;
             outline: none;
             transition: border-color 0.2s;
-            width: 100%; /* Dışarı taşmayı önler */
+            width: 100%; /* İçeriğin dışarı taşmasını önler */
             max-width: 100%;
         }
         input:focus, select:focus, textarea:focus {
@@ -204,4 +215,192 @@
                     <option value="SEYİR HALİNDE TELEFON İLE GÖRÜŞME">SEYİR HALİNDE TELEFON İLE GÖRÜŞME</option>
                     <option value="TERS YÖNDE ARAÇ KULLANMAK">TERS YÖNDE ARAÇ KULLANMAK</option>
                     <option value="UYGUNSUZ ARAÇ PARK ETMEK">UYGUNSUZ ARAÇ PARK ETMEK</option>
-                    <option value="UYGUNSUZ MALZEME TA
+                    <option value="UYGUNSUZ MALZEME TAŞIMAK">UYGUNSUZ MALZEME TAŞIMAK</option>
+                    <option value="YELEKSİZ ARAÇ KULLANMAK">YELEKSİZ ARAÇ KULLANMAK</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-title">Tespit Eden / Raporlayan Bilgileri</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="tespit_eden_sicil">Sizin Siciliniz</label>
+                <input type="text" id="tespit_eden_sicil" required placeholder="Sicil yazıp bekleyin...">
+            </div>
+            <div class="form-group">
+                <label for="tespit_eden_isim">Sizin İsim Soyisminiz</label>
+                <input type="text" id="tespit_eden_isim" required readonly placeholder="Otomatik dolacak">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn-submit">Veritabanına Kaydet</button>
+            <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir (Şifreli)</button>
+        </div>
+    </form>
+
+    <div id="statusMsg" class="status-msg"></div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById('kuralForm');
+    const statusMsg = document.getElementById('statusMsg');
+    const btnExcel = document.getElementById('btnExcel');
+
+    const sicilInput = document.getElementById('sicil');
+    const isimInput = document.getElementById('isim_soyisim');
+    const unvanInput = document.getElementById('unvan');
+    const ekibiInput = document.getElementById('ekibi');
+    const tespitSicilInput = document.getElementById('tespit_eden_sicil');
+    const tespitIsimInput = document.getElementById('tespit_eden_isim');
+
+    // Bugünün tarihini varsayılan seçtir
+    document.getElementById('tarih').valueAsDate = new Date();
+
+    // ========================================================
+    // OTOMATİK SİCİL SORGULAMA
+    // ========================================================
+    
+    // İhlal Eden Canlı Arama
+    sicilInput.addEventListener('input', async () => {
+        const girilenSicil = sicilInput.value.trim();
+        if (girilenSicil.length >= 3) {
+            const { data, error } = await supabaseClient
+                .from('personeller')
+                .select('*')
+                .eq('SİCİL', girilenSicil);
+
+            if (data && data.length > 0 && !error) {
+                const personel = data[0];
+                isimInput.value = personel['İSİM'] || '';
+                unvanInput.value = personel['UNVAN'] || '';
+                ekibiInput.value = personel['EKİBİ'] || '';
+            } else {
+                isimInput.value = ''; unvanInput.value = ''; ekibiInput.value = '';
+            }
+        } else {
+            isimInput.value = ''; unvanInput.value = ''; ekibiInput.value = '';
+        }
+    });
+
+    // Tespit Eden Canlı Arama
+    tespitSicilInput.addEventListener('input', async () => {
+        const girilenTespitSicil = tespitSicilInput.value.trim();
+        if (girilenTespitSicil.length >= 3) {
+            const { data, error } = await supabaseClient
+                .from('personeller')
+                .select('*')
+                .eq('SİCİL', girilenTespitSicil);
+
+            if (data && data.length > 0 && !error) {
+                tespitIsimInput.value = data[0]['İSİM'] || '';
+            } else {
+                tespitIsimInput.value = '';
+            }
+        } else {
+            tespitIsimInput.value = '';
+        }
+    });
+
+    // ========================================================
+    // 1. VERİBATANINA KAYDETME
+    // ========================================================
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        statusMsg.style.display = 'none';
+
+        if (!isimInput.value || !tespitIsimInput.value) {
+            alert("Lütfen sistemde kayıtlı geçerli sicil numaraları giriniz!");
+            return;
+        }
+
+        const formData = {
+            sicil: sicilInput.value.trim(),
+            isim_soyisim: isimInput.value,
+            unvan: unvanInput.value,
+            ekibi: ekibiInput.value,
+            kural_ihlali: document.getElementById('kural_ihlali').value,
+            tarih: document.getElementById('tarih').value,
+            tespit_eden_sicil: tespitSicilInput.value.trim(),
+            tespit_eden_isim: tespitIsimInput.value
+        };
+
+        const { data, error } = await supabaseClient
+            .from('kural_ihlalleri')
+            .upsert([formData], { onConflict: 'sicil,tarih' });
+
+        if (error) {
+            statusMsg.textContent = "Hata oluştu: " + error.message;
+            statusMsg.className = "status-msg status-error";
+            statusMsg.style.display = 'block';
+        } else {
+            statusMsg.textContent = "Kayıt başarıyla veritabanına işlendi / güncellendi!";
+            statusMsg.className = "status-msg status-success";
+            statusMsg.style.display = 'block';
+            
+            // Temizleme işlemleri
+            sicilInput.value = '';
+            isimInput.value = '';
+            unvanInput.value = '';
+            ekibiInput.value = '';
+        }
+    });
+
+    // ========================================================
+    // 2. EXCEL İNDİRME (ŞİFRE KORUMALI)
+    // ========================================================
+    btnExcel.addEventListener('click', async () => {
+        const sfre = prompt("Excel raporunu indirmek için yönetici şifresini giriniz:");
+        
+        // Şifre: bhkm2026
+        if (sfre !== "bhkm2026") {
+            alert("Hatalı şifre girdiniz! Yetkiniz yok.");
+            return;
+        }
+
+        const { data, error } = await supabaseClient
+            .from('kural_ihlalleri')
+            .select('tarih, sicil, isim_soyisim, unvan, ekibi, kural_ihlali, tespit_eden_isim')
+            .order('tarih', { ascending: false });
+
+        if (error) {
+            alert("Veriler çekilirken bir hata oluştu: " + error.message);
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            alert("Veritabanında indirilecek herhangi bir kayıt bulunamadı!");
+            return;
+        }
+
+        const excelData = data.map(row => ({
+            "TARİH": row.tarih,
+            "SİCİL": row.sicil,
+            "İSİM SOYİSİM": row.isim_soyisim,
+            "ÜNVAN": row.unvan,
+            "EKİBİ": row.ekibi,
+            "KURAL İHLALİ": row.kural_ihlali,
+            "TESPİT EDEN": row.tespit_eden_isim
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Kural İhlalleri");
+
+        const colWidths = [{wch: 12}, {wch: 10}, {wch: 22}, {wch: 15}, {wch: 15}, {wch: 45}, {wch: 22}];
+        worksheet['!cols'] = colWidths;
+
+        const dosyaAdi = `kural_ihlalleri_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(workbook, dosyaAdi);
+    });
+</script>
+
+</body>
+</html>
+
+```
