@@ -12,7 +12,7 @@
 
 <div style="max-width: 600px; margin: 20px auto; padding: 20px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
     <h3 style="margin-top: 0; color: #333; text-align: center; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px;">
-        👤 Personel Hızlı İletişim Paneli
+        👤 BHKM Personel Hızlı İletişim Paneli
     </h3>
     
     <div style="margin-bottom: 15px;">
@@ -21,20 +21,21 @@
         <datalist id="personelDatalist"></datalist>
     </div>
 
-    <div id="iletisimAlan" style="display: none; background: #f9f9f9; padding: 15px; border-radius: 6px; border-left: 4px solid #007bff;">
+    <div id="iletisimAlan" style="display: none; background: #f9f9f9; padding: 15px; border-radius: 6px; border-left: 4px solid #007bff; margin-top: 15px;">
         <p style="margin: 0 0 10px 0; font-size: 16px; color: #333;">Seçilen Personel: <strong id="secilenAd">-</strong></p>
         <p style="margin: 0 0 15px 0; font-size: 14px; color: #666;">Telefon: <span id="secilenTel">-</span></p>
         
         <div style="display: flex; gap: 10px;">
-            <a id="wsLink" href="#" target="_blank" style="flex: 1; text-align: center; background: #25D366; color: white; padding: 12px; text-decoration: none; border-radius: 4px; font-weight: bold;">💬 WhatsApp</a>
-            <a id="araLink" href="#" style="flex: 1; text-align: center; background: #007bff; color: white; padding: 12px; text-decoration: none; border-radius: 4px; font-weight: bold;">📞 Ara</a>
+            <a id="wsLink" href="#" target="_blank" style="flex: 1; text-align: center; background: #25D366; color: white; padding: 12px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">💬 WhatsApp</a>
+            <a id="araLink" href="#" style="flex: 1; text-align: center; background: #007bff; color: white; padding: 12px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">📞 Ara</a>
         </div>
     </div>
 </div>
 
 <script>
+// !!! 1900 KİŞİLİK LİSTEYİ AŞAĞIDAKİ İKİ KÖŞELİ PARANTEZİN [ ] ARASINA YAPIŞTIRACAKSIN !!!
 const personelListesi = [
-    { {isim: "Sinan Şahin", tel: "5309151226"},
+   {isim: "Sinan Şahin", tel: "5309151226"},
 {isim: "Enes Sayan", tel: "5323723737"},
 {isim: "Enes Gazi Kılıç", tel: "5334850309"},
 {isim: "Veysel Başer", tel: "5432045353"},
@@ -2043,6 +2044,23 @@ const personelListesi = [
 
 ];
 
+// Geliştirilmiş Türkçe harf duyarsızlaştırma motoru
+function temizleVeKucult(text) {
+    if (!text) return "";
+    return text.toString()
+        .replace(/İ/g, "i")
+        .replace(/I/g, "ı")
+        .toLowerCase()
+        .replace(/ş/g, "s")
+        .replace(/ğ/g, "g")
+        .replace(/ü/g, "u")
+        .replace(/ö/g, "o")
+        .replace(/ç/g, "c")
+        .replace(/ı/g, "i") 
+        .trim();
+}
+
+// Arama listesini doldur
 const datalist = document.getElementById('personelDatalist');
 personelListesi.forEach(personel => {
     let option = document.createElement('option');
@@ -2050,9 +2068,10 @@ personelListesi.forEach(personel => {
     datalist.appendChild(option);
 });
 
+// Arama mekanizması kontrolü
 document.getElementById('personelAra').addEventListener('input', function() {
-    const girilenIsim = this.value;
-    const bulunanPersonel = personelListesi.find(p => p.isim.toLowerCase() === girilenIsim.toLowerCase());
+    const girilenVal = temizleVeKucult(this.value);
+    const bulunanPersonel = personelListesi.find(p => temizleVeKucult(p.isim) === girilenVal);
     const iletisimAlan = document.getElementById('iletisimAlan');
     
     if (bulunanPersonel) {
