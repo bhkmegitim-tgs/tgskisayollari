@@ -2,22 +2,87 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>TGS - Eğitim Formu</title>
+    <title>Bagaj Ayrımı Fonksiyonu Eğitim Formu</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+        .form-container { max-width: 900px; background: #fff; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { border-bottom: 2px solid #e30613; padding-bottom: 10px; color: #333; }
+        .grid-header { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .madde-row { display: grid; grid-template-columns: 6fr 1fr 1fr 1fr; border-bottom: 1px solid #eee; padding: 10px 0; align-items: center; }
+        .madde-row:hover { background: #f9f9f9; }
+        input[type="text"] { width: 90%; padding: 8px; margin-bottom: 5px; }
+        button { background: #e30613; color: white; padding: 15px 30px; border: none; width: 100%; cursor: pointer; font-size: 16px; margin-top: 20px; }
+    </style>
 </head>
 <body>
 
-<form id="trainingForm">
-    <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>
-    <input type="text" name="sicil_no" placeholder="Sicil No">
-    <input type="text" name="egitim_konusu" placeholder="Eğitim Konusu">
-    <button type="submit">Kaydet</button>
-</form>
+<div class="form-container">
+    <h2>EGT.FRM17 - Bagaj Ayrımı İşbaşı Eğitim Formu</h2>
+    <form id="tgsForm">
+        <div class="grid-header">
+            <div>
+                <h3>KATILIMCI BİLGİLERİ</h3>
+                <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>
+                <input type="text" name="sicil_no" placeholder="Sicil No">
+            </div>
+            <div>
+                <h3>İŞBAŞI EĞİTİM NEDENİ</h3>
+                <input type="checkbox" name="egitim_nedeni" value="yeni"> Yeni Personel<br>
+                <input type="checkbox" name="egitim_nedeni" value="ara"> İşe Ara Veren<br>
+                <input type="checkbox" name="egitim_nedeni" value="nakil"> Nakil/Birim Değişikliği
+            </div>
+        </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        <div id="maddeContainer">
+            <div class="madde-row" style="font-weight:bold; background:#eee;">
+                <span>UYGULAMA KONTROL BAŞLIKLARI</span>
+                <span>EVET</span><span>HAYIR</span><span>N/A</span>
+            </div>
+        </div>
 
-    // Senin Firebase ayarların
+        <button type="submit">FORMU KAYDET</button>
+    </form>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-firestore.js"></script>
+<script>
+    // CSV'deki maddelerin listesi
+    const maddeler = [
+        "K.K.D'leri operasyon esnasında eksiksiz kullanıyor.",
+        "Yetkisi olmayan araç/ekipmanı kullanmaz.",
+        "FOD kontrollerini yapar, tespit ederse kutulara atar.",
+        "Etiketsiz bagaj kontrolü yapar.",
+        "Konteyner brandalarını kapatır.",
+        "Bagaj hasar kontrolü yapar.",
+        "FIDS uçuş bilgisi eşleştirmesi yapar.",
+        "Arrival bantlarında barkod cihazına bildirim yapar.",
+        "OGG bagaj uygulamalarını gerçekleştirir.",
+        "Yetkisiz turnike ve kapı kullanımı kuralına uyar.",
+        "BHS ekipmanları (barkod/telsiz) zimmet kurallarına uyar.",
+        "Gümrüklü/gümrüksüz saha prosedürlerini uygular.",
+        "Priority bagajların öncelikli verilmesi kuralına uyar.",
+        "Bagaj toplama öncesi teçhizat uygunluk kontrolü yapar.",
+        "Ekipman emniyet talimatlarını uygular.",
+        "Transit bant yönlendirme ve etiket kontrolü yapar.",
+        "Uçuşa alınmayan/vazgeçen yolcu bagajı uygulaması yapar.",
+        "Tehlikeli madde etiketlerini tanır.",
+        "Gizli/beyan edilmemiş tehlikeli madde risklerini bilir.",
+        "Hasarlı/sızıntılı bagaj durumunda aksiyon alır."
+    ];
+
+    const container = document.getElementById('maddeContainer');
+    maddeler.forEach((m, i) => {
+        container.innerHTML += `
+            <div class="madde-row">
+                <span>${i+1}. ${m}</span>
+                <input type="radio" name="m${i+1}" value="Evet">
+                <input type="radio" name="m${i+1}" value="Hayir">
+                <input type="radio" name="m${i+1}" value="NA">
+            </div>`;
+    });
+
+    // Firebase Ayarları
     const firebaseConfig = {
         apiKey: "AIzaSyBy_YvEso3gLAfsRx5KDxyJrJsM-LhUhI0",
         authDomain: "bhkmform.firebaseapp.com",
@@ -27,20 +92,15 @@
         appId: "1:184259040544:web:f8fdc7b1c723351b6cb345"
     };
 
-    const db = getFirestore(initializeApp(firebaseConfig));
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    document.getElementById('trainingForm').addEventListener('submit', async (e) => {
+    document.getElementById('tgsForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(e.target).entries());
-
-        try {
-            await addDoc(collection(db, "bagaj_egitimleri"), data);
-            alert("Başarıyla Firebase'e kaydedildi!");
-            e.target.reset();
-        } catch (err) {
-            alert("Hata oluştu, konsola bak: " + err.message);
-            console.error(err);
-        }
+        db.collection("bagaj_egitimleri").add(data)
+        .then(() => alert("Form başarıyla Firebase'e kaydedildi!"))
+        .catch(err => alert("Hata: " + err.message));
     });
 </script>
 </body>
