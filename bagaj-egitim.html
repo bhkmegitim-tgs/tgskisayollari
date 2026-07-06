@@ -1,60 +1,27 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <title>TGS - Bagaj Ayrımı Eğitim Formu</title>
-</head>
-<body>
-
 <form id="trainingForm">
     <input type="text" name="p_name" placeholder="Ad Soyad" required>
     <input type="text" name="p_sicil" placeholder="Sicil No">
     <input type="text" name="p_istasyon" placeholder="İstasyon">
     <input type="text" name="p_reason" placeholder="Eğitim Nedeni">
 
-    <input type="text" name="u1_date" placeholder="1. Uygulama Tarih">
-    <input type="text" name="u1_flight_gelis" placeholder="1. Geliş No">
-    <input type="text" name="u1_flight_gidis" placeholder="1. Gidiş No">
-    <input type="text" name="u1_tescil_gelis" placeholder="1. Tescil Geliş">
-    <input type="text" name="u1_tescil_gidis" placeholder="1. Tescil Gidiş">
-    <input type="text" name="u1_parkur_gelis" placeholder="1. Parkur Geliş">
-    <input type="text" name="u1_parkur_gidis" placeholder="1. Parkur Gidiş">
-    <input type="text" name="u1_type" placeholder="1. Uçak Tipi">
-    <input type="text" name="u1_body" placeholder="1. Gövde">
-
-    <input type="text" name="u2_date" placeholder="2. Uygulama Tarih">
-    <input type="text" name="u2_flight_gelis" placeholder="2. Geliş No">
-    <input type="text" name="u2_flight_gidis" placeholder="2. Gidiş No">
-    <input type="text" name="u2_tescil_gelis" placeholder="2. Tescil Geliş">
-    <input type="text" name="u2_tescil_gidis" placeholder="2. Tescil Gidiş">
-    <input type="text" name="u2_parkur_gelis" placeholder="2. Parkur Geliş">
-    <input type="text" name="u2_parkur_gidis" placeholder="2. Parkur Gidiş">
-    <input type="text" name="u2_type" placeholder="2. Uçak Tipi">
-    <input type="text" name="u2_body" placeholder="2. Gövde">
-
     <input type="text" name="s_1_u1" placeholder="Soru 1 - 1. Uyg">
     <input type="text" name="s_1_u2" placeholder="Soru 1 - 2. Uyg">
-    <input type="text" name="s_20_u1" placeholder="Soru 20 - 1. Uyg">
-    <input type="text" name="s_20_u2" placeholder="Soru 20 - 2. Uyg">
-
-    <input type="text" name="p_notes" placeholder="Açıklamalar">
-    
-    <div id="txtScore" style="display:none;">100%</div>
-    <div id="txtStatus" style="display:none;">BAŞARILI</div>
-    
-    <button type="submit">Formu Kaydet</button>
+    <button type="submit">Formu Supabase'e Kaydet</button>
 </form>
 
 <script>
     document.getElementById('trainingForm').addEventListener('submit', (e) => {
         e.preventDefault();
+        
         const formData = new FormData(document.getElementById('trainingForm'));
         const data = {};
-        formData.forEach((value, key) => { data[key] = value; });
         
-        data["basari_yuzdesi"] = document.getElementById('txtScore').innerText;
-        data["sonuc"] = document.getElementById('txtStatus').innerText;
-
+        // Formdaki tüm verileri otomatik topluyoruz
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        
+        // Supabase bağlantısı
         const SUPABASE_URL = "https://haqoaxlvhfvwcbjowaxk.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhhcW9heGx2aGZ2d2Nibm93YXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTcyOTI4MDAsImV4cCI6MjAzMjg2ODgwMH0.0b0B_u4XWzX7hX9P_vXzWzX7hX9P_vXzWzX7hX9P_vX"; 
 
@@ -69,10 +36,14 @@
             body: JSON.stringify(data)
         })
         .then(response => {
-            if (response.ok) { alert("Başarıyla kaydedildi!"); } 
-            else { response.json().then(err => { console.error(err); alert("Hata: " + JSON.stringify(err)); }); }
+            if (response.ok) {
+                alert("Başarıyla kaydedildi!");
+            } else {
+                return response.json().then(err => {
+                    alert("Kayıt hatası: " + err.message);
+                    console.error(err);
+                });
+            }
         });
     });
 </script>
-</body>
-</html>
