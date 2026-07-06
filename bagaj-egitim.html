@@ -75,36 +75,36 @@
         <div class="grid-3">
             <div class="fieldset">
                 <legend>Katılımcı Bilgileri</legend>
-                <div class="form-group"><label>Adı Soyadı:</label><input type="text" id="p_name" required></div>
-                <div class="form-group"><label>Sicil No:</label><input type="text" id="p_sicil" required></div>
+                <div class="form-group"><label>Adı Soyadı:</label><input type="text" name="p_name" id="p_name" required></div>
+                <div class="form-group"><label>Sicil No:</label><input type="text" name="p_sicil" id="p_sicil" required></div>
                 <div class="form-group">
                     <label>Eğitim Nedeni:</label>
-                    <select id="p_reason">
-                        <option>Yeni Personel (Temel)</option>
-                        <option>İşe Ara Verme Durumu</option>
-                        <option>Yer/Bölüm Değişikliği</option>
-                        <option>Yenileme / Tazeleme</option>
+                    <select name="p_reason" id="p_reason">
+                        <option value="Yeni Personel (Temel)">Yeni Personel (Temel)</option>
+                        <option value="İşe Ara Verme Durumu">İşe Ara Verme Durumu</option>
+                        <option value="Yer/Bölüm Değişikliği">Yer/Bölüm Değişikliği</option>
+                        <option value="Yenileme / Tazeleme">Yenileme / Tazeleme</option>
                     </select>
                 </div>
             </div>
             
             <div class="fieldset">
                 <legend>1. Uygulama Uçuşu</legend>
-                <div class="form-group"><label>Tarih / Saat:</label><input type="datetime-local" id="u1_date"></div>
-                <div class="form-group"><label>Uçuş No / Tip:</label><input type="text" id="u1_flight" placeholder="TK1903 / B738"></div>
+                <div class="form-group"><label>Tarih / Saat:</label><input type="datetime-local" name="u1_date" id="u1_date"></div>
+                <div class="form-group"><label>Uçuş No / Tip:</label><input type="text" name="u1_flight" id="u1_flight" placeholder="TK1903 / B738"></div>
                 <div class="form-group">
                     <label>Gövde Tipi:</label>
-                    <select id="u1_body"><option value="DG">Dar Gövde (DG)</option><option value="GG">Geniş Gövde (GG)</option></select>
+                    <select name="u1_body" id="u1_body"><option value="DG">Dar Gövde (DG)</option><option value="GG">Geniş Gövde (GG)</option></select>
                 </div>
             </div>
 
             <div class="fieldset">
                 <legend>2. Uygulama Uçuşu</legend>
-                <div class="form-group"><label>Tarih / Saat:</label><input type="datetime-local" id="u2_date"></div>
-                <div class="form-group"><label>Uçuş No / Tip:</label><input type="text" id="u2_flight" placeholder="TK1881 / A330"></div>
+                <div class="form-group"><label>Tarih / Saat:</label><input type="datetime-local" name="u2_date" id="u2_date"></div>
+                <div class="form-group"><label>Uçuş No / Tip:</label><input type="text" name="u2_flight" id="u2_flight" placeholder="TK1881 / A330"></div>
                 <div class="form-group">
                     <label>Gövde Tipi:</label>
-                    <select id="u2_body"><option value="GG">Geniş Gövde (GG)</option><option value="DG">Dar Gövde (DG)</option></select>
+                    <select name="u2_body" id="u2_body"><option value="GG">Geniş Gövde (GG)</option><option value="DG">Dar Gövde (DG)</option></select>
                 </div>
             </div>
         </div>
@@ -261,7 +261,7 @@
         calculateScore();
     });
 
-    // Google Sheets Entegrasyonu (Verdiğiniz URL Doğrudan Tanımlandı)
+    // Google Sheets Entegrasyonu (Sizin URL Adresiniz Gömüldü)
     document.getElementById('trainingForm').addEventListener('submit', (e) => {
         e.preventDefault();
         
