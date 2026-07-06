@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TGS - Bagaj Ayrımı İşbaşı Eğitimi Kontrol Formu</title>
+    <style>
+        :root {
+            --tgs-red: #d32f2f;
+            --tgs-dark: #1a1a1a;
+            --bg-light: #f8f9fa;
+            --border-color: #cccccc;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--tgs-red); }
+        
+        .header-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--tgs-dark); padding-bottom: 15px; margin-bottom: 20px; }
+        .logo { font-size: 28px; font-weight: bold; color: var(--tgs-red); letter-spacing: 1px; }
+        .form-title { font-size: 16px; font-weight: bold; text-align: center; max-width: 60%; line-height: 1.4; text-transform: uppercase; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .fieldset { border: 1px solid var(--border-color); padding: 15px; border-radius: 5px; background: #fafafa; }
+        .fieldset legend { font-weight: bold; padding: 0 5px; color: var(--tgs-red); font-size: 13px; text-transform: uppercase; }
+        
+        .form-group { margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+        .form-group label { width: 95px; font-size: 12px; font-weight: 600; }
+        .form-group input, .form-group select { flex: 1; padding: 5px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12px; }
+        
+        .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; }
+        .sub-group { display: flex; align-items: center; gap: 3px; margin-bottom: 4px; }
+        .sub-group label { width: 45px; font-size: 11px; font-weight: bold; color: #555; }
+        .sub-group input { flex: 1; padding: 4px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 3px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px; font-size: 12px; }
+        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
+        th { background-color: var(--tgs-dark); color: white; text-transform: uppercase; font-size: 11px; text-align: center; }
+        .sect-header { background-color: #eaeaea; font-weight: bold; color: #000; }
+        .center-align { text-align: center; }
+        
+        .radio-group { display: flex; justify-content: space-around; gap: 5px; }
+        .radio-group label { cursor: pointer; font-weight: bold; font-size: 11px; }
+
+        .notes-section { margin-top: 20px; }
+        .notes-section textarea { width: 100%; height: 80px; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; resize: vertical; }
+
+        .dashboard { background: var(--tgs-dark); color: white; padding: 20px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+        .score-box { font-size: 24px; font-weight: bold; }
+        .status-box { font-size: 20px; font-weight: bold; padding: 5px 15px; border-radius: 4px; }
+        .status-pass { background-color: #2e7d32; }
+        .status-fail { background-color: #c62828; }
+
+        .btn-container { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .btn-submit { background-color: var(--tgs-red); color: white; }
+        .btn-submit:hover { background-color: #b71c1c; }
+        .btn-export { background-color: #1565c0; color: white; }
+        .btn-export:hover { background-color: #0d47a1; }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+            .btn-container { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <div class="logo">TGS <span style="font-size:12px; color:#555; display:block; font-weight:normal;">TURKISH GROUND SERVICES</span></div>
+        <div class="form-title">Bagaj Ayrımı Fonksiyonunda Görevli Personel İşbaşı Eğitimi Kontrol Listesi Formu</div>
+        <div style="font-size: 11px; text-align: right; color: #666;">Kod: EGT.FRM17<br>Rev: 07 / 15.04.2026</div>
+    </div>
+
+    <form id="trainingForm">
+        <div class="grid-3">
+            <div class="fieldset">
+                <legend>Katılımcı Bilgileri</legend>
+                <div class="form-group"><label>Adı Soyadı:</label><input type="text" name="p_name" id="p_name" required></div>
+                <div class="form-group"><label>Sicil No:</label><input type="text" name="p_sicil" id="p_sicil" required></div>
+                <div class="form-group"><label>İstasyon:</label><input type="text" name="p_istasyon" id="p_istasyon" required></div>
+                <div class="form-group">
+                    <label>Eğitim Nedeni:</label>
+                    <select name="p_reason" id="p_reason">
+                        <option value="Yeni Personel (Temel)">Yeni Personel (Temel)</option>
+                        <option value="İşe Ara Veren Personel">İşe Ara Veren Personel</option>
+                        <option value="Nakil / Birim Değişikliği">Nakil / Birim Değişikliği</option>
+                        <option value="Yeniden Yetkinlik">Yeniden Yetkinlik</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="fieldset">
+                <legend>1. Uygulama</legend>
+                <div class="form-group"><label>Tarih:</label><input type="date" name="u1_date" id="u1_date"></div>
+                <div class="sub-grid">
+                    <div class="sub-group"><label>Geliş No:</label><input type="text" name="u1_flight_gelis"></div>
+                    <div class="sub-group"><label>Gidiş No:</label><input type="text" name="u1_flight_gidis"></div>
+                </div>
+                <div class="sub-grid">
+                    <div class="sub-group"><label>G.Tescil:</label><input type="text" name="u1_tescil_gelis"></div>
+                    <div class="sub-group"><label>G.Tescil:</label><input type="text" name="u1_tescil_gidis"></div>
+                </div>
+                <div class="sub-grid">
+                    <div class="sub-group"><label>G.Parkur:</label><input type="text" name="u1_parkur_gelis"></div>
+                    <div class="sub-group"><label>G.Parkur:</label><input type="text" name="u1_parkur_gidis"></div>
+                </div>
+                <div class="form-group"><label>Uçak Tipi:</label><input type="text" name="u1_type" id="u1_type"></div>
+                <div class="form-group">
+                    <label>Gövde:</label>
+                    <select name="u1_body" id="u1_body"><option value="Dar Gövde">Dar Gövde</option><option value="Geniş Gövde">Geniş Gövde</option></select>
+                </div>
+            </div>
+
+            <div class="fieldset">
+                <legend>2. Uygulama</legend>
+                <div class="form-group"><label>Tarih:</label><input type="date" name="u2_date" id="u2_date"></div>
+                <div class="sub-grid">
+                    <div class="sub-group"><label>Geliş No:</label><input type="text" name="u2_flight_gelis"></div>
+                    <div class="sub-group"><label>Gidiş No:</label><input type="text" name="u2_flight_gidis"></div>
+                </div>
+                <div class="sub-grid">
+                    <div class="sub-group"><label>G.Tescil:</label><input type="text" name="u2_tescil_gelis"></div>
+                    <div class="sub-group"><label>G.Tescil:</label><input type="text" name="u2_tescil_gidis"></div>
+                </div>
+                <div class="sub-grid">
+                    <div class="sub-group"><label>G.Parkur:</label><input type="text" name="u2_parkur_gelis"></div>
+                    <div class="sub-group"><label>G.Parkur:</label><input type="text" name="u2_parkur_gidis"></div>
+                </div>
+                <div class="form-group"><label>Uçak Tipi:</label><input type="text" name="u2_type" id="u2_type"></div>
+                <div class="form-group">
+                    <label>Gövde:</label>
+                    <select name="u2_body" id="u2_body"><option value="Dar Gövde">Dar Gövde</option><option value="Geniş Gövde">Geniş Gövde</option></select>
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 4%;">No</th>
+                    <th style="width: 66%;">UYGULAMA KONTROL BAŞLIKLARI</th>
+                    <th style="width: 15%;">1. UYGULAMA</th>
+                    <th style="width: 15%;">2. UYGULAMA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="sect-header"><td colspan="4">BAGAJ AYRIMI FONKSİYONU</td></tr>
+                <script>
+                    const orijinalSorular = [
+                        "K.K.D'leri (kulaklık,yelek,iş eldiveni,iş ayakkabısı, bel kemeri vb.) operasyon esnasında eksiksiz olarak olarak kullanıyor.",
+                        "Telsiz konuşma kural, adabına ve çağrı kodlarına tam olarak riayet edebilir.",
+                        "Görevi devraldığında alanında FOD kontrolü yapar ve çalışma alanını temiz toplayarak kurallara uyar.",
+                        "Gözle alanları kontrol ederek hasar veya eksik bir şey olup olmadığını kontrol ederek üst amirine bildirerek uygun şekilde davranmasını bilir.",
+                        "Bagaj kartı üzerindeki barkodlu bagaj numarasını okutarak bagaj numaralarını karşılaştırır.",
+                        "Bagajları uçuş bazlı ayırarak yönlendirmesini bilir.",
+                        "BHS havuz sistema üzerindeki sorunları okutup, sonuçlandırır ve ilgili alan eşleştirmesini yapabilir.",
+                        "Ambardan salona gelen bagajların yolcu takibini sistem üstünden kontrol etmekte ve personele bilgi veriyor.",
+                        "Uçuş bagaj trafiği akış durumunu takip edebiliyor.",
+                        "Yetki limiti içeren kuralları uygulayarak güvenlik süreçlerini doğru işletilmesi etkinliklerini tam olarak icra eder.",
+                        "BHS sisteminde kullanılan otomasyon
