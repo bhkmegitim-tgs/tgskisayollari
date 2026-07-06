@@ -138,7 +138,7 @@
                         document.write(`
                             <tr>
                                 <td>${num}</td>
-                                Kakao<td>${soru}</td>
+                                <td>${soru}</td>
                                 <td class="center-align">
                                     <div class="radio-group">
                                         <label><input type="radio" name="s_${num}_u1" value="E" checked onclick="calculateScore()"> E</label>
@@ -167,7 +167,7 @@
                     ];
                     
                     dgrSorular.forEach((soru, index) => {
-                        let num = index + 10; // 10 numaradan başlasın
+                        let num = index + 10;
                         document.write(`
                             <tr>
                                 <td>${num}</td>
@@ -194,32 +194,23 @@
         </table>
 
         <div class="dashboard">
-            <div>
-                <span>DEĞERLENDİRME SONUCU</span>
-            </div>
-            <div class="score-box">
-                Başarı Yüzdesi: <span id="txtScore">100%</span>
-            </div>
-            <div id="txtStatus" class="status-box status-pass">
-                BAŞARILI
-            </div>
+            <div><span>DEĞERLENDİRME SONUCU</span></div>
+            <div class="score-box">Başarı Yüzdesi: <span id="txtScore">100%</span></div>
+            <div id="txtStatus" class="status-box status-pass">BAŞARILI</div>
         </div>
 
         <div class="btn-container">
             <button type="button" class="btn btn-export" onclick="window.print()">🖨️ PDF / Yazdır</button>
-            <button type="button" class="btn btn-export" onclick="exportToJSON()">💾 Veriyi JSON İndir</button>
-            <button type="submit" class="btn btn-submit">✅ Formu Kaydet</button>
+            <button type="submit" class="btn btn-submit">✅ Formu Google Etabloya Kaydet</button>
         </div>
     </form>
 </div>
 
 <script>
-    // Dinamik Başarı Puanı Hesaplama Fonksiyonu
     function calculateScore() {
         let totalQuestionsChecked = 0;
         let totalYes = 0;
         
-        // 1'den 12'ye kadar olan tüm soruları ve 2 uygulamayı tara
         for(let i = 1; i <= 12; i++) {
             ['u1', 'u2'].forEach(u => {
                 const radio = document.querySelector(`input[name="s_${i}_${u}"]:checked`);
@@ -230,18 +221,13 @@
                     } else if(radio.value === 'H') {
                         totalQuestionsChecked++;
                     }
-                    // 'NA' ise hesaba katma (N/A kuralı)
                 }
             });
         }
         
-        // Yüzde hesapla
         let percentage = totalQuestionsChecked > 0 ? Math.round((totalYes / totalQuestionsChecked) * 100) : 100;
-        
-        // Ekrana bas
         document.getElementById('txtScore').innerText = percentage + "%";
         
-        // TGS Geçme Barajı: %85 (İsteğe göre değiştirebilirsiniz)
         const statusBox = document.getElementById('txtStatus');
         if(percentage >= 85) {
             statusBox.innerText = "BAŞARILI";
@@ -252,7 +238,7 @@
         }
     }
 
-    // Auto-Save: Form dolduruldukça LocalStorage'a kaydeder
+    // Auto-Save Draft
     document.getElementById('trainingForm').addEventListener('input', () => {
         const formData = new FormData(document.getElementById('trainingForm'));
         const data = {};
@@ -260,7 +246,6 @@
         localStorage.setItem('tgs_bagaj_form_draft', JSON.stringify(data));
     });
 
-    // Sayfa açıldığında taslağı geri yükleme
     window.addEventListener('load', () => {
         const savedDraft = localStorage.getItem('tgs_bagaj_form_draft');
         if(savedDraft) {
@@ -276,28 +261,34 @@
         calculateScore();
     });
 
-    // Verileri JSON dosyası olarak bilgisayara indirme fonksiyonu
-    function exportToJSON() {
+    // Google Sheets Entegrasyonu (Verdiğiniz URL Doğrudan Tanımlandı)
+    document.getElementById('trainingForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
         const formData = new FormData(document.getElementById('trainingForm'));
         const data = {};
         formData.forEach((value, key) => data[key] = value);
         data["basari_yuzdesi"] = document.getElementById('txtScore').innerText;
         data["sonuc"] = document.getElementById('txtStatus').innerText;
 
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `TGS_Bagaj_Egitim_${data['p_sicil'] || 'Formu'}.json`);
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-    }
+        const googleScriptURL = "https://script.google.com/macros/s/AKfycbxneH4e-Fx9a7cMXR5jFPv_ZoWXGYBj4MLZexJQc0Ozo8S9opQfTHuYDfOi-oUuKcWo/exec";
 
-    // Form Gönderildiğinde Tetiklenecek Alan
-    document.getElementById('trainingForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        alert("Form verileri başarıyla sisteme / local hafızaya kaydedildi!");
-        localStorage.removeItem('tgs_bagaj_form_draft'); // Gönderilirse taslağı temizle
+        fetch(googleScriptURL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            alert("Form verileri Google Etabloya başarıyla kaydedildi!");
+            localStorage.removeItem('tgs_bagaj_form_draft');
+            document.getElementById('trainingForm').reset();
+            calculateScore();
+        })
+        .catch(err => {
+            console.error("Hata:", err);
+            alert("Kayıt sırasında bir hata oluştu.");
+        });
     });
 </script>
 
