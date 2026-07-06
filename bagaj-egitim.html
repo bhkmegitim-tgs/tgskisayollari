@@ -7,34 +7,46 @@
 <body>
 
 <form id="trainingForm">
-    <input type="text" name="p_name" placeholder="Ad Soyad" required>
-    <input type="text" name="s_1_u1" placeholder="Soru 1 - 1. Uygulama">
-    <input type="text" name="s_1_u2" placeholder="Soru 1 - 2. Uygulama">
-    <button type="submit">Formu Supabase'e Kaydet</button>
+    <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>
+    <input type="text" name="sicil_no" placeholder="Sicil No">
+    <input type="text" name="egitim_konusu" placeholder="Eğitim Konusu">
+    
+    <button type="submit">Kaydet</button>
 </form>
 
-<script>
+<script type="module">
+    // Firebase SDK kütüphaneleri (CDN üzerinden)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // 1. Senin verdiğin Firebase bilgileri
+    const firebaseConfig = {
+        apiKey: "AIzaSyBy_YvEso3gLAfsRx5KDxyJrJsM-LhUhI0",
+        authDomain: "bhkmform.firebaseapp.com",
+        projectId: "bhkmform",
+        storageBucket: "bhkmform.firebasestorage.app",
+        messagingSenderId: "184259040544",
+        appId: "1:184259040544:web:f8fdc7b1c723351b6cb345",
+        measurementId: "G-ZD1BP4BR2N"
+    };
+
+    // 2. Başlatma
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 3. Form gönderildiğinde veriyi Firestore'a kaydet
     document.getElementById('trainingForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(e.target).entries());
 
-        const response = await fetch("https://haqoaxlvhfvwcbjowaxk.supabase.co/rest/v1/bagaj_egitim", {
-            method: "POST",
-            headers: {
-                "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhhcW9heGx2aGZ2d2Nibm93YXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTcyOTI4MDAsImV4cCI6MjAzMjg2ODgwMH0.0b0B_u4XWzX7hX9P_vXzWzX7hX9P_vXzWzX7hX9P_vX",
-                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhhcW9heGx2aGZ2d2Nibm93YXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTcyOTI4MDAsImV4cCI6MjAzMjg2ODgwMH0.0b0B_u4XWzX7hX9P_vXzWzX7hX9P_vXzWzX7hX9P_vX",
-                "Content-Type": "application/json",
-                "Prefer": "return=minimal"
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            alert("Başarıyla kaydedildi!");
-        } else {
-            const err = await response.json();
-            console.error("Hata Detayı:", err);
-            alert("Kayıt başarısız! Hata: " + err.message + ". Konsolu (F12) incele.");
+        try {
+            // "bagaj_egitimleri" koleksiyonuna ekliyoruz
+            await addDoc(collection(db, "bagaj_egitimleri"), data);
+            alert("Başarıyla Firebase'e kaydedildi!");
+            e.target.reset();
+        } catch (err) {
+            console.error("Hata:", err);
+            alert("Bir hata oluştu. Konsolu (F12) kontrol et.");
         }
     });
 </script>
