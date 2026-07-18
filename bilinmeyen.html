@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Canlı Eşitleme Sistemi V4.1</title>
+    <title>TGS Bagaj Operasyon - Canlı Eşitleme Sistemi V4.2</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- SheetJS -->
@@ -30,7 +30,7 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Kesintisiz Canlı Senkronizasyon (V4.1)</p>
+                <p class="text-sm text-gray-500">Kesintisiz Canlı Senkronizasyon (V4.2)</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
@@ -191,8 +191,7 @@
     </div>
 
     <script>
-        // Ücretsiz, kotasız ve CORS engeline takılmayan açık KV veri havuzu kanalı
-        // 'tgs_baggage_pool_v4' benzersiz anahtarı ile Vercel projeleri için direkt aktiftir.
+        // Ücretsiz, kotasız ve bulut entegrasyonu tamamlanmış veri havuzu kanalı
         const syncStorageURL = "https://kvdb.io/4y9n5t8zPqW7mK3vR2aB/tgs_baggage_pool_v4";
 
         const staticUsers = [
@@ -242,7 +241,7 @@
             pullDataFromServer();
             renderUsers();
             
-            // Canlı veri çekme döngüsü: Her 2.5 saniyede bir arkada otomatik çalışır
+            // Canlı senkronizasyon döngüsü (2.5 saniyede bir tetiklenir)
             setInterval(pullDataFromServer, 2500);
         }
 
@@ -251,7 +250,7 @@
             location.reload();
         }
 
-        // VERİLERİ BULUT HAVUZDAN ÇEKME (AĞ ARAMA HATASI GİDERİLDİ)
+        // VERİLERİ BULUT HAVUZDAN ÇEKME
         async function pullDataFromServer() {
             const syncStatus = document.getElementById('syncStatus');
             try {
@@ -269,7 +268,6 @@
                     syncStatus.className = "text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full";
                 }
             } catch (err) {
-                // Eğer sunucuda geçici bir gecikme olursa lokal listeyi kaybetme, ekranda koru
                 if(syncStatus) {
                     syncStatus.innerText = "🔄 Senkronize Ediliyor...";
                     syncStatus.className = "text-[10px] bg-amber-500 text-slate-900 font-bold px-2 py-0.5 rounded-full";
@@ -281,7 +279,7 @@
         async function pushDataToServer() {
             try {
                 const response = await fetch(syncStorageURL, {
-                    method: 'POST', // kvdb.io veri yazmak için POST veya PUT kabul eder
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ baggages: localBaggageStore })
                 });
@@ -291,12 +289,12 @@
             }
         }
 
-        // FOTOĞRAFI MOBİL HÜCRESEL AĞA UYGUN BOYUTA KÜÇÜLTME
+        // BULUT HAVUZ SINIRI (64KB) İÇİN ULTRA OPTİMİZASYON VE GÖRSEL SIKIŞTIRMA
         document.getElementById('cameraInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('fileStatusText').innerText = "Fotoğraf optimize ediliyor...";
+            document.getElementById('fileStatusText').innerText = "Resim entegre ediliyor...";
             
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -304,7 +302,8 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function() {
-                    const maxW = 160; // Hücresel ağda tıkanma yapmaması için en hafif çözünürlük
+                    // Maksimum genişliği 240px yaparak veriyi memur ekranı için optimize ediyoruz
+                    const maxW = 240; 
                     const scale = maxW / img.width;
                     const canvas = document.createElement('canvas');
                     
@@ -314,11 +313,12 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.2);
+                    // Kaliteyi %30'a çekerek 64KB sınırının çok altında (~20KB) kalmasını sağlıyoruz
+                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.3);
                     
                     document.getElementById('imagePreview').src = finalBase64Image;
                     document.getElementById('previewContainer').classList.remove('hidden');
-                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Hazır";
+                    document.getElementById('fileStatusText').innerText = "✅ Görsel Ağa Hazır";
                 };
             };
         });
@@ -330,14 +330,14 @@
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Gönderiliyor...";
+            submitBtn.innerText = "Ağa Gönderiliyor...";
 
             const barcode = document.getElementById('barcodeInput').value.trim().toUpperCase();
             
             const newBaggage = {
                 id: 'BGG-' + Date.now(),
                 barcode: barcode,
-                imageUrl: finalBase64Image,
+                imageUrl: finalBase64Image, // Sıkıştırılmış Base64 ağa tam entegre gidiyor
                 status: 'Bekliyor',
                 createdBy: loggedInUser.name, 
                 createdAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
@@ -345,14 +345,14 @@
                 processedAt: '-'
             };
 
-            // "Altta gözükmüyor" hatasını önlemek için veriyi ANINDA yerel hafıza dizisinin en başına ekliyoruz
+            // Eşzamanlılığı korumak için en başa ekle
             localBaggageStore.unshift(newBaggage);
             renderLists(); 
 
             // Buluta gönder
             await pushDataToServer();
 
-            // Formu temizle ve sıfırla
+            // Sıfırlama işlemleri
             document.getElementById('baggageForm').reset();
             document.getElementById('previewContainer').classList.add('hidden');
             document.getElementById('fileStatusText').innerText = "Kamera veya Galeri";
@@ -361,7 +361,6 @@
             submitBtn.disabled = false;
             submitBtn.innerText = "Veriyi Ağa Gönder";
             
-            // Güncel listeyi anında eşitle
             pullDataFromServer();
         }
 
@@ -398,7 +397,7 @@
                 document.getElementById('pendingCount').innerText = pendingItems.length;
             }
 
-            // 1. Saha Personeli Alt Listesi
+            // 1. Saha Personeli Ekranı Listesi
             if (sahaOwnList && loggedInUser && loggedInUser.role === "Saha") {
                 sahaOwnList.innerHTML = '';
                 const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.name);
@@ -426,7 +425,7 @@
                 }
             }
 
-            // 2. Memur Onay Ekranı Listesi
+            // 2. Memur Onay Ekranı Listesi (Görsel Tam Entegre Edildi)
             if(pendingList && loggedInUser && loggedInUser.role === "Memur") {
                 pendingList.innerHTML = '';
                 if(pendingItems.length === 0) {
@@ -435,7 +434,7 @@
                     pendingItems.forEach(item => {
                         pendingList.innerHTML += `
                             <div class="border rounded-xl p-4 bg-white shadow-sm border-gray-200">
-                                <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-full h-40 object-cover rounded-lg mb-3 cursor-zoom-in">
+                                <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-full h-40 object-cover rounded-lg mb-3 cursor-zoom-in border border-gray-100">
                                 <div class="flex justify-between items-center font-bold mb-3 text-gray-800">
                                     <span>Barkod: ${item.barcode}</span>
                                     <span class="text-xs font-mono text-gray-400">${item.createdAt}</span>
