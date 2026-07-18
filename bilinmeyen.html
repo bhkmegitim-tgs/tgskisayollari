@@ -131,10 +131,11 @@
             <!-- ADMIN PANELİ -->
             <div id="adminPanel" class="hidden space-y-8">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- PERSONEL EKLEME FORMU -->
+                    <!-- PERSONEL EKLEME/DÜZENLEME FORMU -->
                     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4">➕ Yeni Personel Tanımla</h2>
+                        <h2 id="formTitle" class="text-lg font-bold text-gray-900 mb-4">➕ Yeni Personel Tanımla</h2>
                         <form id="newUserForm" class="space-y-4">
+                            <input type="hidden" id="editMode" value="false">
                             <input type="text" id="newFullName" placeholder="Adı Soyadı" required class="w-full p-2.5 border rounded-lg text-sm">
                             <input type="text" id="newUsername" placeholder="Kullanıcı Adı" required class="w-full p-2.5 border rounded-lg text-sm">
                             <input type="text" id="newPassword" placeholder="Giriş Şifresi" required class="w-full p-2.5 border rounded-lg text-sm">
@@ -143,7 +144,10 @@
                                 <option value="Memur">Memur (Onay Yetkilisi)</option>
                                 <option value="Admin">Admin</option>
                             </select>
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-2.5 rounded-lg text-sm shadow">Sisteme Kaydet (Kalıcı)</button>
+                            <div class="flex gap-2">
+                                <button type="submit" id="formSubmitBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold p-2.5 rounded-lg text-sm shadow">Sisteme Kaydet</button>
+                                <button type="button" id="cancelEditBtn" onclick="resetUserForm()" class="hidden bg-gray-500 hover:bg-gray-600 text-white font-bold p-2.5 rounded-lg text-sm shadow">İptal</button>
+                            </div>
                         </form>
                     </div>
 
@@ -153,7 +157,7 @@
                         <div class="overflow-x-auto">
                             <table class="tgs-table min-w-full text-sm">
                                 <thead class="bg-gray-50 font-bold">
-                                    <tr><th>Ad Soyad</th><th>Kullanıcı Adı</th><th>Yetki Rolü</th><th>Şifre</th></tr>
+                                    <tr><th>Ad Soyad</th><th>Kullanıcı Adı</th><th>Yetki Rolü</th><th>Şifre</th><th>İşlemler</th></tr>
                                 </thead>
                                 <tbody id="userTableBody"></tbody>
                             </table>
@@ -211,7 +215,6 @@
             const uInput = document.getElementById('usernameInput').value.trim().toLowerCase();
             const pInput = document.getElementById('passwordInput').value.trim();
             
-            // Önce kodun içindeki adminFallback veya Firebase'den yüklenen kullanıcı listesinde ara
             const foundUser = localUsers.find(u => u.username === uInput && String(u.password) === String(pInput));
 
             if (foundUser) {
@@ -247,7 +250,7 @@
         function listenLiveUsers() {
             window.onValue(window.ref(window.db, 'users'), (snapshot) => {
                 const data = snapshot.val();
-                localUsers = [adminFallback]; // Listeyi sıfırla, admini en başa koy
+                localUsers = [adminFallback];
                 if(data) {
                     Object.keys(data).forEach(k => {
                         localUsers.push(data[k]);
@@ -271,11 +274,13 @@
             });
         }
 
-        // YENİ PERSONEL KAYDI
+        // PERSONEL KAYDI VE DÜZENLEME
         document.getElementById('newUserForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const username = document.getElementById('newUsername').value.trim().toLowerCase();
-            const newUser = {
+            const isEdit = document.getElementById('editMode').value === "true";
+            
+            const userData = {
                 name: document.getElementById('newFullName').value.trim(),
                 username: username,
                 password: document.getElementById('newPassword').value.trim(),
@@ -283,13 +288,51 @@
             };
 
             try {
-                await window.set(window.ref(window.db, 'users/' + username), newUser);
-                this.reset();
-                alert("Yeni personel başarıyla Firebase bulutuna eklendi!");
+                await window.set(window.ref(window.db, 'users/' + username), userData);
+                resetUserForm();
+                alert(isEdit ? "Personel bilgileri güncellendi!" : "Yeni personel başarıyla eklendi!");
             } catch(err) {
-                alert("Personel kaydedilemedi, ağ bağlantınızı kontrol edin.");
+                alert("İşlem başarısız, ağ bağlantınızı kontrol edin.");
             }
         });
+
+        // PERSONEL SİLME
+        async function deleteUser(username) {
+            if(username === 'admin') return alert("Ana admin hesabı silinemez!");
+            if(confirm(username + " kullanıcısını silmek istediğinize emin misiniz?")) {
+                try {
+                    await window.remove(window.ref(window.db, 'users/' + username));
+                    alert("Kullanıcı silindi.");
+                } catch(err) {
+                    alert("Silme işlemi başarısız.");
+                }
+            }
+        }
+
+        // PERSONEL DÜZENLEME MODUNA GEÇİŞ
+        function editUser(username) {
+            const user = localUsers.find(u => u.username === username);
+            if(!user) return;
+
+            document.getElementById('formTitle').innerText = "📝 Personel Düzenle";
+            document.getElementById('newFullName').value = user.name;
+            document.getElementById('newUsername').value = user.username;
+            document.getElementById('newUsername').readOnly = true; // Kullanıcı adı değiştirilemez
+            document.getElementById('newPassword').value = user.password;
+            document.getElementById('newRole').value = user.role;
+            document.getElementById('editMode').value = "true";
+            document.getElementById('formSubmitBtn').innerText = "Değişiklikleri Kaydet";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+        }
+
+        function resetUserForm() {
+            document.getElementById('newUserForm').reset();
+            document.getElementById('formTitle').innerText = "➕ Yeni Personel Tanımla";
+            document.getElementById('newUsername').readOnly = false;
+            document.getElementById('editMode').value = "false";
+            document.getElementById('formSubmitBtn').innerText = "Sisteme Kaydet";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
 
         // KAMERADAN FOTOĞRAF ALMA VE BOYUT KÜÇÜLTME
         document.getElementById('cameraInput').addEventListener('change', function(e) {
@@ -455,7 +498,20 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             localUsers.forEach(u => {
-                tbody.innerHTML += `<tr><td class="p-2 border-b font-bold">${u.name}</td><td class="p-2 border-b font-mono">${u.username}</td><td class="p-2 border-b"><span class="bg-gray-200 px-2 py-0.5 rounded text-xs">${u.role}</span></td><td class="p-2 border-b font-mono text-xs">${u.password}</td></tr>`;
+                const isSystemAdmin = u.username === 'admin';
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-2 border-b font-bold">${u.name}</td>
+                        <td class="p-2 border-b font-mono">${u.username}</td>
+                        <td class="p-2 border-b"><span class="bg-gray-200 px-2 py-0.5 rounded text-xs">${u.role}</span></td>
+                        <td class="p-2 border-b font-mono text-xs">${u.password}</td>
+                        <td class="p-2 border-b">
+                            <div class="flex gap-2">
+                                <button onclick="editUser('${u.username}')" class="text-blue-600 hover:text-blue-800 font-bold text-xs">Düzenle</button>
+                                ${!isSystemAdmin ? `<button onclick="deleteUser('${u.username}')" class="text-red-600 hover:text-red-800 font-bold text-xs">Sil</button>` : ''}
+                            </div>
+                        </td>
+                    </tr>`;
             });
         }
 
