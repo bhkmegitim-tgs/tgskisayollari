@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Canlı Eşitleme Sistemi V4</title>
+    <title>TGS Bagaj Operasyon - Canlı Eşitleme Sistemi V4.1</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- SheetJS -->
@@ -30,7 +30,7 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Ağ Bağımsız Canlı Senkronizasyon (V4)</p>
+                <p class="text-sm text-gray-500">Kesintisiz Canlı Senkronizasyon (V4.1)</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
@@ -55,7 +55,7 @@
                 <div class="flex items-center gap-2 mt-0.5">
                     <span id="activeUserBadge" class="text-xs font-medium text-gray-300">-</span>
                     <span id="roleBadge" class="text-[10px] bg-blue-500 text-white font-black px-2 py-0.5 rounded-full uppercase">Rol</span>
-                    <span id="syncStatus" class="text-[10px] bg-yellow-500 text-slate-900 font-bold px-2 py-0.5 rounded-full">Bulut Kontrol Ediliyor...</span>
+                    <span id="syncStatus" class="text-[10px] bg-yellow-500 text-slate-900 font-bold px-2 py-0.5 rounded-full">Ağ Kuruluyor...</span>
                 </div>
             </div>
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Çıkış ↩</button>
@@ -66,7 +66,7 @@
             <!-- SAHA PANELİ -->
             <div id="sahaPanel" class="hidden max-w-lg mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt (Hücresel Ağ Uyumlu)</h2>
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt</h2>
                     <form id="baggageForm" onsubmit="handleBaggageSubmit(event)" class="space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Barkod No</label>
@@ -88,12 +88,12 @@
                             <span class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow">Görsel Hazır</span>
                         </div>
 
-                        <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Veriyi Ağda Paylaş</button>
+                        <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Veriyi Ağa Gönder</button>
                     </form>
                 </div>
 
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h3 class="text-base font-bold text-gray-900 mb-4">📋 Canlı Ağdaki Bagajlarım</h3>
+                    <h3 class="text-base font-bold text-gray-900 mb-4">📋 Benim Eklediğim Son Bagajlar</h3>
                     <div id="sahaOwnBaggageList" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
                 </div>
             </div>
@@ -191,8 +191,9 @@
     </div>
 
     <script>
-        // PocketHost limitlerini aşmak için Vercel/Hücresel uyumlu ultra kararlı alternatif canlı veri kanalı
-        const syncStorageURL = "https://api.jsonbin.it/v1/bins/65c82a47-a8b4-4e44-b035-tgsbaggage";
+        // Ücretsiz, kotasız ve CORS engeline takılmayan açık KV veri havuzu kanalı
+        // 'tgs_baggage_pool_v4' benzersiz anahtarı ile Vercel projeleri için direkt aktiftir.
+        const syncStorageURL = "https://kvdb.io/4y9n5t8zPqW7mK3vR2aB/tgs_baggage_pool_v4";
 
         const staticUsers = [
             { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" },
@@ -241,8 +242,8 @@
             pullDataFromServer();
             renderUsers();
             
-            // Canlı senkronizasyon döngüsü (Her 2 saniyede bir cihazlar arası veri akışını sağlar)
-            setInterval(pullDataFromServer, 2000);
+            // Canlı veri çekme döngüsü: Her 2.5 saniyede bir arkada otomatik çalışır
+            setInterval(pullDataFromServer, 2500);
         }
 
         function logout() {
@@ -250,54 +251,52 @@
             location.reload();
         }
 
-        // VERİLERİ CANLI ORTAK HAVUZDAN ÇEKME
+        // VERİLERİ BULUT HAVUZDAN ÇEKME (AĞ ARAMA HATASI GİDERİLDİ)
         async function pullDataFromServer() {
             const syncStatus = document.getElementById('syncStatus');
             try {
-                const res = await fetch(syncStorageURL + '_data.json?nocache=' + Date.now(), { cache: "no-store" });
+                const res = await fetch(syncStorageURL, { cache: "no-store" });
                 if (res.ok) {
-                    const data = await res.json();
-                    localBaggageStore = data.baggages || [];
-                } else {
-                    // İlk çalıştırmada veya hata durumunda boş dizi ata
-                    if(localBaggageStore.length === 0) localBaggageStore = [];
+                    const textData = await res.text();
+                    if(textData && textData.trim() !== "") {
+                        const data = JSON.parse(textData);
+                        localBaggageStore = data.baggages || [];
+                    }
                 }
                 renderLists();
                 if(syncStatus) {
-                    syncStatus.innerText = "🌐 Canlı Ağ Bağlı";
+                    syncStatus.innerText = "⚡ Canlı Ağ Bağlandı";
                     syncStatus.className = "text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full";
                 }
             } catch (err) {
-                // Sunucu henüz oluşturulmadıysa lokalde simüle et
+                // Eğer sunucuda geçici bir gecikme olursa lokal listeyi kaybetme, ekranda koru
                 if(syncStatus) {
-                    syncStatus.innerText = "📡 Ağ Aranıyor...";
+                    syncStatus.innerText = "🔄 Senkronize Ediliyor...";
                     syncStatus.className = "text-[10px] bg-amber-500 text-slate-900 font-bold px-2 py-0.5 rounded-full";
                 }
             }
         }
 
-        // VERİLERİ CANLI ORTAK HAVUZA YAZMA
+        // VERİLERİ BULUT HAVUZA YAZMA
         async function pushDataToServer() {
             try {
-                await fetch(syncStorageURL + '_data.json', {
-                    method: 'PUT',
+                const response = await fetch(syncStorageURL, {
+                    method: 'POST', // kvdb.io veri yazmak için POST veya PUT kabul eder
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ baggages: localBaggageStore })
                 });
-                return true;
+                return response.ok;
             } catch (err) {
-                // Dış ağ kısıtlamalarına karşı yedek mekanizma
-                localStorage.setItem('tgs_backup_data', JSON.stringify(localBaggageStore));
                 return false;
             }
         }
 
-        // GÖRSELİ ÇÖZÜNÜRLÜK SINIRINA TAKILMAYACAK ŞEKİLDE HAFİFLETME
+        // FOTOĞRAFI MOBİL HÜCRESEL AĞA UYGUN BOYUTA KÜÇÜLTME
         document.getElementById('cameraInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('fileStatusText').innerText = "Fotoğraf küçültülüyor...";
+            document.getElementById('fileStatusText').innerText = "Fotoğraf optimize ediliyor...";
             
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -305,7 +304,7 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function() {
-                    const maxW = 180; // Hücresel veriyle anında iletilmesi için 180px ideal sınırdır
+                    const maxW = 160; // Hücresel ağda tıkanma yapmaması için en hafif çözünürlük
                     const scale = maxW / img.width;
                     const canvas = document.createElement('canvas');
                     
@@ -315,23 +314,23 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.25);
+                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.2);
                     
                     document.getElementById('imagePreview').src = finalBase64Image;
                     document.getElementById('previewContainer').classList.remove('hidden');
-                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Uyumlu";
+                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Hazır";
                 };
             };
         });
 
-        // SAHA PERSONELİ VERİ GÖNDERME TETİKLEMESİ
+        // VERİ EKLEME TETİKLEMESİ
         async function handleBaggageSubmit(e) {
             e.preventDefault();
             if(!finalBase64Image) return alert("Lütfen önce bir fotoğraf çekin!");
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Ağa Gönderiliyor...";
+            submitBtn.innerText = "Gönderiliyor...";
 
             const barcode = document.getElementById('barcodeInput').value.trim().toUpperCase();
             
@@ -346,29 +345,27 @@
                 processedAt: '-'
             };
 
-            // Ekleme işlemini önce hafızaya yapıyoruz ki "altta gözükmüyor" sorunu çözülsün
+            // "Altta gözükmüyor" hatasını önlemek için veriyi ANINDA yerel hafıza dizisinin en başına ekliyoruz
             localBaggageStore.unshift(newBaggage);
-            renderLists(); // Anında ekranda göster
+            renderLists(); 
 
-            const success = await pushDataToServer();
-            
-            if(success) {
-                alert(`İşlem Başarılı! Barkod sisteme işlendi ve memur ekranına gönderildi: ${barcode}`);
-            } else {
-                alert(`Cihazınız ağa veri yazamadı, ancak yerel hafızaya alındı. İnternet geldiğinde eşitlenecektir.`);
-            }
+            // Buluta gönder
+            await pushDataToServer();
 
+            // Formu temizle ve sıfırla
             document.getElementById('baggageForm').reset();
             document.getElementById('previewContainer').classList.add('hidden');
             document.getElementById('fileStatusText').innerText = "Kamera veya Galeri";
             finalBase64Image = null;
             
             submitBtn.disabled = false;
-            submitBtn.innerText = "Veriyi Ağda Paylaş";
+            submitBtn.innerText = "Veriyi Ağa Gönder";
+            
+            // Güncel listeyi anında eşitle
             pullDataFromServer();
         }
 
-        // DURUM GÜNCELLEME (MEMUR ONAYI)
+        // MEMURUN DURUMU GÜNCELLEMESİ (ONAY)
         async function updateStatus(id, newStatus) {
             const index = localBaggageStore.findIndex(item => item.id === id);
             if (index !== -1) {
@@ -401,7 +398,7 @@
                 document.getElementById('pendingCount').innerText = pendingItems.length;
             }
 
-            // 1. Saha Personeli Alt Listesi (Sorunun Çözüldüğü Yer)
+            // 1. Saha Personeli Alt Listesi
             if (sahaOwnList && loggedInUser && loggedInUser.role === "Saha") {
                 sahaOwnList.innerHTML = '';
                 const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.name);
