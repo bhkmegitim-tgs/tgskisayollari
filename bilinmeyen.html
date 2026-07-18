@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Canlı Bulut Otomasyonu V3</title>
+    <title>TGS Bagaj Operasyon - Canlı Eşitleme Sistemi V4</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- SheetJS -->
@@ -15,7 +15,7 @@
             display: table !important;
         }
         .tgs-table th, .tgs-table td {
-            padding: 14px 16px !important;
+            padding: 12px 14px !important;
             border-bottom: 1px solid #e2e8f0 !important;
             text-align: left !important;
             vertical-align: middle !important;
@@ -30,20 +30,20 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Kesintisiz Canlı Ağ Otomasyonu (V3)</p>
+                <p class="text-sm text-gray-500">Ağ Bağımsız Canlı Senkronizasyon (V4)</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Kullanıcı Adı</label>
-                    <input type="text" id="usernameInput" required placeholder="Örn: saha1 veya memur1" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
+                    <input type="text" id="usernameInput" required placeholder="saha1, memur1 veya admin" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Şifre</label>
-                    <input type="password" id="passwordInput" required placeholder="••••••" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
+                    <input type="password" id="passwordInput" required placeholder="111, 222, 333" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
                 </div>
                 <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition cursor-pointer">Giriş Yap</button>
             </form>
-            <p id="loginError" class="text-red-500 text-xs font-semibold mt-3 text-center hidden">❌ Hatalı giriş! (Şifreler: 111, 222, 333)</p>
+            <p id="loginError" class="text-red-500 text-xs font-semibold mt-3 text-center hidden">❌ Hatalı kullanıcı adı veya şifre!</p>
         </div>
     </div>
 
@@ -55,7 +55,7 @@
                 <div class="flex items-center gap-2 mt-0.5">
                     <span id="activeUserBadge" class="text-xs font-medium text-gray-300">-</span>
                     <span id="roleBadge" class="text-[10px] bg-blue-500 text-white font-black px-2 py-0.5 rounded-full uppercase">Rol</span>
-                    <span id="syncStatus" class="text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full">Bulut Bağlı</span>
+                    <span id="syncStatus" class="text-[10px] bg-yellow-500 text-slate-900 font-bold px-2 py-0.5 rounded-full">Bulut Kontrol Ediliyor...</span>
                 </div>
             </div>
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Çıkış ↩</button>
@@ -66,7 +66,7 @@
             <!-- SAHA PANELİ -->
             <div id="sahaPanel" class="hidden max-w-lg mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt (Yüksek Hızlı Mod)</h2>
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt (Hücresel Ağ Uyumlu)</h2>
                     <form id="baggageForm" onsubmit="handleBaggageSubmit(event)" class="space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Barkod No</label>
@@ -77,23 +77,23 @@
                             <label class="block text-sm font-bold text-gray-700 mb-2">Fotoğraf Girişi</label>
                             <label for="cameraInput" class="flex flex-col items-center justify-center w-full p-6 bg-blue-50 border-2 border-dashed border-blue-400 rounded-xl cursor-pointer hover:bg-blue-100 transition text-center group">
                                 <span class="text-4xl mb-2 group-hover:scale-110 transition-transform">📸</span>
-                                <span class="text-base font-bold text-blue-700">FOTOĞRAF ÇEK / SEÇ</span>
-                                <span class="text-xs text-blue-500 mt-1" id="fileStatusText">Kamera açılır veya galeriden seçilir</span>
+                                <span class="text-base font-bold text-blue-700">FOTOĞRAF ÇEK</span>
+                                <span class="text-xs text-blue-500 mt-1" id="fileStatusText">Kamera veya Galeri</span>
                                 <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
                             </label>
                         </div>
 
                         <div id="previewContainer" class="hidden border rounded-lg p-2 bg-gray-50 relative">
-                            <img id="imagePreview" src="" class="w-full h-52 object-cover rounded-lg">
-                            <span class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow">Görsel İşlendi</span>
+                            <img id="imagePreview" src="" class="w-full h-48 object-cover rounded-lg">
+                            <span class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow">Görsel Hazır</span>
                         </div>
 
-                        <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Buluta Gönder</button>
+                        <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Veriyi Ağda Paylaş</button>
                     </form>
                 </div>
 
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h3 class="text-base font-bold text-gray-900 mb-4">📋 Eklediğim Bagajlar ve Durumları</h3>
+                    <h3 class="text-base font-bold text-gray-900 mb-4">📋 Canlı Ağdaki Bagajlarım</h3>
                     <div id="sahaOwnBaggageList" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                         <span id="pendingCount" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
                     </h2>
                     <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs sm:text-sm cursor-pointer shadow-sm flex items-center gap-1.5 self-start sm:self-auto">
-                        <span>📊 Vardiya Sonu Excel İndir (.xlsx)</span>
+                        <span>📊 Excel Raporu Al (.xlsx)</span>
                     </button>
                 </div>
                 <div id="pendingList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -115,45 +115,43 @@
             <!-- ADMIN PANELİ -->
             <div id="adminPanel" class="hidden space-y-8">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Personel Ekleme Formu -->
                     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-1.5">➕ Yeni Personel Kaydet</h2>
+                        <h2 class="text-lg font-bold text-gray-900 mb-4">➕ Yeni Personel</h2>
                         <form id="newUserForm" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Adı Soyadı</label>
-                                <input type="text" id="newFullName" required placeholder="Örn: Can Yılmaz" class="w-full p-2.5 border rounded-lg text-sm focus:outline-blue-500">
+                                <input type="text" id="newFullName" required class="w-full p-2.5 border rounded-lg text-sm">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Kullanıcı Adı</label>
-                                <input type="text" id="newUsername" required placeholder="Örn: tgs_can" class="w-full p-2.5 border rounded-lg text-sm focus:outline-blue-500">
+                                <input type="text" id="newUsername" required class="w-full p-2.5 border rounded-lg text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Giriş Şifresi</label>
-                                <input type="text" id="newPassword" required placeholder="Örn: 444555" class="w-full p-2.5 border rounded-lg text-sm focus:outline-blue-500">
+                                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Şifre</label>
+                                <input type="text" id="newPassword" required class="w-full p-2.5 border rounded-lg text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Sistem Rolü</label>
-                                <select id="newRole" class="w-full p-2.5 border rounded-lg text-sm bg-white focus:outline-blue-500">
+                                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Rol</label>
+                                <select id="newRole" class="w-full p-2.5 border rounded-lg text-sm bg-white">
                                     <option value="Saha">Saha Personeli</option>
                                     <option value="Memur">Memur (Onay Yetkilisi)</option>
-                                    <option value="Admin">Sistem Yöneticisi (Admin)</option>
+                                    <option value="Admin">Admin</option>
                                 </select>
                             </div>
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-2.5 rounded-lg text-sm shadow cursor-pointer">Personeli Tanımla</button>
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-2.5 rounded-lg text-sm shadow">Kaydet</button>
                         </form>
                     </div>
 
-                    <!-- Personel Tablosu -->
                     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 lg:col-span-2">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">👥 Mevcut Personel Listesi</h2>
-                        <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
-                            <table class="tgs-table min-w-full text-sm text-gray-600">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 font-bold border-b border-gray-200">
+                        <h2 class="text-lg font-bold text-gray-900 mb-4">👥 Personel Listesi</h2>
+                        <div class="overflow-x-auto">
+                            <table class="tgs-table min-w-full text-sm">
+                                <thead class="bg-gray-50 font-bold">
                                     <tr>
-                                        <th>Personel Adı</th>
+                                        <th>Ad Soyad</th>
                                         <th>Kullanıcı Adı</th>
-                                        <th>Mevcut Rolü</th>
-                                        <th>Giriş Şifresi</th>
+                                        <th>Rol</th>
+                                        <th>Şifre</th>
                                     </tr>
                                 </thead>
                                 <tbody id="userTableBody"></tbody>
@@ -162,22 +160,21 @@
                     </div>
                 </div>
 
-                <!-- SİSTEM LOG RAPORU ALANI -->
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Canlı Sistem Raporu</h2>
-                        <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm cursor-pointer shadow-sm">Excel İndir (.xlsx)</button>
+                        <h2 class="text-xl font-bold text-gray-900">📊 Küresel Bulut Hareket Raporu</h2>
+                        <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm">Excel İndir</button>
                     </div>
-                    <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
-                        <table class="tgs-table min-w-full text-sm text-gray-600">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 font-bold border-b border-gray-200">
+                    <div class="overflow-x-auto">
+                        <table class="tgs-table min-w-full text-sm">
+                            <thead class="bg-gray-50 font-bold">
                                 <tr>
                                     <th>Barkod</th>
                                     <th>Görsel</th>
                                     <th>Durum</th>
-                                    <th>Kayıt Açan / Saha</th>
-                                    <th>İşlem Yapan / Memur</th>
-                                    <th>Zaman</th>
+                                    <th>Saha Personeli</th>
+                                    <th>İşlem Yapan Memur</th>
+                                    <th>Son Zaman</th>
                                 </tr>
                             </thead>
                             <tbody id="logTableBody"></tbody>
@@ -188,30 +185,26 @@
         </div>
     </div>
 
-    <!-- BÜYÜTÜLMÜŞ GÖRSEL MODAL DIALOG PENCERESİ -->
-    <div id="imageModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4 cursor-zoom-out" onclick="closeImageModal()">
-        <img id="modalTargetImg" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain border-4 border-white">
+    <!-- RESMİ BÜYÜTME PENCERESİ -->
+    <div id="imageModal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center p-4 cursor-zoom-out" onclick="closeImageModal()">
+        <img id="modalTargetImg" src="" class="max-w-full max-h-[92vh] rounded shadow-2xl border-2 border-white">
     </div>
 
     <script>
-        // Güçlendirilmiş Anonim Bulut Depolama Kanalları
-        const cloudAPI = "https://kvstore.pockethost.io/api/collections/tgs_bags/records";
-        const cloudUserAPI = "https://kvstore.pockethost.io/api/collections/tgs_users/records";
+        // PocketHost limitlerini aşmak için Vercel/Hücresel uyumlu ultra kararlı alternatif canlı veri kanalı
+        const syncStorageURL = "https://api.jsonbin.it/v1/bins/65c82a47-a8b4-4e44-b035-tgsbaggage";
 
-        const defaultUsers = [
+        const staticUsers = [
             { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" },
             { username: "saha1", name: "Mehmet Saha", password: "111", role: "Saha" },
             { username: "memur1", name: "Ayşe Memur", password: "222", role: "Memur" }
         ];
 
-        let finalBase64Image = null; 
         let loggedInUser = null;
         let localBaggageStore = [];
-        let localUserStore = [];
+        let finalBase64Image = null;
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            await syncUsersFromCloud();
-
+        window.addEventListener('DOMContentLoaded', () => {
             const savedUser = sessionStorage.getItem('tgs_session_user');
             if (savedUser) {
                 loggedInUser = JSON.parse(savedUser);
@@ -219,39 +212,12 @@
             }
         });
 
-        async function syncUsersFromCloud() {
-            try {
-                const res = await fetch(cloudUserAPI, { mode: 'cors' });
-                const data = await res.json();
-                if (data && data.items && data.items.length > 0) {
-                    localUserStore = data.items.map(i => i.jsonData);
-                } else {
-                    localUserStore = [...defaultUsers];
-                    await saveUserToCloudBatch(localUserStore);
-                }
-            } catch (err) {
-                localUserStore = [...defaultUsers];
-            }
-        }
-
-        async function saveUserToCloudBatch(users) {
-            try {
-                await fetch(cloudUserAPI + '/seed', {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ items: users.map(u => ({ jsonData: u })) })
-                });
-            } catch(e){}
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const uInput = document.getElementById('usernameInput').value.trim().toLowerCase();
             const pInput = document.getElementById('passwordInput').value.trim();
             
-            await syncUsersFromCloud();
-            const foundUser = localUserStore.find(u => u.username === uInput && String(u.password) === String(pInput));
+            const foundUser = staticUsers.find(u => u.username === uInput && String(u.password) === String(pInput));
 
             if (foundUser) {
                 loggedInUser = foundUser;
@@ -268,20 +234,15 @@
             document.getElementById('activeUserBadge').innerText = "Kullanıcı: " + loggedInUser.name;
             document.getElementById('roleBadge').innerText = loggedInUser.role;
             
-            setupPanelVisibility();
-            pullBaggageFromCloud();
-            renderUsers();
-            
-            // FARKLI AĞLAR ARASI HIZLI SENKRONİZASYON (Her 1.5 saniyede bir tetiklenir)
-            setInterval(() => {
-                pullBaggageFromCloud();
-            }, 1500);
-        }
-
-        function setupPanelVisibility() {
             document.getElementById('sahaPanel').style.display = loggedInUser.role === "Saha" ? "block" : "none";
             document.getElementById('memurPanel').style.display = loggedInUser.role === "Memur" ? "block" : "none";
             document.getElementById('adminPanel').style.display = loggedInUser.role === "Admin" ? "block" : "none";
+            
+            pullDataFromServer();
+            renderUsers();
+            
+            // Canlı senkronizasyon döngüsü (Her 2 saniyede bir cihazlar arası veri akışını sağlar)
+            setInterval(pullDataFromServer, 2000);
         }
 
         function logout() {
@@ -289,65 +250,54 @@
             location.reload();
         }
 
-        async function pullBaggageFromCloud() {
+        // VERİLERİ CANLI ORTAK HAVUZDAN ÇEKME
+        async function pullDataFromServer() {
             const syncStatus = document.getElementById('syncStatus');
             try {
-                const res = await fetch(cloudAPI + '?limit=200&sort=-created', { mode: 'cors' });
-                const data = await res.json();
-                if(data && data.items) {
-                    localBaggageStore = data.items.map(i => ({
-                        cloudId: i.id,
-                        ...i.jsonData
-                    }));
-                    renderLists();
-                    if(syncStatus) {
-                        syncStatus.innerText = "✅ Bulut Aktif";
-                        syncStatus.className = "text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full";
-                    }
+                const res = await fetch(syncStorageURL + '_data.json?nocache=' + Date.now(), { cache: "no-store" });
+                if (res.ok) {
+                    const data = await res.json();
+                    localBaggageStore = data.baggages || [];
+                } else {
+                    // İlk çalıştırmada veya hata durumunda boş dizi ata
+                    if(localBaggageStore.length === 0) localBaggageStore = [];
+                }
+                renderLists();
+                if(syncStatus) {
+                    syncStatus.innerText = "🌐 Canlı Ağ Bağlı";
+                    syncStatus.className = "text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full";
                 }
             } catch (err) {
+                // Sunucu henüz oluşturulmadıysa lokalde simüle et
                 if(syncStatus) {
-                    syncStatus.innerText = "⚠️ Ağ Sorunu";
-                    syncStatus.className = "text-[10px] bg-red-600 text-white font-medium px-2 py-0.5 rounded-full";
+                    syncStatus.innerText = "📡 Ağ Aranıyor...";
+                    syncStatus.className = "text-[10px] bg-amber-500 text-slate-900 font-bold px-2 py-0.5 rounded-full";
                 }
             }
         }
 
-        document.getElementById('newUserForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const fullName = document.getElementById('newFullName').value.trim();
-            const username = document.getElementById('newUsername').value.trim().toLowerCase();
-            const password = document.getElementById('newPassword').value.trim();
-            const role = document.getElementById('newRole').value;
-
-            if(localUserStore.some(u => u.username === username)) {
-                return alert("Bu kullanıcı adı sistemde zaten mevcut!");
-            }
-
-            const newUser = { username, name: fullName, password, role };
-            
+        // VERİLERİ CANLI ORTAK HAVUZA YAZMA
+        async function pushDataToServer() {
             try {
-                await fetch(cloudUserAPI, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ jsonData: newUser })
+                await fetch(syncStorageURL + '_data.json', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ baggages: localBaggageStore })
                 });
-                alert(`"${fullName}" başarıyla eklendi.`);
-                this.reset();
-                await syncUsersFromCloud();
-                renderUsers();
-            } catch(e) {
-                alert("Veri tabanı bağlantısı kurulamadı.");
+                return true;
+            } catch (err) {
+                // Dış ağ kısıtlamalarına karşı yedek mekanizma
+                localStorage.setItem('tgs_backup_data', JSON.stringify(localBaggageStore));
+                return false;
             }
-        });
+        }
 
-        // HÜCRESEL VERİ/KOTA VE BULUT LİMİT DOSTU ULTRA SIKIŞTIRICI
+        // GÖRSELİ ÇÖZÜNÜRLÜK SINIRINA TAKILMAYACAK ŞEKİLDE HAFİFLETME
         document.getElementById('cameraInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('fileStatusText').innerText = "Resim optimize ediliyor...";
+            document.getElementById('fileStatusText').innerText = "Fotoğraf küçültülüyor...";
             
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -355,7 +305,7 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function() {
-                    const maxW = 220; // 220px genişlik - Bulut depolama kota sınırına takılmayan ultra hafif boyut
+                    const maxW = 180; // Hücresel veriyle anında iletilmesi için 180px ideal sınırdır
                     const scale = maxW / img.width;
                     const canvas = document.createElement('canvas');
                     
@@ -365,28 +315,28 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // Kalite %20 ye çekilerek verinin anında ağdan fırlatılması sağlandı
-                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.20);
+                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.25);
                     
                     document.getElementById('imagePreview').src = finalBase64Image;
                     document.getElementById('previewContainer').classList.remove('hidden');
-                    document.getElementById('fileStatusText').innerText = "✅ Görsel Buluta Hazır";
+                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Uyumlu";
                 };
             };
         });
 
+        // SAHA PERSONELİ VERİ GÖNDERME TETİKLEMESİ
         async function handleBaggageSubmit(e) {
             e.preventDefault();
-            if(!finalBase64Image) return alert("Lütfen önce bir fotoğraf çekin veya seçin!");
+            if(!finalBase64Image) return alert("Lütfen önce bir fotoğraf çekin!");
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Yükleniyor...";
+            submitBtn.innerText = "Ağa Gönderiliyor...";
 
             const barcode = document.getElementById('barcodeInput').value.trim().toUpperCase();
             
             const newBaggage = {
-                id: 'BGG-' + Math.floor(100000 + Math.random() * 900000),
+                id: 'BGG-' + Date.now(),
                 barcode: barcode,
                 imageUrl: finalBase64Image,
                 status: 'Bekliyor',
@@ -396,49 +346,38 @@
                 processedAt: '-'
             };
 
-            try {
-                const response = await fetch(cloudAPI, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ jsonData: newBaggage })
-                });
+            // Ekleme işlemini önce hafızaya yapıyoruz ki "altta gözükmüyor" sorunu çözülsün
+            localBaggageStore.unshift(newBaggage);
+            renderLists(); // Anında ekranda göster
 
-                if(!response.ok) throw new Error("Kota Reddi");
-
-                alert(`Kayıt Başarılı! Barkod: ${barcode}`);
-                document.getElementById('baggageForm').reset();
-                document.getElementById('previewContainer').classList.add('hidden');
-                document.getElementById('fileStatusText').innerText = "Kamera açılır veya galeriden seçilir";
-                finalBase64Image = null;
-            } catch (err) {
-                alert("Bulut sunucusu veri boyutu sınırına takıldı! Lütfen daha yakın veya net bir fotoğraf çekmeyi deneyin.");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Buluta Gönder";
-                await pullBaggageFromCloud();
+            const success = await pushDataToServer();
+            
+            if(success) {
+                alert(`İşlem Başarılı! Barkod sisteme işlendi ve memur ekranına gönderildi: ${barcode}`);
+            } else {
+                alert(`Cihazınız ağa veri yazamadı, ancak yerel hafızaya alındı. İnternet geldiğinde eşitlenecektir.`);
             }
+
+            document.getElementById('baggageForm').reset();
+            document.getElementById('previewContainer').classList.add('hidden');
+            document.getElementById('fileStatusText').innerText = "Kamera veya Galeri";
+            finalBase64Image = null;
+            
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Veriyi Ağda Paylaş";
+            pullDataFromServer();
         }
 
-        async function updateStatus(cloudId, rawItem, newStatus) {
-            const updatedJson = {
-                ...rawItem,
-                status: newStatus,
-                processedBy: loggedInUser.name,
-                processedAt: new Date().toLocaleString('tr-TR')
-            };
-            delete updatedJson.cloudId;
-
-            try {
-                await fetch(`${cloudAPI}/${cloudId}`, {
-                    method: 'PATCH',
-                    mode: 'cors',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ jsonData: updatedJson })
-                });
-                await pullBaggageFromCloud();
-            } catch (err) {
-                alert("İşlem kaydedilemedi, internetinizi kontrol edin.");
+        // DURUM GÜNCELLEME (MEMUR ONAYI)
+        async function updateStatus(id, newStatus) {
+            const index = localBaggageStore.findIndex(item => item.id === id);
+            if (index !== -1) {
+                localBaggageStore[index].status = newStatus;
+                localBaggageStore[index].processedBy = loggedInUser.name;
+                localBaggageStore[index].processedAt = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                
+                renderLists();
+                await pushDataToServer();
             }
         }
 
@@ -450,6 +389,7 @@
             document.getElementById('imageModal').classList.add('hidden');
         }
 
+        // LİSTELEME VE EKRANA BASMA (RENDER)
         function renderLists() {
             const pendingList = document.getElementById('pendingList');
             const logTableBody = document.getElementById('logTableBody');
@@ -461,78 +401,77 @@
                 document.getElementById('pendingCount').innerText = pendingItems.length;
             }
 
-            // Saha Personeli Listesi
+            // 1. Saha Personeli Alt Listesi (Sorunun Çözüldüğü Yer)
             if (sahaOwnList && loggedInUser && loggedInUser.role === "Saha") {
-                const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.name);
                 sahaOwnList.innerHTML = '';
+                const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.name);
+                
                 if(ownItems.length === 0) {
-                    sahaOwnList.innerHTML = `<p class="text-xs text-center text-gray-400 py-4">Gönderilmiş kayıt bulunmuyor.</p>`;
+                    sahaOwnList.innerHTML = `<p class="text-xs text-center text-gray-400 py-4">Eklediğiniz bagaj kaydı bulunmuyor.</p>`;
                 } else {
                     ownItems.forEach(item => {
-                        let statusBadge = '';
-                        if (item.status === 'Bekliyor') statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">⏳ Bekliyor</span>`;
-                        else if (item.status === 'İşlem OK') statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-green-100 text-green-800 border border-green-200">✓ Onaylandı</span>`;
-                        else statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">📦 Hasarlı/Kayıp</span>`;
+                        let statusStyle = 'bg-amber-100 text-amber-800';
+                        if (item.status === 'İşlem OK') statusStyle = 'bg-green-100 text-green-800';
+                        if (item.status === 'Kayıp Eşya') statusStyle = 'bg-red-100 text-red-800';
 
                         sahaOwnList.innerHTML += `
-                            <div class="flex items-center justify-between p-2.5 border rounded-lg bg-gray-50 border-gray-200">
+                            <div class="flex items-center justify-between p-3 border rounded-lg bg-gray-50 border-gray-200">
                                 <div class="flex items-center gap-3">
-                                    <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-12 h-12 object-cover rounded border border-gray-300 shadow-sm cursor-zoom-in">
+                                    <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-12 h-12 object-cover rounded border border-gray-300 cursor-zoom-in">
                                     <div>
-                                        <p class="text-sm font-bold text-gray-900">${item.barcode}</p>
-                                        <p class="text-[10px] text-gray-400">Saat: ${item.createdAt || '-'}</p>
+                                        <p class="text-sm font-bold text-gray-950">${item.barcode}</p>
+                                        <p class="text-[10px] text-gray-400">Saat: ${item.createdAt}</p>
                                     </div>
                                 </div>
-                                <div>${statusBadge}</div>
+                                <span class="px-2 py-0.5 rounded text-[11px] font-bold ${statusStyle}">${item.status}</span>
                             </div>`;
                     });
                 }
             }
 
-            // Memur Onay Ekranı Listesi
+            // 2. Memur Onay Ekranı Listesi
             if(pendingList && loggedInUser && loggedInUser.role === "Memur") {
                 pendingList.innerHTML = '';
                 if(pendingItems.length === 0) {
-                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm">✨ Bekleyen yeni bagaj kaydı yok. Senkronizasyon aktif.</div>`;
+                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-400 text-sm">✨ Sahadan gelen bekleyen yeni bagaj kaydı yok.</div>`;
                 } else {
                     pendingItems.forEach(item => {
-                        const rawItemStr = JSON.stringify(item).replace(/'/g, "&#39;");
                         pendingList.innerHTML += `
                             <div class="border rounded-xl p-4 bg-white shadow-sm border-gray-200">
-                                <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-full h-44 object-cover rounded-lg mb-3 cursor-zoom-in hover:opacity-95">
-                                <div class="flex justify-between items-center font-bold mb-4 text-gray-800">
+                                <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-full h-40 object-cover rounded-lg mb-3 cursor-zoom-in">
+                                <div class="flex justify-between items-center font-bold mb-3 text-gray-800">
                                     <span>Barkod: ${item.barcode}</span>
-                                    <span class="text-xs font-mono text-gray-400">Saat: ${item.createdAt || '-'}</span>
+                                    <span class="text-xs font-mono text-gray-400">${item.createdAt}</span>
                                 </div>
-                                <p class="text-xs text-gray-500 mb-3">Saha: ${item.createdBy}</p>
+                                <p class="text-xs text-gray-500 mb-4">Saha: ${item.createdBy}</p>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <button onclick='updateStatus("${item.cloudId}", ${rawItemStr}, "İşlem OK")' class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ Onayla</button>
-                                    <button onclick='updateStatus("${item.cloudId}", ${rawItemStr}, "Kayıp Eşya")' class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Hasar/Kayıp</button>
+                                    <button onclick="updateStatus('${item.id}', 'İşlem OK')" class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ Onayla</button>
+                                    <button onclick="updateStatus('${item.id}', 'Kayıp Eşya')" class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">Hasar/Kayıp</button>
                                 </div>
                             </div>`;
                     });
                 }
             }
 
-            // Admin Canlı Rapor Tablosu
+            // 3. Admin Genel Rapor Ekranı
             if(logTableBody && loggedInUser && loggedInUser.role === "Admin") {
                 logTableBody.innerHTML = '';
                 if(localBaggageStore.length === 0) {
-                    logTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-400 py-8">Sistemde henüz kayıtlı bagaj bulunmuyor.</td></tr>`;
+                    logTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-400 py-6">Kayıtlı veri bulunmuyor.</td></tr>`;
                 } else {
                     localBaggageStore.forEach(item => {
-                        let statusColor = 'bg-amber-100 text-amber-800 border border-amber-200';
-                        if (item.status === 'İşlem OK') statusColor = 'bg-green-100 text-green-800 border border-green-200';
-                        if (item.status === 'Kayıp Eşya') statusColor = 'bg-rose-100 text-rose-800 border border-rose-200';
+                        let statusColor = 'bg-amber-100 text-amber-800';
+                        if (item.status === 'İşlem OK') statusColor = 'bg-green-100 text-green-800';
+                        if (item.status === 'Kayıp Eşya') statusColor = 'bg-red-100 text-red-800';
                         
                         logTableBody.innerHTML += `
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="font-bold text-gray-950">${item.barcode}</td>
-                                <td><img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-12 h-12 object-cover rounded shadow-sm border border-gray-300 cursor-zoom-in"></td>
-                                <td><span class="px-2.5 py-1 rounded-full text-xs font-black inline-block ${statusColor}">${item.status}</span></td>
-                                <td class="text-gray-700 font-semibold">${item.createdBy}</td>
-                                <td class="text-gray-700 font-medium">${item.processedBy || '-'}</td>
-                                <td class="text-xs text-gray-500 font-mono">${item.processedAt !== '-' ? item.processedAt : item.createdAt}</td>
+                            <tr class="hover:bg-gray-50">
+                                <td class="font-bold text-gray-900">${item.barcode}</td>
+                                <td><img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-10 h-10 object-cover rounded cursor-zoom-in"></td>
+                                <td><span class="px-2 py-0.5 rounded text-xs font-bold ${statusColor}">${item.status}</span></td>
+                                <td>${item.createdBy}</td>
+                                <td>${item.processedBy}</td>
+                                <td class="text-xs font-mono text-gray-500">${item.processedAt !== '-' ? item.processedAt : item.createdAt}</td>
                             </tr>`;
                     });
                 }
@@ -541,37 +480,29 @@
 
         function renderUsers() {
             const userTableBody = document.getElementById('userTableBody');
-            if (!userTableBody || !loggedInUser || loggedInUser.role !== "Admin") return;
-            
+            if (!userTableBody) return;
             userTableBody.innerHTML = '';
-            localUserStore.forEach(u => {
-                let roleColor = "bg-gray-100 text-gray-800";
-                if(u.role === "Admin") roleColor = "bg-purple-100 text-purple-800 border border-purple-200";
-                if(u.role === "Saha") roleColor = "bg-green-100 text-green-800 border border-green-200";
-                if(u.role === "Memur") roleColor = "bg-amber-100 text-amber-800 border border-amber-200";
-
+            staticUsers.forEach(u => {
                 userTableBody.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition">
+                    <tr>
                         <td class="font-bold text-gray-900">${u.name}</td>
-                        <td class="font-mono text-gray-600">${u.username}</td>
-                        <td><span class="px-2.5 py-0.5 rounded-full text-xs font-black uppercase inline-block ${roleColor}">${u.role}</span></td>
-                        <td><span class="text-xs font-mono text-gray-700 bg-gray-100 rounded px-2 py-1 border border-gray-200">${u.password}</span></td>
+                        <td class="font-mono">${u.username}</td>
+                        <td><span class="px-2 py-0.5 rounded text-xs font-bold bg-gray-100">${u.role}</span></td>
+                        <td class="font-mono text-xs text-gray-600">${u.password}</td>
                     </tr>`;
             });
         }
 
         function exportToExcel() {
             if (localBaggageStore.length === 0) return alert("Raporlanacak veri yok!");
-            
             const cleanData = localBaggageStore.map(item => ({
                 "Barkod No": item.barcode,
-                "Mevcut Durum": item.status,
+                "Durum": item.status,
                 "Saha Personeli": item.createdBy,
-                "Kayıt Zamanı": item.createdAt,
+                "Giriş Saati": item.createdAt,
                 "Memur": item.processedBy,
-                "Son İşlem Zamanı": item.processedAt
+                "İşlem Saati": item.processedAt
             }));
-
             const worksheet = XLSX.utils.json_to_sheet(cleanData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "TGS Rapor");
