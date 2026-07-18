@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Canlı Sistem Kesin Çözüm</title>
+    <title>TGS Bagaj Operasyon</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- SheetJS (Excel İçin) -->
@@ -38,12 +38,9 @@
         window.onValue = onValue;
         
         // Sistem yüklenince dinleyicileri başlat
-        setTimeout(() => {
-            if(window.initSystemFlag) {
-                listenLiveBaggageData();
-                listenLiveUsers();
-            }
-        }, 500);
+        window.initSystemFlag = true;
+        listenLiveBaggageData();
+        listenLiveUsers();
     </script>
 
     <style>
@@ -59,7 +56,6 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Firebase Gerçek Zamanlı Hat</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <input type="text" id="usernameInput" required placeholder="Kullanıcı Adı" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
@@ -186,10 +182,9 @@
     </div>
 
     <script>
-        // Varsayılan sistem ana yöneticisi (Kilitlenmelere karşı kodda sabit)
-        let localUsers = [
-            { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" }
-        ];
+        // Sabit ve Değişmez Ana Giriş Bilgisi
+        const adminFallback = { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" };
+        let localUsers = [adminFallback];
 
         let loggedInUser = null;
         let localBaggageStore = [];
@@ -209,9 +204,11 @@
             const uInput = document.getElementById('usernameInput').value.trim().toLowerCase();
             const pInput = document.getElementById('passwordInput').value.trim();
             
+            // Önce kodun içindeki adminFallback veya Firebase'den yüklenen kullanıcı listesinde ara
             const foundUser = localUsers.find(u => u.username === uInput && String(u.password) === String(pInput));
 
             if (foundUser) {
+                document.getElementById('loginError').classList.add('hidden');
                 loggedInUser = foundUser;
                 sessionStorage.setItem('tgs_session_user', JSON.stringify(loggedInUser));
                 initSystem();
@@ -221,7 +218,6 @@
         });
 
         function initSystem() {
-            window.initSystemFlag = true;
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('activeUserBadge').innerText = "Kullanıcı: " + loggedInUser.name;
@@ -231,10 +227,8 @@
             document.getElementById('memurPanel').style.display = loggedInUser.role === "Memur" ? "block" : "none";
             document.getElementById('adminPanel').style.display = loggedInUser.role === "Admin" ? "block" : "none";
             
-            if (window.db) {
-                listenLiveBaggageData();
-                listenLiveUsers();
-            }
+            renderLists();
+            renderUsersTable();
         }
 
         function logout() {
@@ -242,11 +236,11 @@
             location.reload();
         }
 
-        // FİREBASE'DEN KULLANICILARI CANLI ÇEKME (KALICI SİSTEM)
+        // FİREBASE'DEN KULLANICILARI CANLI ÇEKME
         function listenLiveUsers() {
             window.onValue(window.ref(window.db, 'users'), (snapshot) => {
                 const data = snapshot.val();
-                localUsers = [{ username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" }];
+                localUsers = [adminFallback]; // Listeyi sıfırla, admini en başa koy
                 if(data) {
                     Object.keys(data).forEach(k => {
                         localUsers.push(data[k]);
@@ -270,7 +264,7 @@
             });
         }
 
-        // YENİ PERSONEL KAYDI (FİREBASE'E EKLEME)
+        // YENİ PERSONEL KAYDI
         document.getElementById('newUserForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const username = document.getElementById('newUsername').value.trim().toLowerCase();
@@ -282,11 +276,12 @@
             };
 
             try {
+                // Hatalı iç içe ref kullanımı düzeltildi
                 await window.set(window.ref(window.db, 'users/' + username), newUser);
                 this.reset();
                 alert("Yeni personel başarıyla Firebase bulutuna eklendi!");
             } catch(err) {
-                alert("Personel kaydedilemedi, Firebase izinlerini kontrol edin.");
+                alert("Personel kaydedilemedi, ağ bağlantınızı kontrol edin.");
             }
         });
 
