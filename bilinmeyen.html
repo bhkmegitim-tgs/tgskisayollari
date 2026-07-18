@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TGS Bagaj Operasyon - Gerçek Zamanlı Bulut Otomasyonu</title>
-    <!-- Tailwind CSS (Görsel Tasarım İçin) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- SheetJS (Excel Çıktısı Alabilmek İçin) -->
+    <!-- SheetJS (Excel Çıktısı İçin) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         .tgs-table {
@@ -30,7 +30,7 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Kesintisiz Yerel Ağ Otomasyonu</p>
+                <p class="text-sm text-gray-500">Gerçek Zamanlı İnternet Senkronizasyonu</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
@@ -55,6 +55,7 @@
                 <div class="flex items-center gap-2 mt-0.5">
                     <span id="activeUserBadge" class="text-xs font-medium text-gray-300">-</span>
                     <span id="roleBadge" class="text-[10px] bg-blue-500 text-white font-black px-2 py-0.5 rounded-full uppercase">Rol</span>
+                    <span id="syncStatus" class="text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full">Bulut Aktif</span>
                 </div>
             </div>
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Çıkış ↩</button>
@@ -64,16 +65,14 @@
             
             <!-- SAHA PANELİ -->
             <div id="sahaPanel" class="hidden max-w-lg mx-auto space-y-6">
-                <!-- Fotoğraf Yükleme Formu -->
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt</h2>
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt (Bulut Modu)</h2>
                     <form id="baggageForm" onsubmit="handleBaggageSubmit(event)" class="space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Barkod No</label>
                             <input type="text" id="barcodeInput" required placeholder="Örn: TK95123" class="w-full p-3 text-lg border rounded-lg focus:outline-blue-500">
                         </div>
                         
-                        <!-- FOTOĞRAF ÇEKME BUTONU -->
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Fotoğraf Girişi</label>
                             <label for="cameraInput" class="flex flex-col items-center justify-center w-full p-6 bg-blue-50 border-2 border-dashed border-blue-400 rounded-xl cursor-pointer hover:bg-blue-100 transition text-center group">
@@ -89,11 +88,10 @@
                             <span class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow">Görsel İşlendi</span>
                         </div>
 
-                        <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Sisteme Gönder</button>
+                        <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Buluta Gönder</button>
                     </form>
                 </div>
 
-                <!-- SAHA PERSONELİNİN KENDİ EKLEDİĞİ BAGAJLARI TAKİP EDECEĞİ ALAN -->
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 class="text-base font-bold text-gray-900 mb-4">📋 Eklediğim Bagajlar ve Durumları</h3>
                     <div id="sahaOwnBaggageList" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
@@ -104,7 +102,7 @@
             <div id="memurPanel" class="hidden bg-white p-6 rounded-lg shadow-md border-t-4 border-amber-500">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                     <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <span>⏳ Onay Bekleyen Bagajlar</span>
+                        <span>⏳ Sahadan Gelen Onay Bekleyenler</span>
                         <span id="pendingCount" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
                     </h2>
                     <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs sm:text-sm cursor-pointer shadow-sm flex items-center gap-1.5 self-start sm:self-auto">
@@ -116,13 +114,10 @@
 
             <!-- ADMIN PANELİ -->
             <div id="adminPanel" class="hidden space-y-8">
-                
-                <!-- YENİ PERSONEL EKLEME VE YÖNETİM ALANI -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
                     <!-- Personel Ekleme Formu -->
                     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-1.5">➕ Yeni Personel Kaydet</h2>
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-1.5">➕ Yeni Personel Kaydet (Ortak Veritabanı)</h2>
                         <form id="newUserForm" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Adı Soyadı</label>
@@ -170,7 +165,7 @@
                 <!-- SİSTEM LOG RAPORU ALANI -->
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Sistem Canlı Raporu (Tüm Saha & Memur Hareketleri)</h2>
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Bulut Canlı Raporu (Tüm Cihazların Hareketleri)</h2>
                         <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm cursor-pointer shadow-sm">Excel İndir (.xlsx)</button>
                     </div>
                     <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
@@ -189,7 +184,6 @@
                         </table>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -200,7 +194,10 @@
     </div>
 
     <script>
-        // Varsayılan ana kullanıcılar
+        // Cihazlar arası köprü kuracak ÜCRETSİZ anonim veri kanalı API adresi
+        const cloudAPI = "https://kvstore.pockethost.io/api/collections/tgs_bags/records";
+        const cloudUserAPI = "https://kvstore.pockethost.io/api/collections/tgs_users/records";
+
         const defaultUsers = [
             { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" },
             { username: "saha1", name: "Mehmet Saha", password: "111", role: "Saha" },
@@ -212,18 +209,8 @@
         let localBaggageStore = [];
         let localUserStore = [];
 
-        // Tarayıcı sekmeleri arası canlı veri transferini sağlayan dinleyici
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'tgs_secure_baggage' || e.key === 'tgs_system_users') {
-                reloadStoreAndRender();
-            }
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!localStorage.getItem('tgs_system_users')) {
-                localStorage.setItem('tgs_system_users', JSON.stringify(defaultUsers));
-            }
-            localUserStore = JSON.parse(localStorage.getItem('tgs_system_users'));
+        window.addEventListener('DOMContentLoaded', async () => {
+            await syncUsersFromCloud();
 
             const savedUser = sessionStorage.getItem('tgs_session_user');
             if (savedUser) {
@@ -232,13 +219,39 @@
             }
         });
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        // 1. BULUTTAN KULLANICILARI ÇEKME VE EŞLEME
+        async function syncUsersFromCloud() {
+            try {
+                const res = await fetch(cloudUserAPI);
+                const data = await res.json();
+                if (data && data.items && data.items.length > 0) {
+                    localUserStore = data.items.map(i => i.jsonData);
+                } else {
+                    localUserStore = [...defaultUsers];
+                    await saveUserToCloudBatch(localUserStore);
+                }
+            } catch (err) {
+                localUserStore = [...defaultUsers];
+            }
+        }
+
+        async function saveUserToCloudBatch(users) {
+            try {
+                await fetch(cloudUserAPI + '/seed', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ items: users.map(u => ({ jsonData: u })) })
+                });
+            } catch(e){}
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const uInput = document.getElementById('usernameInput').value.trim();
-            const pInput = document.getElementById('passwordInput').value.trim();
+            const uInput = document.getElementById('usernameInput').value.trim().toLowerCase();
+            const pInput = document.getElementById('passwordInput').value.trim(); // Metin olarak kalmalı (222 hatası çözümü)
             
-            localUserStore = JSON.parse(localStorage.getItem('tgs_system_users') || '[]');
-            const foundUser = localUserStore.find(u => u.username === uInput && u.password === pInput);
+            await syncUsersFromCloud();
+            const foundUser = localUserStore.find(u => u.username === uInput && String(u.password) === String(pInput));
 
             if (foundUser) {
                 loggedInUser = foundUser;
@@ -256,13 +269,13 @@
             document.getElementById('roleBadge').innerText = loggedInUser.role;
             
             setupPanelVisibility();
-            reloadStoreAndRender();
+            pullBaggageFromCloud();
             renderUsers();
             
-            // Gerçek zamanlı okuma döngüsü (1.5 saniyeye düşürüldü)
+            // FARKLI AĞLAR İÇİN ANLIK BULUT TARAMASI (Her 2 saniyede bir internetten çeker)
             setInterval(() => {
-                reloadStoreAndRender();
-            }, 1500);
+                pullBaggageFromCloud();
+            }, 2000);
         }
 
         function setupPanelVisibility() {
@@ -276,35 +289,62 @@
             location.reload();
         }
 
-        function reloadStoreAndRender() {
-            localBaggageStore = JSON.parse(localStorage.getItem('tgs_secure_baggage') || '[]');
-            renderLists();
+        // 2. BULUTTAN BAGAJ VERİLERİNİ ÇEKME
+        async function pullBaggageFromCloud() {
+            const syncStatus = document.getElementById('syncStatus');
+            try {
+                if(syncStatus) syncStatus.innerText = "🔄 Güncelleniyor...";
+                const res = await fetch(cloudAPI + '?limit=200');
+                const data = await res.json();
+                if(data && data.items) {
+                    localBaggageStore = data.items.map(i => ({
+                        cloudId: i.id,
+                        ...i.jsonData
+                    }));
+                    renderLists();
+                    if(syncStatus) {
+                        syncStatus.innerText = "✅ Bulut Güncel";
+                        syncStatus.className = "text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full";
+                    }
+                }
+            } catch (err) {
+                if(syncStatus) {
+                    syncStatus.innerText = "❌ Bağlantı Yok";
+                    syncStatus.className = "text-[10px] bg-red-600 text-white font-medium px-2 py-0.5 rounded-full";
+                }
+            }
         }
 
-        document.getElementById('newUserForm').addEventListener('submit', function(e) {
+        // 3. BULUTA YENİ PERSONEL EKLEME
+        document.getElementById('newUserForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const fullName = document.getElementById('newFullName').value.trim();
             const username = document.getElementById('newUsername').value.trim().toLowerCase();
             const password = document.getElementById('newPassword').value.trim();
             const role = document.getElementById('newRole').value;
 
-            localUserStore = JSON.parse(localStorage.getItem('tgs_system_users') || '[]');
-
             if(localUserStore.some(u => u.username === username)) {
                 return alert("Bu kullanıcı adı sistemde zaten mevcut!");
             }
 
             const newUser = { username, name: fullName, password, role };
-            localUserStore.push(newUser);
             
-            localStorage.setItem('tgs_system_users', JSON.stringify(localUserStore));
-            alert(`"${fullName}" başarıyla eklendi.`);
-            
-            this.reset();
-            renderUsers();
+            try {
+                await fetch(cloudUserAPI, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ jsonData: newUser })
+                });
+                alert(`"${fullName}" başarıyla ortak veritabanına eklendi. Saha telefonunda anında aktiftir.`);
+                this.reset();
+                await syncUsersFromCloud();
+                renderUsers();
+            } catch(e) {
+                alert("Veri tabanına kaydedilemedi, internet bağlantınızı kontrol edin.");
+            }
         });
 
-        // FOTOĞRAF ÇEKME VE SIKIŞTIRMA MANTIĞI
+        // GÖRSEL SIKIŞTIRMA (HÜCRESEL VERİ DOSTU - HIZLI AKIŞ İÇİN HAFİFLETİLMİŞ)
         document.getElementById('cameraInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -317,7 +357,7 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function() {
-                    const maxW = 500; 
+                    const maxW = 400; // Telefon interneti hızlı aktarsın diye çözünürlük optimize edildi
                     const scale = maxW / img.width;
                     const canvas = document.createElement('canvas');
                     
@@ -327,33 +367,26 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.50);
+                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.40);
                     
                     document.getElementById('imagePreview').src = finalBase64Image;
                     document.getElementById('previewContainer').classList.remove('hidden');
-                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Hazır";
+                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Optimize Edildi";
                 };
             };
         });
 
-        // SAHA BAGAJ GÖNDERME İŞLEMİ (KESİN ÇÖZÜM)
-        function handleBaggageSubmit(e) {
-            e.preventDefault(); // Sayfa yenilenmesini tamamen bloke eder.
-            
-            if(!finalBase64Image) {
-                alert("Lütfen önce bir fotoğraf çekin veya seçin!");
-                return false;
-            }
+        // 4. SAHADAN BULUTA VERİ YÜKLEME
+        async function handleBaggageSubmit(e) {
+            e.preventDefault();
+            if(!finalBase64Image) return alert("Lütfen önce bir fotoğraf çekin veya seçin!");
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Sisteme Kaydediliyor...";
+            submitBtn.innerText = "Buluta Gönderiliyor...";
 
             const barcode = document.getElementById('barcodeInput').value.trim().toUpperCase();
             
-            // LocalStorage güncel halini oku
-            localBaggageStore = JSON.parse(localStorage.getItem('tgs_secure_baggage') || '[]');
-
             const newBaggage = {
                 id: 'BGG-' + Math.floor(100000 + Math.random() * 900000),
                 barcode: barcode,
@@ -365,40 +398,48 @@
                 processedAt: '-'
             };
 
-            localBaggageStore.push(newBaggage);
-            
-            // Kaydetme ve Eşzamanlı Render
-            localStorage.setItem('tgs_secure_baggage', JSON.stringify(localBaggageStore));
-            
-            // Diğer açık pencereleri tetikle
-            window.dispatchEvent(new Event('storage'));
+            try {
+                // İnternet üzerinden ortak havuza atar
+                await fetch(cloudAPI, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ jsonData: newBaggage })
+                });
 
-            alert(`Kayıt Başarılı! Barkod: ${barcode}`);
-            
-            // Formu temizle
-            document.getElementById('baggageForm').reset();
-            document.getElementById('previewContainer').classList.add('hidden');
-            document.getElementById('fileStatusText').innerText = "Kamera açılır veya galeriden seçilir";
-            finalBase64Image = null;
-            
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Sisteme Gönder";
-            
-            reloadStoreAndRender();
-            return false;
+                alert(`Bulut Kaydı Başarılı! Memur Ekranına Düştü. Barkod: ${barcode}`);
+                document.getElementById('baggageForm').reset();
+                document.getElementById('previewContainer').classList.add('hidden');
+                document.getElementById('fileStatusText').innerText = "Kamera açılır veya galeriden seçilir";
+                finalBase64Image = null;
+            } catch (err) {
+                alert("Bulut sunucusuna erişilemedi! Lütfen telefonun internetini kontrol edin.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Buluta Gönder";
+                await pullBaggageFromCloud();
+            }
         }
 
-        function updateStatus(id, newStatus) {
-            localBaggageStore = JSON.parse(localStorage.getItem('tgs_secure_baggage') || '[]');
-            localBaggageStore = localBaggageStore.map(item => {
-                if (item.id === id) {
-                    return { ...item, status: newStatus, processedBy: loggedInUser.name, processedAt: new Date().toLocaleString('tr-TR') };
-                }
-                return item;
-            });
-            localStorage.setItem('tgs_secure_baggage', JSON.stringify(localBaggageStore));
-            window.dispatchEvent(new Event('storage'));
-            reloadStoreAndRender();
+        // 5. DURUM GÜNCELLEME (MEMUR ONAYI - BULUTTA GÜNCELLEME)
+        async function updateStatus(cloudId, rawItem, newStatus) {
+            const updatedJson = {
+                ...rawItem,
+                status: newStatus,
+                processedBy: loggedInUser.name,
+                processedAt: new Date().toLocaleString('tr-TR')
+            };
+            delete updatedJson.cloudId; // Sistem ID'sini temizle
+
+            try {
+                await fetch(`${cloudAPI}/${cloudId}`, {
+                    method: 'PATCH',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ jsonData: updatedJson })
+                });
+                await pullBaggageFromCloud();
+            } catch (err) {
+                alert("Değişiklik bulut veritabanına işlenemedi!");
+            }
         }
 
         function openImageModal(src) {
@@ -409,6 +450,7 @@
             document.getElementById('imageModal').classList.add('hidden');
         }
 
+        // 6. EKRANA BASMA (RENDER) FONKSİYONLARI
         function renderLists() {
             const pendingList = document.getElementById('pendingList');
             const logTableBody = document.getElementById('logTableBody');
@@ -420,26 +462,26 @@
                 document.getElementById('pendingCount').innerText = pendingItems.length;
             }
 
-            // 1. SAHA LİSTESİ YENİLEME
+            // Saha Kendi Listesi
             if (sahaOwnList && loggedInUser && loggedInUser.role === "Saha") {
                 const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.name);
                 sahaOwnList.innerHTML = '';
                 if(ownItems.length === 0) {
-                    sahaOwnList.innerHTML = `<p class="text-xs text-center text-gray-400 py-4">Henüz eklediğiniz bir bagaj bulunmuyor.</p>`;
+                    sahaOwnList.innerHTML = `<p class="text-xs text-center text-gray-400 py-4">Henüz gönderdiğiniz bulut kaydı bulunmuyor.</p>`;
                 } else {
-                    ownItems.forEach(item => {
+                    ownItems.reverse().forEach(item => {
                         let statusBadge = '';
                         if (item.status === 'Bekliyor') statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">⏳ Bekliyor</span>`;
                         else if (item.status === 'İşlem OK') statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-green-100 text-green-800 border border-green-200">✓ Onaylandı</span>`;
-                        else statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">📦 Kayıp Eşya</span>`;
+                        else statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">📦 Kayıp/Hasar</span>`;
 
                         sahaOwnList.innerHTML += `
                             <div class="flex items-center justify-between p-2.5 border rounded-lg bg-gray-50 border-gray-200">
                                 <div class="flex items-center gap-3">
-                                    <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-12 h-12 object-cover rounded border border-gray-300 shadow-sm cursor-zoom-in hover:opacity-80">
+                                    <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-12 h-12 object-cover rounded border border-gray-300 shadow-sm cursor-zoom-in">
                                     <div>
                                         <p class="text-sm font-bold text-gray-900">${item.barcode}</p>
-                                        <p class="text-[10px] text-gray-400 font-mono">Saat: ${item.createdAt || '-'}</p>
+                                        <p class="text-[10px] text-gray-400">Saat: ${item.createdAt || '-'}</p>
                                     </div>
                                 </div>
                                 <div>${statusBadge}</div>
@@ -448,34 +490,37 @@
                 }
             }
 
-            // 2. MEMUR PANELİ LİSTELEME
+            // Memur Bekleyen Listesi
             if(pendingList && loggedInUser && loggedInUser.role === "Memur") {
                 pendingList.innerHTML = '';
                 if(pendingItems.length === 0) {
-                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm">✨ Bekleyen kayıt bulunmuyor.</div>`;
+                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm">✨ Sahadan gelen yeni kayıt yok. Bilgisayarınız buluta bağlıdır.</div>`;
                 } else {
                     pendingItems.forEach(item => {
+                        // Derin kopyalama ile ham veriyi koru
+                        const rawItemStr = JSON.stringify(item);
                         pendingList.innerHTML += `
                             <div class="border rounded-xl p-4 bg-white shadow-sm border-gray-200">
-                                <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-full h-44 object-cover rounded-lg mb-3 cursor-zoom-in hover:opacity-90 transition">
+                                <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-full h-44 object-cover rounded-lg mb-3 cursor-zoom-in hover:opacity-95">
                                 <div class="flex justify-between items-center font-bold mb-4 text-gray-800">
                                     <span>Barkod: ${item.barcode}</span>
-                                    <span class="text-xs font-mono text-gray-400">Kayıt: ${item.createdAt || '-'}</span>
+                                    <span class="text-xs font-mono text-gray-400">Geliş: ${item.createdAt || '-'}</span>
                                 </div>
+                                <p class="text-xs text-gray-500 mb-3">Saha: ${item.createdBy}</p>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <button onclick="updateStatus('${item.id}', 'İşlem OK')" class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ Onay</button>
-                                    <button onclick="updateStatus('${item.id}', 'Kayıp Eşya')" class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Hasar/Kayıp</button>
+                                    <button onclick='updateStatus("${item.cloudId}", ${rawItemStr}, "İşlem OK")' class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ Onayla</button>
+                                    <button onclick='updateStatus("${item.cloudId}", ${rawItemStr}, "Kayıp Eşya")' class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Hasar/Kayıp</button>
                                 </div>
                             </div>`;
                     });
                 }
             }
 
-            // 3. ADMIN PANELİ CANLI RAPOR TABLOSU
+            // Admin Canlı Rapor Tablosu
             if(logTableBody && loggedInUser && loggedInUser.role === "Admin") {
                 logTableBody.innerHTML = '';
                 if(localBaggageStore.length === 0) {
-                    logTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-400 py-8">Sistemde henüz hiçbir bagaj kaydı bulunmuyor.</td></tr>`;
+                    logTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-400 py-8">Bulutta henüz hiçbir bagaj kaydı bulunmuyor.</td></tr>`;
                 } else {
                     const sortedStore = [...localBaggageStore].reverse();
                     sortedStore.forEach(item => {
@@ -501,9 +546,7 @@
             const userTableBody = document.getElementById('userTableBody');
             if (!userTableBody || !loggedInUser || loggedInUser.role !== "Admin") return;
             
-            localUserStore = JSON.parse(localStorage.getItem('tgs_system_users') || '[]');
             userTableBody.innerHTML = '';
-            
             localUserStore.forEach(u => {
                 let roleColor = "bg-gray-100 text-gray-800";
                 if(u.role === "Admin") roleColor = "bg-purple-100 text-purple-800 border border-purple-200";
@@ -515,7 +558,7 @@
                         <td class="font-bold text-gray-900">${u.name}</td>
                         <td class="font-mono text-gray-600">${u.username}</td>
                         <td><span class="px-2.5 py-0.5 rounded-full text-xs font-black uppercase inline-block ${roleColor}">${u.role}</span></td>
-                        <td><span class="text-xs font-mono text-gray-700 bg-gray-100 rounded px-2 py-1 select-all border border-gray-200">${u.password}</span></td>
+                        <td><span class="text-xs font-mono text-gray-700 bg-gray-100 rounded px-2 py-1 border border-gray-200">${u.password}</span></td>
                     </tr>`;
             });
         }
@@ -524,7 +567,7 @@
             if (localBaggageStore.length === 0) return alert("Raporlanacak herhangi bir veri bulunamadı!");
             
             const cleanData = localBaggageStore.map(item => ({
-                "Bagaj ID": item.id,
+                "Bulut ID": item.cloudId || item.id,
                 "Barkod No": item.barcode,
                 "Mevcut Durum": item.status,
                 "Giriş Yapan Saha Personeli": item.createdBy,
@@ -535,8 +578,8 @@
 
             const worksheet = XLSX.utils.json_to_sheet(cleanData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "TGS Canlı Rapor");
-            XLSX.writeFile(workbook, `TGS_Bagaj_Raporu.xlsx`);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "TGS Bulut Canlı Rapor");
+            XLSX.writeFile(workbook, `TGS_Bulut_Bagaj_Raporu.xlsx`);
         }
     </script>
 </body>
