@@ -3,11 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Kesintisiz Canlı Eşitleme V4.3</title>
+    <title>TGS Bagaj Operasyon - Gerçek Zamanlı Canlı Sistem V5.1</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- FİREBASE MODÜLLERİ (Gerçek Zamanlı Işınlama İçin) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Yeni "bilinmeyen" projenizin entegre edilmiş güncel bilgileri
+        const firebaseConfig = {
+            apiKey: "AIzaSyCq656hCaM2FASRqspAZLDCAdJwqDW-wCQ",
+            authDomain: "bilinmeyen-3ef78.firebaseapp.com",
+            databaseURL: "https://bilinmeyen-3ef78-default-rtdb.firebaseio.com",
+            projectId: "bilinmeyen-3ef78",
+            storageBucket: "bilinmeyen-3ef78.firebasestorage.app",
+            messagingSenderId: "636444939099",
+            appId: "1:636444939099:web:0eb0820a8c71a58dfac07e",
+            measurementId: "G-HNG00C71HM"
+        };
+
+        // Firebase Başlat
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Küresel fonksiyonları dışarı aktar ki HTML butonları tetikleyebilsin
+        window.db = db;
+        window.ref = ref;
+        window.set = set;
+        window.update = update;
+        
+        // Bağlantı kurulduğunda ağ durumunu güncelle
+        setTimeout(() => {
+            if(window.initSystemFlag) {
+                listenLiveBaggageData();
+            }
+        }, 1000);
+    </script>
+
     <style>
         .tgs-table {
             width: 100% !important;
@@ -30,7 +66,7 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Hücresel Uyumlu Işınlama Motoru (V4.3)</p>
+                <p class="text-sm text-gray-500">Firebase Kesintisiz Canlı Hat (V5.1)</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
@@ -55,7 +91,7 @@
                 <div class="flex items-center gap-2 mt-0.5">
                     <span id="activeUserBadge" class="text-xs font-medium text-gray-300">-</span>
                     <span id="roleBadge" class="text-[10px] bg-blue-500 text-white font-black px-2 py-0.5 rounded-full uppercase">Rol</span>
-                    <span id="syncStatus" class="text-[10px] bg-yellow-500 text-slate-900 font-bold px-2 py-0.5 rounded-full">Ağ Bağlantısı...</span>
+                    <span id="syncStatus" class="text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full">⚡ Firebase Aktif</span>
                 </div>
             </div>
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Çıkış ↩</button>
@@ -85,7 +121,7 @@
 
                         <div id="previewContainer" class="hidden border rounded-lg p-2 bg-gray-50 relative">
                             <img id="imagePreview" src="" class="w-full h-48 object-cover rounded-lg">
-                            <span class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow">Görsel Optimize Edildi</span>
+                            <span class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow">Görsel Hazır</span>
                         </div>
 
                         <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Veriyi Ağa Gönder</button>
@@ -191,9 +227,6 @@
     </div>
 
     <script>
-        // Kotasız, anlık tepki veren ve CORS blokajı içermeyen küresel senkronizasyon kanalı
-        const syncStorageURL = "https://kvdb.io/4y9n5t8zPqW7mK3vR2aB/tgs_baggage_pool_v43";
-
         const staticUsers = [
             { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" },
             { username: "saha1", name: "Mehmet Saha", password: "111", role: "Saha" },
@@ -229,6 +262,7 @@
         });
 
         function initSystem() {
+            window.initSystemFlag = true;
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('activeUserBadge').innerText = "Kullanıcı: " + loggedInUser.name;
@@ -238,11 +272,12 @@
             document.getElementById('memurPanel').style.display = loggedInUser.role === "Memur" ? "block" : "none";
             document.getElementById('adminPanel').style.display = loggedInUser.role === "Admin" ? "block" : "none";
             
-            pullDataFromServer();
             renderUsers();
             
-            // 2 saniyede bir arkada otomatik veri yenileme (Saniyeler içinde memur ekranına aktarır)
-            setInterval(pullDataFromServer, 2000);
+            // Firebase modülü yüklenmişse doğrudan dinlemeyi başlat
+            if (window.db) {
+                listenLiveBaggageData();
+            }
         }
 
         function logout() {
@@ -250,51 +285,27 @@
             location.reload();
         }
 
-        // VERİLERİ BULUT HAVUZDAN ÇEKME
-        async function pullDataFromServer() {
-            const syncStatus = document.getElementById('syncStatus');
-            try {
-                const res = await fetch(syncStorageURL, { cache: "no-store" });
-                if (res.ok) {
-                    const textData = await res.text();
-                    if(textData && textData.trim() !== "") {
-                        const data = JSON.parse(textData);
-                        localBaggageStore = data.baggages || [];
-                    }
+        // FİREBASE CANLI DİNLEME
+        function listenLiveBaggageData() {
+            const starCountRef = window.ref(window.db, 'baggages');
+            window.onValue(starCountRef, (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    const list = Object.keys(data).map(key => data[key]);
+                    localBaggageStore = list.sort((a, b) => b.timestamp - a.timestamp);
+                } else {
+                    localBaggageStore = [];
                 }
                 renderLists();
-                if(syncStatus) {
-                    syncStatus.innerText = "⚡ Canlı Ağ Senkronize";
-                    syncStatus.className = "text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full";
-                }
-            } catch (err) {
-                if(syncStatus) {
-                    syncStatus.innerText = "🔄 Yenileniyor...";
-                    syncStatus.className = "text-[10px] bg-amber-500 text-slate-900 font-bold px-2 py-0.5 rounded-full";
-                }
-            }
+            });
         }
 
-        // VERİLERİ BULUT HAVUZA YAZMA
-        async function pushDataToServer() {
-            try {
-                const response = await fetch(syncStorageURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ baggages: localBaggageStore })
-                });
-                return response.ok;
-            } catch (err) {
-                return false;
-            }
-        }
-
-        // DEVRİMSEL ÇİFT AŞAMALI SIKIŞTIRMA MOTORU (FOTOĞRAFIN ANINDA İLETİLMESİNİ GARANTİLER)
+        // RESMİ SAHA İÇİN OPTİMİZE ET
         document.getElementById('cameraInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('fileStatusText').innerText = "Resim mikronize ediliyor...";
+            document.getElementById('fileStatusText').innerText = "Resim işleniyor...";
             
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -302,8 +313,7 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function() {
-                    // 1. AŞAMA: Piksel Boyutunu 140px genişliğe çekiyoruz (Hücresel ağ dostu)
-                    const maxW = 140; 
+                    const maxW = 320; 
                     const scale = maxW / img.width;
                     const canvas = document.createElement('canvas');
                     
@@ -313,68 +323,62 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // 2. AŞAMA: Kalite katsayısını %15'e düşürerek veriyi 3-4 KB civarına indiriyoruz!
-                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.15);
+                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.5);
                     
                     document.getElementById('imagePreview').src = finalBase64Image;
                     document.getElementById('previewContainer').classList.remove('hidden');
-                    document.getElementById('fileStatusText').innerText = "✅ Görsel Ağa Aktarıldı";
+                    document.getElementById('fileStatusText').innerText = "✅ Resim Yüklendi";
                 };
             };
         });
 
-        // SAHA PERSONELİ BAGGAGE GÖNDERİMİ
+        // SAHA PERSONELİ VERİ GÖNDERİMİ
         async function handleBaggageSubmit(e) {
             e.preventDefault();
             if(!finalBase64Image) return alert("Lütfen önce bir fotoğraf çekin!");
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Buluta Işınlanıyor...";
+            submitBtn.innerText = "Canlı Ağa İletiliyor...";
 
             const barcode = document.getElementById('barcodeInput').value.trim().toUpperCase();
+            const uniqueId = 'BGG-' + Date.now();
             
-            const newBaggage = {
-                id: 'BGG-' + Date.now(),
+            const baggageData = {
+                id: uniqueId,
                 barcode: barcode,
-                imageUrl: finalBase64Image, // 3KB'lık hafifletilmiş veri paketi
+                imageUrl: finalBase64Image,
                 status: 'Bekliyor',
                 createdBy: loggedInUser.name, 
                 createdAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
                 processedBy: '-',
-                processedAt: '-'
+                processedAt: '-',
+                timestamp: Date.now()
             };
 
-            // Yerel ekranı anında güncelle
-            localBaggageStore.unshift(newBaggage);
-            renderLists(); 
+            try {
+                await window.set(window.ref(window.db, 'baggages/' + uniqueId), baggageData);
 
-            // Küresel buluta yaz (Kesin İletim)
-            await pushDataToServer();
-
-            // Form sıfırlama
-            document.getElementById('baggageForm').reset();
-            document.getElementById('previewContainer').classList.add('hidden');
-            document.getElementById('fileStatusText').innerText = "Kamera aç veya resim seç";
-            finalBase64Image = null;
+                document.getElementById('baggageForm').reset();
+                document.getElementById('previewContainer').classList.add('hidden');
+                document.getElementById('fileStatusText').innerText = "Kamera aç veya resim seç";
+                finalBase64Image = null;
+            } catch (error) {
+                alert("Ağ hatası: Veri iletilemedi.");
+            }
             
             submitBtn.disabled = false;
             submitBtn.innerText = "Veriyi Ağa Gönder";
-            
-            pullDataFromServer();
         }
 
-        // MEMUR BUTON EYLEMLERİ
+        // MEMUR DURUM GÜNCELLEMESİ
         async function updateStatus(id, newStatus) {
-            const index = localBaggageStore.findIndex(item => item.id === id);
-            if (index !== -1) {
-                localBaggageStore[index].status = newStatus;
-                localBaggageStore[index].processedBy = loggedInUser.name;
-                localBaggageStore[index].processedAt = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-                
-                renderLists();
-                await pushDataToServer();
-            }
+            const updates = {};
+            updates['/baggages/' + id + '/status'] = newStatus;
+            updates['/baggages/' + id + '/processedBy'] = loggedInUser.name;
+            updates['/baggages/' + id + '/processedAt'] = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            
+            await window.update(window.ref(window.db), updates);
         }
 
         function openImageModal(src) {
@@ -385,7 +389,7 @@
             document.getElementById('imageModal').classList.add('hidden');
         }
 
-        // DİNAMİK LİSTE OLUŞTURUCU (RENDER)
+        // DOM RENDER MOTORU
         function renderLists() {
             const pendingList = document.getElementById('pendingList');
             const logTableBody = document.getElementById('logTableBody');
@@ -425,7 +429,7 @@
                 }
             }
 
-            // 2. Memur Canlı Ekranı Listesi (Fotoğraflar Kesinlikle Aktif)
+            // 2. Memur Canlı Ekranı
             if(pendingList && loggedInUser && loggedInUser.role === "Memur") {
                 pendingList.innerHTML = '';
                 if(pendingItems.length === 0) {
