@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Gerçek Zamanlı Canlı Sistem V5.1</title>
+    <title>TGS Bagaj Operasyon - Canlı Sistem V5.2</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
-    <!-- FİREBASE MODÜLLERİ (Gerçek Zamanlı Işınlama İçin) -->
+    <!-- FİREBASE MODÜLLERİ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Yeni "bilinmeyen" projenizin entegre edilmiş güncel bilgileri
+        // Firebase Yapılandırması (Giriş Yapılan Proje)
         const firebaseConfig = {
             apiKey: "AIzaSyCq656hCaM2FASRqspAZLDCAdJwqDW-wCQ",
             authDomain: "bilinmeyen-3ef78.firebaseapp.com",
@@ -30,18 +30,19 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Küresel fonksiyonları dışarı aktar ki HTML butonları tetikleyebilsin
+        // Fonksiyonları küresele taşıyalım
         window.db = db;
         window.ref = ref;
         window.set = set;
         window.update = update;
+        window.onValue = onValue;
         
-        // Bağlantı kurulduğunda ağ durumunu güncelle
+        // Sistem açıldığında dinlemeyi başlat
         setTimeout(() => {
             if(window.initSystemFlag) {
                 listenLiveBaggageData();
             }
-        }, 1000);
+        }, 500);
     </script>
 
     <style>
@@ -66,7 +67,7 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Firebase Kesintisiz Canlı Hat (V5.1)</p>
+                <p class="text-sm text-gray-500">Firebase Gerçek Zamanlı Hat</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
@@ -83,7 +84,7 @@
         </div>
     </div>
 
-    <!-- SİSTEM ANA İÇERİĞİ -->
+    <!-- ANA İÇERİK -->
     <div id="mainContent" class="hidden">
         <nav class="bg-slate-800 text-white p-4 shadow-md flex justify-between items-center mb-6">
             <div>
@@ -91,7 +92,7 @@
                 <div class="flex items-center gap-2 mt-0.5">
                     <span id="activeUserBadge" class="text-xs font-medium text-gray-300">-</span>
                     <span id="roleBadge" class="text-[10px] bg-blue-500 text-white font-black px-2 py-0.5 rounded-full uppercase">Rol</span>
-                    <span id="syncStatus" class="text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full">⚡ Firebase Aktif</span>
+                    <span id="syncStatus" class="text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full">⚡ Firebase Canlı</span>
                 </div>
             </div>
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Çıkış ↩</button>
@@ -274,7 +275,6 @@
             
             renderUsers();
             
-            // Firebase modülü yüklenmişse doğrudan dinlemeyi başlat
             if (window.db) {
                 listenLiveBaggageData();
             }
@@ -285,7 +285,7 @@
             location.reload();
         }
 
-        // FİREBASE CANLI DİNLEME
+        // FİREBASE KESİNTİSİZ VERİ DİNLEME
         function listenLiveBaggageData() {
             const starCountRef = window.ref(window.db, 'baggages');
             window.onValue(starCountRef, (snapshot) => {
@@ -300,7 +300,7 @@
             });
         }
 
-        // RESMİ SAHA İÇİN OPTİMİZE ET
+        // FOTOĞRAFI SIKIŞTIRMA VE HAZIRLAMA
         document.getElementById('cameraInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -332,7 +332,7 @@
             };
         });
 
-        // SAHA PERSONELİ VERİ GÖNDERİMİ
+        // SAHADAN VERİ YÜKLEME (TAKILMA HATASI DÜZELTİLDİ)
         async function handleBaggageSubmit(e) {
             e.preventDefault();
             if(!finalBase64Image) return alert("Lütfen önce bir fotoğraf çekin!");
@@ -357,21 +357,25 @@
             };
 
             try {
+                // Firebase Realtime Database'e kayıt
                 await window.set(window.ref(window.db, 'baggages/' + uniqueId), baggageData);
 
+                // Yükleme bitince arayüzü ve butonu sıfırla
                 document.getElementById('baggageForm').reset();
                 document.getElementById('previewContainer').classList.add('hidden');
                 document.getElementById('fileStatusText').innerText = "Kamera aç veya resim seç";
                 finalBase64Image = null;
+                
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Veriyi Ağa Gönder";
             } catch (error) {
-                alert("Ağ hatası: Veri iletilemedi.");
+                alert("Ağ hatası: Veri iletilemedi. Lütfen kuralları kontrol edin.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Veriyi Ağa Gönder";
             }
-            
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Veriyi Ağa Gönder";
         }
 
-        // MEMUR DURUM GÜNCELLEMESİ
+        // MEMUR BUTON AKSİYONLARI
         async function updateStatus(id, newStatus) {
             const updates = {};
             updates['/baggages/' + id + '/status'] = newStatus;
@@ -389,7 +393,7 @@
             document.getElementById('imageModal').classList.add('hidden');
         }
 
-        // DOM RENDER MOTORU
+        // EKRANLARA VERİLERİ YAZAN RENDER MOTORU
         function renderLists() {
             const pendingList = document.getElementById('pendingList');
             const logTableBody = document.getElementById('logTableBody');
@@ -401,7 +405,7 @@
                 document.getElementById('pendingCount').innerText = pendingItems.length;
             }
 
-            // 1. Saha Alt Listesi
+            // 1. Saha Arayüzü Listesi
             if (sahaOwnList && loggedInUser && loggedInUser.role === "Saha") {
                 sahaOwnList.innerHTML = '';
                 const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.name);
@@ -429,7 +433,7 @@
                 }
             }
 
-            // 2. Memur Canlı Ekranı
+            // 2. Memur Arayüzü Listesi
             if(pendingList && loggedInUser && loggedInUser.role === "Memur") {
                 pendingList.innerHTML = '';
                 if(pendingItems.length === 0) {
@@ -453,7 +457,7 @@
                 }
             }
 
-            // 3. Admin Rapor Ekranı
+            // 3. Admin Genel Takip Listesi
             if(logTableBody && loggedInUser && loggedInUser.role === "Admin") {
                 logTableBody.innerHTML = '';
                 if(localBaggageStore.length === 0) {
@@ -493,6 +497,7 @@
             });
         }
 
+        // EXCEL RAPORLAMA MOTORU
         function exportToExcel() {
             if (localBaggageStore.length === 0) return alert("Raporlanacak veri yok!");
             const cleanData = localBaggageStore.map(item => ({
