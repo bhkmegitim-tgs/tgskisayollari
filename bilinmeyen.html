@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Kesintisiz Yerel Bulut Sistemi</title>
+    <title>TGS Bagaj Operasyon - Gerçek Zamanlı Bulut Otomasyonu</title>
     <!-- Tailwind CSS (Görsel Tasarım İçin) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- SheetJS (Excel Çıktısı Alabilmek İçin) -->
@@ -20,9 +20,6 @@
             text-align: left !important;
             vertical-align: middle !important;
         }
-        .admin-block {
-            display: block !important;
-        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans min-h-screen">
@@ -33,7 +30,7 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Yerel Güvenli Otomasyon Sistemi</p>
+                <p class="text-sm text-gray-500">Kesintisiz Yerel Ağ Otomasyonu</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
@@ -70,7 +67,7 @@
                 <!-- Fotoğraf Yükleme Formu -->
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
                     <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt</h2>
-                    <form id="baggageForm" class="space-y-5">
+                    <form id="baggageForm" onsubmit="handleBaggageSubmit(event)" class="space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Barkod No</label>
                             <input type="text" id="barcodeInput" required placeholder="Örn: TK95123" class="w-full p-3 text-lg border rounded-lg focus:outline-blue-500">
@@ -96,7 +93,7 @@
                     </form>
                 </div>
 
-                <!-- SAHA PERSONELİNİN SADECE KENDİ EKLEDİĞİ BAGAJLARI TAKİP EDECEĞİ ALAN -->
+                <!-- SAHA PERSONELİNİN KENDİ EKLEDİĞİ BAGAJLARI TAKİP EDECEĞİ ALAN -->
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 class="text-base font-bold text-gray-900 mb-4">📋 Eklediğim Bagajlar ve Durumları</h3>
                     <div id="sahaOwnBaggageList" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
@@ -110,7 +107,6 @@
                         <span>⏳ Onay Bekleyen Bagajlar</span>
                         <span id="pendingCount" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
                     </h2>
-                    <!-- VARDİYA SONU EXCEL İNDİRME BUTONU (MEMURA ÖZEL) -->
                     <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs sm:text-sm cursor-pointer shadow-sm flex items-center gap-1.5 self-start sm:self-auto">
                         <span>📊 Vardiya Sonu Excel İndir (.xlsx)</span>
                     </button>
@@ -119,30 +115,62 @@
             </div>
 
             <!-- ADMIN PANELİ -->
-            <div id="adminPanel" class="hidden space-y-8 admin-block">
+            <div id="adminPanel" class="hidden space-y-8">
                 
-                <!-- PERSONEL TANIMLAMA VE YÖNETİM ALANI -->
-                <div id="personelYonetimBlogu" class="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-6 hidden">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">👥 Personel ve Rol Tanımlama</h2>
-                    <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
-                        <table class="tgs-table min-w-full text-sm text-gray-600">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 font-bold border-b border-gray-200">
-                                <tr>
-                                    <th>Personel Adı</th>
-                                    <th>Kullanıcı Adı</th>
-                                    <th>Mevcut Rolü</th>
-                                    <th>Giriş Şifresi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="userTableBody"></tbody>
-                        </table>
+                <!-- YENİ PERSONEL EKLEME VE YÖNETİM ALANI -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Personel Ekleme Formu -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-1.5">➕ Yeni Personel Kaydet</h2>
+                        <form id="newUserForm" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Adı Soyadı</label>
+                                <input type="text" id="newFullName" required placeholder="Örn: Can Yılmaz" class="w-full p-2.5 border rounded-lg text-sm focus:outline-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Kullanıcı Adı</label>
+                                <input type="text" id="newUsername" required placeholder="Örn: tgs_can" class="w-full p-2.5 border rounded-lg text-sm focus:outline-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Giriş Şifresi</label>
+                                <input type="text" id="newPassword" required placeholder="Örn: 444555" class="w-full p-2.5 border rounded-lg text-sm focus:outline-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Sistem Rolü</label>
+                                <select id="newRole" class="w-full p-2.5 border rounded-lg text-sm bg-white focus:outline-blue-500">
+                                    <option value="Saha">Saha Personeli</option>
+                                    <option value="Memur">Memur (Onay Yetkilisi)</option>
+                                    <option value="Admin">Sistem Yöneticisi (Admin)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-2.5 rounded-lg text-sm shadow cursor-pointer">Personeli Tanımla</button>
+                        </form>
+                    </div>
+
+                    <!-- Personel Tablosu -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 lg:col-span-2">
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">👥 Mevcut Personel Listesi</h2>
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
+                            <table class="tgs-table min-w-full text-sm text-gray-600">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 font-bold border-b border-gray-200">
+                                    <tr>
+                                        <th>Personel Adı</th>
+                                        <th>Kullanıcı Adı</th>
+                                        <th>Mevcut Rolü</th>
+                                        <th>Giriş Şifresi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
                 <!-- SİSTEM LOG RAPORU ALANI -->
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Sistem Log Raporu (Tüm İşlemler)</h2>
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Sistem Canlı Raporu (Tüm Saha & Memur Hareketleri)</h2>
                         <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm cursor-pointer shadow-sm">Excel İndir (.xlsx)</button>
                     </div>
                     <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
@@ -152,7 +180,8 @@
                                     <th>Barkod</th>
                                     <th>Görsel</th>
                                     <th>Durum</th>
-                                    <th>İşlem Yapan</th>
+                                    <th>Kayıt Açan / Saha</th>
+                                    <th>İşlem Yapan / Memur</th>
                                     <th>Zaman</th>
                                 </tr>
                             </thead>
@@ -171,8 +200,8 @@
     </div>
 
     <script>
-        // Personel verileri sabit tutulmuştur
-        const users = [
+        // Varsayılan ana kullanıcılar
+        const defaultUsers = [
             { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" },
             { username: "saha1", name: "Mehmet Saha", password: "111", role: "Saha" },
             { username: "memur1", name: "Ayşe Memur", password: "222", role: "Memur" }
@@ -180,34 +209,61 @@
 
         let finalBase64Image = null; 
         let loggedInUser = null;
-        let localBaggageStore = JSON.parse(localStorage.getItem('tgs_secure_baggage') || '[]');
+        let localBaggageStore = [];
+        let localUserStore = [];
+
+        // Tarayıcı sekmeleri arası canlı veri transferini sağlayan dinleyici
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'tgs_secure_baggage' || e.key === 'tgs_system_users') {
+                reloadStoreAndRender();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('tgs_system_users')) {
+                localStorage.setItem('tgs_system_users', JSON.stringify(defaultUsers));
+            }
+            localUserStore = JSON.parse(localStorage.getItem('tgs_system_users'));
+
+            const savedUser = sessionStorage.getItem('tgs_session_user');
+            if (savedUser) {
+                loggedInUser = JSON.parse(savedUser);
+                initSystem();
+            }
+        });
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const uInput = document.getElementById('usernameInput').value.trim();
             const pInput = document.getElementById('passwordInput').value.trim();
-            const foundUser = users.find(u => u.username === uInput && u.password === pInput);
+            
+            localUserStore = JSON.parse(localStorage.getItem('tgs_system_users') || '[]');
+            const foundUser = localUserStore.find(u => u.username === uInput && u.password === pInput);
 
             if (foundUser) {
                 loggedInUser = foundUser;
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                document.getElementById('activeUserBadge').innerText = "Kullanıcı: " + loggedInUser.name;
-                document.getElementById('roleBadge').innerText = loggedInUser.role;
-                
-                setupPanelVisibility();
-                renderLists();
-                renderUsers();
-                
-                // Cihazlar arası simülasyon/dinamik yenileme döngüsü
-                setInterval(() => {
-                    localBaggageStore = JSON.parse(localStorage.getItem('tgs_secure_baggage') || '[]');
-                    renderLists();
-                }, 3000);
+                sessionStorage.setItem('tgs_session_user', JSON.stringify(loggedInUser));
+                initSystem();
             } else {
                 document.getElementById('loginError').classList.remove('hidden');
             }
         });
+
+        function initSystem() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('activeUserBadge').innerText = "Kullanıcı: " + loggedInUser.name;
+            document.getElementById('roleBadge').innerText = loggedInUser.role;
+            
+            setupPanelVisibility();
+            reloadStoreAndRender();
+            renderUsers();
+            
+            // Gerçek zamanlı okuma döngüsü (1.5 saniyeye düşürüldü)
+            setInterval(() => {
+                reloadStoreAndRender();
+            }, 1500);
+        }
 
         function setupPanelVisibility() {
             document.getElementById('sahaPanel').style.display = loggedInUser.role === "Saha" ? "block" : "none";
@@ -215,9 +271,40 @@
             document.getElementById('adminPanel').style.display = loggedInUser.role === "Admin" ? "block" : "none";
         }
 
-        function logout() { location.reload(); }
+        function logout() {
+            sessionStorage.removeItem('tgs_session_user');
+            location.reload();
+        }
 
-        // MÜKEMMEL GÖRSEL SIKIŞTIRMA VE HATA ÖNLEME MANTIĞI
+        function reloadStoreAndRender() {
+            localBaggageStore = JSON.parse(localStorage.getItem('tgs_secure_baggage') || '[]');
+            renderLists();
+        }
+
+        document.getElementById('newUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('newFullName').value.trim();
+            const username = document.getElementById('newUsername').value.trim().toLowerCase();
+            const password = document.getElementById('newPassword').value.trim();
+            const role = document.getElementById('newRole').value;
+
+            localUserStore = JSON.parse(localStorage.getItem('tgs_system_users') || '[]');
+
+            if(localUserStore.some(u => u.username === username)) {
+                return alert("Bu kullanıcı adı sistemde zaten mevcut!");
+            }
+
+            const newUser = { username, name: fullName, password, role };
+            localUserStore.push(newUser);
+            
+            localStorage.setItem('tgs_system_users', JSON.stringify(localUserStore));
+            alert(`"${fullName}" başarıyla eklendi.`);
+            
+            this.reset();
+            renderUsers();
+        });
+
+        // FOTOĞRAF ÇEKME VE SIKIŞTIRMA MANTIĞI
         document.getElementById('cameraInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -230,8 +317,7 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function() {
-                    // Depolama alanı dostu akıllı küçültme (600px genişlik limiti)
-                    const maxW = 600; 
+                    const maxW = 500; 
                     const scale = maxW / img.width;
                     const canvas = document.createElement('canvas');
                     
@@ -241,43 +327,56 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // Güvenilir Base64 String üretimi (JPEG formatı %60 kalite)
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.60);
-                    finalBase64Image = compressedBase64;
+                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.50);
                     
-                    document.getElementById('imagePreview').src = compressedBase64;
+                    document.getElementById('imagePreview').src = finalBase64Image;
                     document.getElementById('previewContainer').classList.remove('hidden');
-                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Hazır (Sorunsuz)";
+                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Hazır";
                 };
             };
         });
 
-        document.getElementById('baggageForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if(!finalBase64Image) return alert("Lütfen önce bir fotoğraf çekin veya seçin!");
+        // SAHA BAGAJ GÖNDERME İŞLEMİ (KESİN ÇÖZÜM)
+        function handleBaggageSubmit(e) {
+            e.preventDefault(); // Sayfa yenilenmesini tamamen bloke eder.
+            
+            if(!finalBase64Image) {
+                alert("Lütfen önce bir fotoğraf çekin veya seçin!");
+                return false;
+            }
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Sisteme Yazılıyor...";
+            submitBtn.innerText = "Sisteme Kaydediliyor...";
 
             const barcode = document.getElementById('barcodeInput').value.trim().toUpperCase();
+            
+            // LocalStorage güncel halini oku
+            localBaggageStore = JSON.parse(localStorage.getItem('tgs_secure_baggage') || '[]');
 
             const newBaggage = {
                 id: 'BGG-' + Math.floor(100000 + Math.random() * 900000),
                 barcode: barcode,
-                imageUrl: finalBase64Image, // Hatasız gömülü Base64 veri
+                imageUrl: finalBase64Image,
                 status: 'Bekliyor',
-                createdBy: loggedInUser.username, 
+                createdBy: loggedInUser.name, 
                 createdAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-                processedBy: null,
-                processedAt: null
+                processedBy: '-',
+                processedAt: '-'
             };
 
             localBaggageStore.push(newBaggage);
+            
+            // Kaydetme ve Eşzamanlı Render
             localStorage.setItem('tgs_secure_baggage', JSON.stringify(localBaggageStore));
+            
+            // Diğer açık pencereleri tetikle
+            window.dispatchEvent(new Event('storage'));
 
-            alert("Bagaj kaydı hatasız şekilde sisteme eklendi!");
-            this.reset();
+            alert(`Kayıt Başarılı! Barkod: ${barcode}`);
+            
+            // Formu temizle
+            document.getElementById('baggageForm').reset();
             document.getElementById('previewContainer').classList.add('hidden');
             document.getElementById('fileStatusText').innerText = "Kamera açılır veya galeriden seçilir";
             finalBase64Image = null;
@@ -285,10 +384,12 @@
             submitBtn.disabled = false;
             submitBtn.innerText = "Sisteme Gönder";
             
-            renderLists();
-        });
+            reloadStoreAndRender();
+            return false;
+        }
 
         function updateStatus(id, newStatus) {
+            localBaggageStore = JSON.parse(localStorage.getItem('tgs_secure_baggage') || '[]');
             localBaggageStore = localBaggageStore.map(item => {
                 if (item.id === id) {
                     return { ...item, status: newStatus, processedBy: loggedInUser.name, processedAt: new Date().toLocaleString('tr-TR') };
@@ -296,10 +397,10 @@
                 return item;
             });
             localStorage.setItem('tgs_secure_baggage', JSON.stringify(localBaggageStore));
-            renderLists();
+            window.dispatchEvent(new Event('storage'));
+            reloadStoreAndRender();
         }
 
-        // BÜYÜK GÖRSELİ İNCELEME MODAL FONKSİYONLARI
         function openImageModal(src) {
             document.getElementById('modalTargetImg').src = src;
             document.getElementById('imageModal').classList.remove('hidden');
@@ -309,22 +410,19 @@
         }
 
         function renderLists() {
-            if (!loggedInUser) return;
-
             const pendingList = document.getElementById('pendingList');
             const logTableBody = document.getElementById('logTableBody');
             const sahaOwnList = document.getElementById('sahaOwnBaggageList');
             
             const pendingItems = localBaggageStore.filter(item => item.status === 'Bekliyor');
-            const processedItems = localBaggageStore.filter(item => item.status !== 'Bekliyor');
 
             if(document.getElementById('pendingCount')) {
                 document.getElementById('pendingCount').innerText = pendingItems.length;
             }
 
-            // 1. SAHA LİSTESİ
-            if (sahaOwnList && loggedInUser.role === "Saha") {
-                const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.username);
+            // 1. SAHA LİSTESİ YENİLEME
+            if (sahaOwnList && loggedInUser && loggedInUser.role === "Saha") {
+                const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.name);
                 sahaOwnList.innerHTML = '';
                 if(ownItems.length === 0) {
                     sahaOwnList.innerHTML = `<p class="text-xs text-center text-gray-400 py-4">Henüz eklediğiniz bir bagaj bulunmuyor.</p>`;
@@ -351,10 +449,10 @@
             }
 
             // 2. MEMUR PANELİ LİSTELEME
-            if(pendingList && loggedInUser.role === "Memur") {
+            if(pendingList && loggedInUser && loggedInUser.role === "Memur") {
                 pendingList.innerHTML = '';
                 if(pendingItems.length === 0) {
-                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm">✨ Bekleyen kayıt bulunmuyor. Vardiya sonu rapor alabilirsiniz.</div>`;
+                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm">✨ Bekleyen kayıt bulunmuyor.</div>`;
                 } else {
                     pendingItems.forEach(item => {
                         pendingList.innerHTML += `
@@ -365,29 +463,34 @@
                                     <span class="text-xs font-mono text-gray-400">Kayıt: ${item.createdAt || '-'}</span>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <button onclick="updateStatus('${item.id}', 'İşlem OK')" class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ İşlem OK</button>
-                                    <button onclick="updateStatus('${item.id}', 'Kayıp Eşya')" class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Kayıp Eşya</button>
+                                    <button onclick="updateStatus('${item.id}', 'İşlem OK')" class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ Onay</button>
+                                    <button onclick="updateStatus('${item.id}', 'Kayıp Eşya')" class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Hasar/Kayıp</button>
                                 </div>
                             </div>`;
                     });
                 }
             }
 
-            // 3. ADMIN PANELİ LOG TABLOSU
-            if(logTableBody && loggedInUser.role === "Admin") {
+            // 3. ADMIN PANELİ CANLI RAPOR TABLOSU
+            if(logTableBody && loggedInUser && loggedInUser.role === "Admin") {
                 logTableBody.innerHTML = '';
-                if(processedItems.length === 0) {
-                    logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-400 py-8">Henüz işlem görmüş bir bagaj kaydı bulunmuyor.</td></tr>`;
+                if(localBaggageStore.length === 0) {
+                    logTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-400 py-8">Sistemde henüz hiçbir bagaj kaydı bulunmuyor.</td></tr>`;
                 } else {
-                    processedItems.forEach(item => {
-                        const statusColor = item.status === 'İşlem OK' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-rose-100 text-rose-800 border border-rose-200';
+                    const sortedStore = [...localBaggageStore].reverse();
+                    sortedStore.forEach(item => {
+                        let statusColor = 'bg-amber-100 text-amber-800 border border-amber-200';
+                        if (item.status === 'İşlem OK') statusColor = 'bg-green-100 text-green-800 border border-green-200';
+                        if (item.status === 'Kayıp Eşya') statusColor = 'bg-rose-100 text-rose-800 border border-rose-200';
+                        
                         logTableBody.innerHTML += `
                             <tr class="hover:bg-gray-50 transition">
                                 <td class="font-bold text-gray-950">${item.barcode}</td>
                                 <td><img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-12 h-12 object-cover rounded shadow-sm border border-gray-300 cursor-zoom-in"></td>
                                 <td><span class="px-2.5 py-1 rounded-full text-xs font-black inline-block ${statusColor}">${item.status}</span></td>
+                                <td class="text-gray-700 font-semibold">${item.createdBy}</td>
                                 <td class="text-gray-700 font-medium">${item.processedBy || '-'}</td>
-                                <td class="text-xs text-gray-500 font-mono">${item.processedAt || '-'}</td>
+                                <td class="text-xs text-gray-500 font-mono">${item.processedAt !== '-' ? item.processedAt : item.createdAt}</td>
                             </tr>`;
                     });
                 }
@@ -396,19 +499,12 @@
 
         function renderUsers() {
             const userTableBody = document.getElementById('userTableBody');
-            const personelYonetimBlogu = document.getElementById('personelYonetimBlogu');
-            if (!userTableBody || !personelYonetimBlogu) return;
+            if (!userTableBody || !loggedInUser || loggedInUser.role !== "Admin") return;
             
-            if (!loggedInUser || loggedInUser.role !== "Admin") {
-                userTableBody.innerHTML = '';
-                personelYonetimBlogu.classList.add('hidden');
-                return;
-            }
-            
-            personelYonetimBlogu.classList.remove('hidden');
+            localUserStore = JSON.parse(localStorage.getItem('tgs_system_users') || '[]');
             userTableBody.innerHTML = '';
             
-            users.forEach(u => {
+            localUserStore.forEach(u => {
                 let roleColor = "bg-gray-100 text-gray-800";
                 if(u.role === "Admin") roleColor = "bg-purple-100 text-purple-800 border border-purple-200";
                 if(u.role === "Saha") roleColor = "bg-green-100 text-green-800 border border-green-200";
@@ -430,18 +526,17 @@
             const cleanData = localBaggageStore.map(item => ({
                 "Bagaj ID": item.id,
                 "Barkod No": item.barcode,
-                "Durum": item.status,
-                "Ekleyen Personel": item.createdBy,
-                "İşlem Yapan Memur": item.processedBy || "Bekliyor",
-                "İşlem Zamanı": item.processedAt || "Bekliyor"
+                "Mevcut Durum": item.status,
+                "Giriş Yapan Saha Personeli": item.createdBy,
+                "Kayıt Zamanı (Saha)": item.createdAt,
+                "İşlem Yapan Memur": item.processedBy,
+                "Son İşlem Zamanı (Memur)": item.processedAt
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(cleanData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "TGS Vardiya Raporu");
-            
-            const prefix = loggedInUser ? loggedInUser.username : "Vardiya";
-            XLSX.writeFile(workbook, `TGS_Bagaj_Raporu_${prefix}.xlsx`);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "TGS Canlı Rapor");
+            XLSX.writeFile(workbook, `TGS_Bagaj_Raporu.xlsx`);
         }
     </script>
 </body>
