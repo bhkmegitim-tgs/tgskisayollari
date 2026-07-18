@@ -12,7 +12,7 @@
     <!-- FİREBASE MODÜLLERİ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // Sizin Projenizin Firebase Yapılandırması
         const firebaseConfig = {
@@ -35,6 +35,7 @@
         window.ref = ref;
         window.set = set;
         window.update = update;
+        window.remove = remove;
         window.onValue = onValue;
         
         // Sistem yüklenince dinleyicileri başlat
@@ -119,7 +120,10 @@
                         <span>⏳ Sahadan Gelen Onay Bekleyenler</span>
                         <span id="pendingCount" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
                     </h2>
-                    <button onclick="exportToExcel()" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-xs">📊 Excel Raporu (.xlsx)</button>
+                    <div class="flex gap-2">
+                        <button onclick="clearAllData()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition">🗑️ Verileri Sil</button>
+                        <button onclick="exportToExcel()" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-xs">📊 Excel Raporu (.xlsx)</button>
+                    </div>
                 </div>
                 <div id="pendingList" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
             </div>
@@ -161,7 +165,10 @@
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-gray-900">📊 Tüm Bulut Hareket Raporu</h2>
-                        <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm">Excel İndir</button>
+                        <div class="flex gap-2">
+                            <button onclick="clearAllData()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition">Tüm Verileri Sil</button>
+                            <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm">Excel İndir</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="tgs-table min-w-full text-sm">
@@ -276,7 +283,6 @@
             };
 
             try {
-                // Hatalı iç içe ref kullanımı düzeltildi
                 await window.set(window.ref(window.db, 'users/' + username), newUser);
                 this.reset();
                 alert("Yeni personel başarıyla Firebase bulutuna eklendi!");
@@ -363,6 +369,21 @@
             updates['/baggages/' + id + '/processedBy'] = loggedInUser.name;
             updates['/baggages/' + id + '/processedAt'] = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
             await window.update(window.ref(window.db), updates);
+        }
+
+        // TÜM VERİLERİ SİLME FONKSİYONU
+        async function clearAllData() {
+            if (localBaggageStore.length === 0) return alert("Silinecek veri bulunmuyor.");
+            
+            const confirmDelete = confirm("TÜM bagaj verilerini kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!");
+            if (confirmDelete) {
+                try {
+                    await window.remove(window.ref(window.db, 'baggages'));
+                    alert("Tüm veriler başarıyla temizlendi.");
+                } catch (error) {
+                    alert("Hata: Veriler silinemedi. Lütfen bağlantınızı kontrol edin.");
+                }
+            }
         }
 
         // EKRAN ARAYÜZLERİNİ YAZDIRMA MOTORU
