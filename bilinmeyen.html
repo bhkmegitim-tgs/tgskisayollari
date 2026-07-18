@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Gerçek Zamanlı Bulut Otomasyonu</title>
+    <title>TGS Bagaj Operasyon - Canlı Bulut Otomasyonu V3</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- SheetJS (Excel Çıktısı İçin) -->
+    <!-- SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         .tgs-table {
@@ -30,12 +30,12 @@
             <div class="text-center mb-6">
                 <span class="text-5xl block mb-2">🧳</span>
                 <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-                <p class="text-sm text-gray-500">Gerçek Zamanlı İnternet Senkronizasyonu</p>
+                <p class="text-sm text-gray-500">Kesintisiz Canlı Ağ Otomasyonu (V3)</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Kullanıcı Adı</label>
-                    <input type="text" id="usernameInput" required placeholder="Örn: tgs1234" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
+                    <input type="text" id="usernameInput" required placeholder="Örn: saha1 veya memur1" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Şifre</label>
@@ -43,7 +43,7 @@
                 </div>
                 <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition cursor-pointer">Giriş Yap</button>
             </form>
-            <p id="loginError" class="text-red-500 text-xs font-semibold mt-3 text-center hidden">❌ Hatalı giriş!</p>
+            <p id="loginError" class="text-red-500 text-xs font-semibold mt-3 text-center hidden">❌ Hatalı giriş! (Şifreler: 111, 222, 333)</p>
         </div>
     </div>
 
@@ -55,7 +55,7 @@
                 <div class="flex items-center gap-2 mt-0.5">
                     <span id="activeUserBadge" class="text-xs font-medium text-gray-300">-</span>
                     <span id="roleBadge" class="text-[10px] bg-blue-500 text-white font-black px-2 py-0.5 rounded-full uppercase">Rol</span>
-                    <span id="syncStatus" class="text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full">Bulut Aktif</span>
+                    <span id="syncStatus" class="text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full">Bulut Bağlı</span>
                 </div>
             </div>
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Çıkış ↩</button>
@@ -66,7 +66,7 @@
             <!-- SAHA PANELİ -->
             <div id="sahaPanel" class="hidden max-w-lg mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt (Bulut Modu)</h2>
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt (Yüksek Hızlı Mod)</h2>
                     <form id="baggageForm" onsubmit="handleBaggageSubmit(event)" class="space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Barkod No</label>
@@ -117,7 +117,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Personel Ekleme Formu -->
                     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-1.5">➕ Yeni Personel Kaydet (Ortak Veritabanı)</h2>
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-1.5">➕ Yeni Personel Kaydet</h2>
                         <form id="newUserForm" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Adı Soyadı</label>
@@ -165,7 +165,7 @@
                 <!-- SİSTEM LOG RAPORU ALANI -->
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Bulut Canlı Raporu (Tüm Cihazların Hareketleri)</h2>
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Canlı Sistem Raporu</h2>
                         <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm cursor-pointer shadow-sm">Excel İndir (.xlsx)</button>
                     </div>
                     <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
@@ -194,7 +194,7 @@
     </div>
 
     <script>
-        // Cihazlar arası köprü kuracak ÜCRETSİZ anonim veri kanalı API adresi
+        // Güçlendirilmiş Anonim Bulut Depolama Kanalları
         const cloudAPI = "https://kvstore.pockethost.io/api/collections/tgs_bags/records";
         const cloudUserAPI = "https://kvstore.pockethost.io/api/collections/tgs_users/records";
 
@@ -219,10 +219,9 @@
             }
         });
 
-        // 1. BULUTTAN KULLANICILARI ÇEKME VE EŞLEME
         async function syncUsersFromCloud() {
             try {
-                const res = await fetch(cloudUserAPI);
+                const res = await fetch(cloudUserAPI, { mode: 'cors' });
                 const data = await res.json();
                 if (data && data.items && data.items.length > 0) {
                     localUserStore = data.items.map(i => i.jsonData);
@@ -239,6 +238,7 @@
             try {
                 await fetch(cloudUserAPI + '/seed', {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ items: users.map(u => ({ jsonData: u })) })
                 });
@@ -248,7 +248,7 @@
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const uInput = document.getElementById('usernameInput').value.trim().toLowerCase();
-            const pInput = document.getElementById('passwordInput').value.trim(); // Metin olarak kalmalı (222 hatası çözümü)
+            const pInput = document.getElementById('passwordInput').value.trim();
             
             await syncUsersFromCloud();
             const foundUser = localUserStore.find(u => u.username === uInput && String(u.password) === String(pInput));
@@ -272,10 +272,10 @@
             pullBaggageFromCloud();
             renderUsers();
             
-            // FARKLI AĞLAR İÇİN ANLIK BULUT TARAMASI (Her 2 saniyede bir internetten çeker)
+            // FARKLI AĞLAR ARASI HIZLI SENKRONİZASYON (Her 1.5 saniyede bir tetiklenir)
             setInterval(() => {
                 pullBaggageFromCloud();
-            }, 2000);
+            }, 1500);
         }
 
         function setupPanelVisibility() {
@@ -289,12 +289,10 @@
             location.reload();
         }
 
-        // 2. BULUTTAN BAGAJ VERİLERİNİ ÇEKME
         async function pullBaggageFromCloud() {
             const syncStatus = document.getElementById('syncStatus');
             try {
-                if(syncStatus) syncStatus.innerText = "🔄 Güncelleniyor...";
-                const res = await fetch(cloudAPI + '?limit=200');
+                const res = await fetch(cloudAPI + '?limit=200&sort=-created', { mode: 'cors' });
                 const data = await res.json();
                 if(data && data.items) {
                     localBaggageStore = data.items.map(i => ({
@@ -303,19 +301,18 @@
                     }));
                     renderLists();
                     if(syncStatus) {
-                        syncStatus.innerText = "✅ Bulut Güncel";
+                        syncStatus.innerText = "✅ Bulut Aktif";
                         syncStatus.className = "text-[10px] bg-green-600 text-white font-medium px-2 py-0.5 rounded-full";
                     }
                 }
             } catch (err) {
                 if(syncStatus) {
-                    syncStatus.innerText = "❌ Bağlantı Yok";
+                    syncStatus.innerText = "⚠️ Ağ Sorunu";
                     syncStatus.className = "text-[10px] bg-red-600 text-white font-medium px-2 py-0.5 rounded-full";
                 }
             }
         }
 
-        // 3. BULUTA YENİ PERSONEL EKLEME
         document.getElementById('newUserForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const fullName = document.getElementById('newFullName').value.trim();
@@ -332,19 +329,20 @@
             try {
                 await fetch(cloudUserAPI, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ jsonData: newUser })
                 });
-                alert(`"${fullName}" başarıyla ortak veritabanına eklendi. Saha telefonunda anında aktiftir.`);
+                alert(`"${fullName}" başarıyla eklendi.`);
                 this.reset();
                 await syncUsersFromCloud();
                 renderUsers();
             } catch(e) {
-                alert("Veri tabanına kaydedilemedi, internet bağlantınızı kontrol edin.");
+                alert("Veri tabanı bağlantısı kurulamadı.");
             }
         });
 
-        // GÖRSEL SIKIŞTIRMA (HÜCRESEL VERİ DOSTU - HIZLI AKIŞ İÇİN HAFİFLETİLMİŞ)
+        // HÜCRESEL VERİ/KOTA VE BULUT LİMİT DOSTU ULTRA SIKIŞTIRICI
         document.getElementById('cameraInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -357,33 +355,33 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function() {
-                    const maxW = 400; // Telefon interneti hızlı aktarsın diye çözünürlük optimize edildi
+                    const maxW = 220; // 220px genişlik - Bulut depolama kota sınırına takılmayan ultra hafif boyut
                     const scale = maxW / img.width;
                     const canvas = document.createElement('canvas');
                     
-                    canvas.width = img.width > maxW ? maxW : img.width;
-                    canvas.height = img.width > maxW ? img.height * scale : img.height;
+                    canvas.width = maxW;
+                    canvas.height = img.height * scale;
                     
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.40);
+                    // Kalite %20 ye çekilerek verinin anında ağdan fırlatılması sağlandı
+                    finalBase64Image = canvas.toDataURL('image/jpeg', 0.20);
                     
                     document.getElementById('imagePreview').src = finalBase64Image;
                     document.getElementById('previewContainer').classList.remove('hidden');
-                    document.getElementById('fileStatusText').innerText = "✅ Fotoğraf Optimize Edildi";
+                    document.getElementById('fileStatusText').innerText = "✅ Görsel Buluta Hazır";
                 };
             };
         });
 
-        // 4. SAHADAN BULUTA VERİ YÜKLEME
         async function handleBaggageSubmit(e) {
             e.preventDefault();
             if(!finalBase64Image) return alert("Lütfen önce bir fotoğraf çekin veya seçin!");
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Buluta Gönderiliyor...";
+            submitBtn.innerText = "Yükleniyor...";
 
             const barcode = document.getElementById('barcodeInput').value.trim().toUpperCase();
             
@@ -399,20 +397,22 @@
             };
 
             try {
-                // İnternet üzerinden ortak havuza atar
-                await fetch(cloudAPI, {
+                const response = await fetch(cloudAPI, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ jsonData: newBaggage })
                 });
 
-                alert(`Bulut Kaydı Başarılı! Memur Ekranına Düştü. Barkod: ${barcode}`);
+                if(!response.ok) throw new Error("Kota Reddi");
+
+                alert(`Kayıt Başarılı! Barkod: ${barcode}`);
                 document.getElementById('baggageForm').reset();
                 document.getElementById('previewContainer').classList.add('hidden');
                 document.getElementById('fileStatusText').innerText = "Kamera açılır veya galeriden seçilir";
                 finalBase64Image = null;
             } catch (err) {
-                alert("Bulut sunucusuna erişilemedi! Lütfen telefonun internetini kontrol edin.");
+                alert("Bulut sunucusu veri boyutu sınırına takıldı! Lütfen daha yakın veya net bir fotoğraf çekmeyi deneyin.");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Buluta Gönder";
@@ -420,7 +420,6 @@
             }
         }
 
-        // 5. DURUM GÜNCELLEME (MEMUR ONAYI - BULUTTA GÜNCELLEME)
         async function updateStatus(cloudId, rawItem, newStatus) {
             const updatedJson = {
                 ...rawItem,
@@ -428,17 +427,18 @@
                 processedBy: loggedInUser.name,
                 processedAt: new Date().toLocaleString('tr-TR')
             };
-            delete updatedJson.cloudId; // Sistem ID'sini temizle
+            delete updatedJson.cloudId;
 
             try {
                 await fetch(`${cloudAPI}/${cloudId}`, {
                     method: 'PATCH',
+                    mode: 'cors',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ jsonData: updatedJson })
                 });
                 await pullBaggageFromCloud();
             } catch (err) {
-                alert("Değişiklik bulut veritabanına işlenemedi!");
+                alert("İşlem kaydedilemedi, internetinizi kontrol edin.");
             }
         }
 
@@ -450,7 +450,6 @@
             document.getElementById('imageModal').classList.add('hidden');
         }
 
-        // 6. EKRANA BASMA (RENDER) FONKSİYONLARI
         function renderLists() {
             const pendingList = document.getElementById('pendingList');
             const logTableBody = document.getElementById('logTableBody');
@@ -462,18 +461,18 @@
                 document.getElementById('pendingCount').innerText = pendingItems.length;
             }
 
-            // Saha Kendi Listesi
+            // Saha Personeli Listesi
             if (sahaOwnList && loggedInUser && loggedInUser.role === "Saha") {
                 const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.name);
                 sahaOwnList.innerHTML = '';
                 if(ownItems.length === 0) {
-                    sahaOwnList.innerHTML = `<p class="text-xs text-center text-gray-400 py-4">Henüz gönderdiğiniz bulut kaydı bulunmuyor.</p>`;
+                    sahaOwnList.innerHTML = `<p class="text-xs text-center text-gray-400 py-4">Gönderilmiş kayıt bulunmuyor.</p>`;
                 } else {
-                    ownItems.reverse().forEach(item => {
+                    ownItems.forEach(item => {
                         let statusBadge = '';
                         if (item.status === 'Bekliyor') statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">⏳ Bekliyor</span>`;
                         else if (item.status === 'İşlem OK') statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-green-100 text-green-800 border border-green-200">✓ Onaylandı</span>`;
-                        else statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">📦 Kayıp/Hasar</span>`;
+                        else statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">📦 Hasarlı/Kayıp</span>`;
 
                         sahaOwnList.innerHTML += `
                             <div class="flex items-center justify-between p-2.5 border rounded-lg bg-gray-50 border-gray-200">
@@ -490,21 +489,20 @@
                 }
             }
 
-            // Memur Bekleyen Listesi
+            // Memur Onay Ekranı Listesi
             if(pendingList && loggedInUser && loggedInUser.role === "Memur") {
                 pendingList.innerHTML = '';
                 if(pendingItems.length === 0) {
-                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm">✨ Sahadan gelen yeni kayıt yok. Bilgisayarınız buluta bağlıdır.</div>`;
+                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm">✨ Bekleyen yeni bagaj kaydı yok. Senkronizasyon aktif.</div>`;
                 } else {
                     pendingItems.forEach(item => {
-                        // Derin kopyalama ile ham veriyi koru
-                        const rawItemStr = JSON.stringify(item);
+                        const rawItemStr = JSON.stringify(item).replace(/'/g, "&#39;");
                         pendingList.innerHTML += `
                             <div class="border rounded-xl p-4 bg-white shadow-sm border-gray-200">
                                 <img src="${item.imageUrl}" onclick="openImageModal(this.src)" class="w-full h-44 object-cover rounded-lg mb-3 cursor-zoom-in hover:opacity-95">
                                 <div class="flex justify-between items-center font-bold mb-4 text-gray-800">
                                     <span>Barkod: ${item.barcode}</span>
-                                    <span class="text-xs font-mono text-gray-400">Geliş: ${item.createdAt || '-'}</span>
+                                    <span class="text-xs font-mono text-gray-400">Saat: ${item.createdAt || '-'}</span>
                                 </div>
                                 <p class="text-xs text-gray-500 mb-3">Saha: ${item.createdBy}</p>
                                 <div class="grid grid-cols-2 gap-2">
@@ -520,10 +518,9 @@
             if(logTableBody && loggedInUser && loggedInUser.role === "Admin") {
                 logTableBody.innerHTML = '';
                 if(localBaggageStore.length === 0) {
-                    logTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-400 py-8">Bulutta henüz hiçbir bagaj kaydı bulunmuyor.</td></tr>`;
+                    logTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-400 py-8">Sistemde henüz kayıtlı bagaj bulunmuyor.</td></tr>`;
                 } else {
-                    const sortedStore = [...localBaggageStore].reverse();
-                    sortedStore.forEach(item => {
+                    localBaggageStore.forEach(item => {
                         let statusColor = 'bg-amber-100 text-amber-800 border border-amber-200';
                         if (item.status === 'İşlem OK') statusColor = 'bg-green-100 text-green-800 border border-green-200';
                         if (item.status === 'Kayıp Eşya') statusColor = 'bg-rose-100 text-rose-800 border border-rose-200';
@@ -564,22 +561,21 @@
         }
 
         function exportToExcel() {
-            if (localBaggageStore.length === 0) return alert("Raporlanacak herhangi bir veri bulunamadı!");
+            if (localBaggageStore.length === 0) return alert("Raporlanacak veri yok!");
             
             const cleanData = localBaggageStore.map(item => ({
-                "Bulut ID": item.cloudId || item.id,
                 "Barkod No": item.barcode,
                 "Mevcut Durum": item.status,
-                "Giriş Yapan Saha Personeli": item.createdBy,
-                "Kayıt Zamanı (Saha)": item.createdAt,
-                "İşlem Yapan Memur": item.processedBy,
-                "Son İşlem Zamanı (Memur)": item.processedAt
+                "Saha Personeli": item.createdBy,
+                "Kayıt Zamanı": item.createdAt,
+                "Memur": item.processedBy,
+                "Son İşlem Zamanı": item.processedAt
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(cleanData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "TGS Bulut Canlı Rapor");
-            XLSX.writeFile(workbook, `TGS_Bulut_Bagaj_Raporu.xlsx`);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "TGS Rapor");
+            XLSX.writeFile(workbook, `TGS_Bagaj_Raporu.xlsx`);
         }
     </script>
 </body>
