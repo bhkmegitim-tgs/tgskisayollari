@@ -12,7 +12,7 @@
     <!-- FİREBASE MODÜLLERİ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // Sizin Projenizin Firebase Yapılandırması
         const firebaseConfig = {
@@ -35,6 +35,7 @@
         window.ref = ref;
         window.set = set;
         window.update = update;
+        window.remove = remove;
         window.onValue = onValue;
         
         // Sistem yüklenince dinleyicileri başlat
@@ -127,10 +128,14 @@
             <!-- ADMIN PANELİ -->
             <div id="adminPanel" class="hidden space-y-8">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- PERSONEL EKLEME FORMU -->
+                    <!-- PERSONEL FORMU (HEM EKLEME HEM DÜZENLEME) -->
                     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4">➕ Yeni Personel Tanımla</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 id="formTitle" class="text-lg font-bold text-gray-900">➕ Yeni Personel Tanımla</h2>
+                            <button id="cancelEditBtn" type="button" onclick="resetUserForm()" class="text-xs text-red-500 font-bold hidden hover:underline">Vazgeç</button>
+                        </div>
                         <form id="newUserForm" class="space-y-4">
+                            <!-- Düzenleme modunda kullanıcı adının değiştirilmesini engellemek için gizli durum kontrolü yapacağız -->
                             <input type="text" id="newFullName" placeholder="Adı Soyadı" required class="w-full p-2.5 border rounded-lg text-sm">
                             <input type="text" id="newUsername" placeholder="Kullanıcı Adı" required class="w-full p-2.5 border rounded-lg text-sm">
                             <input type="text" id="newPassword" placeholder="Giriş Şifresi" required class="w-full p-2.5 border rounded-lg text-sm">
@@ -139,7 +144,7 @@
                                 <option value="Memur">Memur (Onay Yetkilisi)</option>
                                 <option value="Admin">Admin</option>
                             </select>
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-2.5 rounded-lg text-sm shadow">Sisteme Kaydet (Kalıcı)</button>
+                            <button type="submit" id="userFormSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-2.5 rounded-lg text-sm shadow">Sisteme Kaydet (Kalıcı)</button>
                         </form>
                     </div>
 
@@ -149,7 +154,7 @@
                         <div class="overflow-x-auto">
                             <table class="tgs-table min-w-full text-sm">
                                 <thead class="bg-gray-50 font-bold">
-                                    <tr><th>Ad Soyad</th><th>Kullanıcı Adı</th><th>Yetki Rolü</th><th>Şifre</th></tr>
+                                    <tr><th>Ad Soyad</th><th>Kullanıcı Adı</th><th>Yetki Rolü</th><th>Şifre</th><th class="text-right">İşlemler</th></tr>
                                 </thead>
                                 <tbody id="userTableBody"></tbody>
                             </table>
@@ -182,9 +187,9 @@
     </div>
 
     <script>
-        // Sabit ve Değişmez Ana Giriş Bilgisi
         const adminFallback = { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" };
         let localUsers = [adminFallback];
+        let isEditMode = false; // Düzenleme modunda olup olmadığımızı kontrol eden bayrak
 
         let loggedInUser = null;
         let localBaggageStore = [];
@@ -204,7 +209,6 @@
             const uInput = document.getElementById('usernameInput').value.trim().toLowerCase();
             const pInput = document.getElementById('passwordInput').value.trim();
             
-            // Önce kodun içindeki adminFallback veya Firebase'den yüklenen kullanıcı listesinde ara
             const foundUser = localUsers.find(u => u.username === uInput && String(u.password) === String(pInput));
 
             if (foundUser) {
@@ -240,7 +244,7 @@
         function listenLiveUsers() {
             window.onValue(window.ref(window.db, 'users'), (snapshot) => {
                 const data = snapshot.val();
-                localUsers = [adminFallback]; // Listeyi sıfırla, admini en başa koy
+                localUsers = [adminFallback]; 
                 if(data) {
                     Object.keys(data).forEach(k => {
                         localUsers.push(data[k]);
@@ -264,7 +268,7 @@
             });
         }
 
-        // YENİ PERSONEL KAYDI
+        // PERSONEL FORMU GÖNDERME (EKLEME VE GÜNCELLEME ORTAK MOTORU)
         document.getElementById('newUserForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const username = document.getElementById('newUsername').value.trim().toLowerCase();
@@ -276,14 +280,82 @@
             };
 
             try {
-                // Hatalı iç içe ref kullanımı düzeltildi
                 await window.set(window.ref(window.db, 'users/' + username), newUser);
-                this.reset();
-                alert("Yeni personel başarıyla Firebase bulutuna eklendi!");
+                alert(isEditMode ? "Personel bilgileri başarıyla güncellendi!" : "Yeni personel başarıyla eklendi!");
+                resetUserForm();
             } catch(err) {
-                alert("Personel kaydedilemedi, ağ bağlantınızı kontrol edin.");
+                alert("İşlem başarısız oldu, ağ bağlantınızı kontrol edin.");
             }
         });
+
+        // DÜZENLEME MODUNU AÇMA
+        function editUser(username) {
+            const user = localUsers.find(u => u.username === username);
+            if (!user || user.username === 'admin') return;
+
+            isEditMode = true;
+            document.getElementById('formTitle').innerText = "📝 Personel Düzenle";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('userFormSubmitBtn').innerText = "Personeli Güncelle";
+            document.getElementById('userFormSubmitBtn').classList.replace('bg-blue-600', 'bg-amber-600');
+            
+            // Bilgileri forma doldur
+            document.getElementById('newFullName').value = user.name;
+            document.getElementById('newUsername').value = user.username;
+            document.getElementById('newUsername').disabled = true; // Kullanıcı adı ID olduğu için değiştirilemez
+            document.getElementById('newPassword').value = user.password;
+            document.getElementById('newRole').value = user.role;
+        }
+
+        // SİLME FONKSİYONU
+        async function deleteUser(username) {
+            if (username === 'admin') return alert("Ana yönetici hesabı silinemez!");
+            if (confirm(`${username} kullanıcısını kalıcı olarak silmek istediğinize emin misiniz?`)) {
+                try {
+                    await window.remove(window.ref(window.db, 'users/' + username));
+                    alert("Kullanıcı silindi.");
+                    if(isEditMode && document.getElementById('newUsername').value === username) {
+                        resetUserForm();
+                    }
+                } catch (error) {
+                    alert("Silme işlemi başarısız.");
+                }
+            }
+        }
+
+        // FORMU SIFIRLAMA / DÜZENLEMEDEN VAZGEÇME
+        function resetUserForm() {
+            isEditMode = false;
+            document.getElementById('newUserForm').reset();
+            document.getElementById('formTitle').innerText = "➕ Yeni Personel Tanımla";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('userFormSubmitBtn').innerText = "Sisteme Kaydet (Kalıcı)";
+            document.getElementById('userFormSubmitBtn').classList.replace('bg-amber-600', 'bg-blue-600');
+            document.getElementById('newUsername').disabled = false;
+        }
+
+        // TABLODA KULLANICILARI YAZDIRMA (İŞLEM BUTONLARI EKLENDİ)
+        function renderUsersTable() {
+            const tbody = document.getElementById('userTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            localUsers.forEach(u => {
+                const isAdmin = u.username === 'admin';
+                const actionButtons = isAdmin ? 
+                    `<span class="text-xs text-gray-400 italic">Sistem Kilidi</span>` : 
+                    `<button onclick="editUser('${u.username}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2 py-1 rounded text-xs mr-1 transition cursor-pointer">Düzenle</button>
+                     <button onclick="deleteUser('${u.username}')" class="bg-red-500 hover:bg-red-600 text-white font-bold px-2 py-1 rounded text-xs transition cursor-pointer">Sil</button>`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-2 border-b font-bold">${u.name}</td>
+                        <td class="p-2 border-b font-mono">${u.username}</td>
+                        <td class="p-2 border-b"><span class="bg-gray-200 px-2 py-0.5 rounded text-xs">${u.role}</span></td>
+                        <td class="p-2 border-b font-mono text-xs">${u.password}</td>
+                        <td class="p-2 border-b text-right">${actionButtons}</td>
+                    </tr>`;
+            });
+        }
 
         // KAMERADAN FOTOĞRAF ALMA VE BOYUT KÜÇÜLTME
         document.getElementById('cameraInput').addEventListener('change', function(e) {
@@ -427,15 +499,6 @@
                         </tr>`;
                 });
             }
-        }
-
-        function renderUsersTable() {
-            const tbody = document.getElementById('userTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            localUsers.forEach(u => {
-                tbody.innerHTML += `<tr><td class="p-2 border-b font-bold">${u.name}</td><td class="p-2 border-b font-mono">${u.username}</td><td class="p-2 border-b"><span class="bg-gray-200 px-2 py-0.5 rounded text-xs">${u.role}</span></td><td class="p-2 border-b font-mono text-xs">${u.password}</td></tr>`;
-            });
         }
 
         function openImageModal(src) { document.getElementById('modalTargetImg').src = src; document.getElementById('imageModal').classList.remove('hidden'); }
