@@ -66,40 +66,59 @@
         <div class="max-w-7xl mx-auto px-4 space-y-8">
             
             <!-- SAHA PANELİ -->
-            <div id="sahaPanel" class="hidden max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
-                <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt</h2>
-                <form id="baggageForm" class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Barkod No</label>
-                        <input type="text" id="barcodeInput" required placeholder="Örn: TK95123" class="w-full p-3 text-lg border rounded-lg focus:outline-blue-500">
-                    </div>
-                    
-                    <!-- BÜYÜTÜLMÜŞ MOBİL UYUMLU FOTOĞRAF ÇEKME BUTONU -->
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Fotoğraf Girişi</label>
-                        <label for="cameraInput" class="flex flex-col items-center justify-center w-full p-6 bg-blue-50 border-2 border-dashed border-blue-400 rounded-xl cursor-pointer hover:bg-blue-100 transition text-center group">
-                            <span class="text-4xl mb-2 group-hover:scale-110 transition-transform">📸</span>
-                            <span class="text-base font-bold text-blue-700">FOTOĞRAF ÇEK / SEÇ</span>
-                            <span class="text-xs text-blue-500 mt-1" id="fileStatusText">Kamera açılır veya galeriden seçilir</span>
-                            <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
-                        </label>
-                    </div>
+            <div id="sahaPanel" class="hidden max-w-lg mx-auto space-y-6">
+                <!-- Fotoğraf Yükleme Formu -->
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">📸 Saha Bagaj Kayıt</h2>
+                    <form id="baggageForm" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Barkod No</label>
+                            <input type="text" id="barcodeInput" required placeholder="Örn: TK95123" class="w-full p-3 text-lg border rounded-lg focus:outline-blue-500">
+                        </div>
+                        
+                        <!-- FOTOĞRAF ÇEKME BUTONU -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Fotoğraf Girişi</label>
+                            <label for="cameraInput" class="flex flex-col items-center justify-center w-full p-6 bg-blue-50 border-2 border-dashed border-blue-400 rounded-xl cursor-pointer hover:bg-blue-100 transition text-center group">
+                                <span class="text-4xl mb-2 group-hover:scale-110 transition-transform">📸</span>
+                                <span class="text-base font-bold text-blue-700">FOTOĞRAF ÇEK / SEÇ</span>
+                                <span class="text-xs text-blue-500 mt-1" id="fileStatusText">Kamera açılır veya galeriden seçilir</span>
+                                <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
+                            </label>
+                        </div>
 
-                    <div id="previewContainer" class="hidden border rounded-lg p-2 bg-gray-50 relative">
-                        <img id="imagePreview" src="" class="w-full h-52 object-cover rounded-lg">
-                        <span class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow">Görsel Hazır</span>
-                    </div>
+                        <div id="previewContainer" class="hidden border rounded-lg p-2 bg-gray-50 relative">
+                            <img id="imagePreview" src="" class="w-full h-52 object-cover rounded-lg">
+                            <span class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow">Görsel Hazır</span>
+                        </div>
 
-                    <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Sisteme Gönder</button>
-                </form>
+                        <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white p-3.5 rounded-lg text-base font-bold hover:bg-green-700 cursor-pointer shadow-md transition-all">Sisteme Gönder</button>
+                    </form>
+                </div>
+
+                <!-- SAHA PERSONELİNİN SADECE KENDİ EKLEDİĞİ BAGAJLARI TAKİP EDECEĞİ ALAN -->
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h3 class="text-base font-bold text-gray-900 mb-4 flex justify-between items-center">
+                        <span>📋 Eklediğim Bagajlar ve Durumları</span>
+                    </h3>
+                    <div id="sahaOwnBaggageList" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                        <!-- Sadece giriş yapan personelin eklediği bagajlar dinamik listelenecek -->
+                    </div>
+                </div>
             </div>
 
             <!-- MEMUR PANELİ -->
             <div id="memurPanel" class="hidden bg-white p-6 rounded-lg shadow-md border-t-4 border-amber-500">
-                <h2 class="text-lg font-bold text-gray-800 mb-4 flex justify-between">
-                    <span>⏳ Onay Bekleyen Bagajlar</span>
-                    <span id="pendingCount" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
-                </h2>
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <span>⏳ Onay Bekleyen Bagajlar</span>
+                        <span id="pendingCount" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
+                    </h2>
+                    <!-- VARDİYA SONU EXCEL İNDİRME BUTONU (MEMURA ÖZEL) -->
+                    <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs sm:text-sm cursor-pointer shadow-sm flex items-center gap-1.5 self-start sm:self-auto">
+                        <span>📊 Vardiya Sonu Excel İndir (.xlsx)</span>
+                    </button>
+                </div>
                 <div id="pendingList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
@@ -126,7 +145,7 @@
                     </div>
                 </div>
 
-                <!-- SİSTEM LOG RAPORU ALANI -->
+                <!-- SİSTEM LOG RAPORU ALANI (Yalnızca Adminlerde Görünür) -->
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Sistem Log Raporu</h2>
@@ -163,7 +182,7 @@
             { username: "memur1", name: "Ayşe Memur", password: "222", role: "Memur" }
         ];
 
-        let compressedBlobData = null; // Sıkıştırılmış resim verisini tutacak
+        let compressedBlobData = null; 
         let loggedInUser = null;
         let localBaggageStore = JSON.parse(localStorage.getItem('tgs_blob_baggage') || '[]');
 
@@ -184,12 +203,11 @@
                 renderLists();
                 renderUsers();
                 
-                if(loggedInUser.role !== "Saha") {
-                    setInterval(() => {
-                        localBaggageStore = JSON.parse(localStorage.getItem('tgs_blob_baggage') || '[]');
-                        renderLists();
-                    }, 3000);
-                }
+                // Canlı senkronizasyon (Memur veya saha listeyi güncellediğinde otomatik yenilenir)
+                setInterval(() => {
+                    localBaggageStore = JSON.parse(localStorage.getItem('tgs_blob_baggage') || '[]');
+                    renderLists();
+                }, 3000);
             } else {
                 document.getElementById('loginError').classList.remove('hidden');
             }
@@ -202,6 +220,201 @@
         }
 
         function logout() { location.reload(); }
+
+        document.getElementById('cameraInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileStatusText').innerText = "Görsel işleniyor...";
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    const maxW = 1024;
+                    const scale = maxW / img.width;
+                    const canvas = document.createElement('canvas');
+                    
+                    canvas.width = img.width > maxW ? maxW : img.width;
+                    canvas.height = img.width > maxW ? img.height * scale : img.height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    canvas.toBlob(function(blob) {
+                        compressedBlobData = blob;
+                        document.getElementById('imagePreview').src = canvas.toDataURL('image/jpeg', 0.75);
+                        document.getElementById('previewContainer').classList.remove('hidden');
+                        document.getElementById('fileStatusText').innerText = "✅ Fotoğraf hazırlandı (" + (blob.size/1024).toFixed(1) + " KB)";
+                    }, 'image/jpeg', 0.75);
+                };
+            };
+        });
+
+        document.getElementById('baggageForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if(!compressedBlobData) return alert("Lütfen önce bir fotoğraf çekin veya seçin!");
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Buluta Gönderiliyor...";
+
+            const barcode = document.getElementById('barcodeInput').value.trim();
+            const filename = `tgs-${barcode}-${Date.now()}.jpg`;
+
+            try {
+                const response = await fetch(`https://blob.vercel-storage.com/${filename}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${VERCEL_BLOB_TOKEN}`,
+                        'X-API-Version': '1', 
+                        'Content-Type': 'image/jpeg'
+                    },
+                    body: compressedBlobData 
+                });
+
+                if(!response.ok) throw new Error("Vercel Blob sunucusu yüklemeyi reddetti.");
+                
+                const blobData = await response.json();
+                const bulutResimLinki = blobData.url;
+
+                const newBaggage = {
+                    id: 'BGG-' + Math.floor(100000 + Math.random() * 900000),
+                    barcode: barcode,
+                    imageUrl: bulutResimLinki,
+                    status: 'Bekliyor',
+                    createdBy: loggedInUser.username, 
+                    createdAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+                    processedBy: null,
+                    processedAt: null
+                };
+
+                localBaggageStore.push(newBaggage);
+                localStorage.setItem('tgs_blob_baggage', JSON.stringify(localBaggageStore));
+
+                alert("Bagaj fotoğrafı başarıyla buluta yüklendi ve sisteme kaydedildi!");
+                this.reset();
+                document.getElementById('previewContainer').classList.add('hidden');
+                document.getElementById('fileStatusText').innerText = "Kamera açılır veya galeriden seçilir";
+                compressedBlobData = null;
+                
+                renderLists();
+
+            } catch (err) {
+                console.error(err);
+                alert("Yükleme Hatası: Sunucu bağlantısı doğrulanamadı.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Sisteme Gönder";
+            }
+        });
+
+        function updateStatus(id, newStatus) {
+            localBaggageStore = localBaggageStore.map(item => {
+                if (item.id === id) {
+                    return { ...item, status: newStatus, processedBy: loggedInUser.name, processedAt: new Date().toLocaleString('tr-TR') };
+                }
+                return item;
+            });
+            localStorage.setItem('tgs_blob_baggage', JSON.stringify(localBaggageStore));
+            renderLists();
+        }
+
+        function renderLists() {
+            if (!loggedInUser) return;
+
+            const pendingList = document.getElementById('pendingList');
+            const logTableBody = document.getElementById('logTableBody');
+            const sahaOwnList = document.getElementById('sahaOwnBaggageList');
+            
+            const pendingItems = localBaggageStore.filter(item => item.status === 'Bekliyor');
+            const processedItems = localBaggageStore.filter(item => item.status !== 'Bekliyor');
+
+            if(document.getElementById('pendingCount')) {
+                document.getElementById('pendingCount').innerText = pendingItems.length;
+            }
+
+            // 1. SAHA PERSONELİ LİSTELEME MANTIĞI
+            if (sahaOwnList && loggedInUser.role === "Saha") {
+                const ownItems = localBaggageStore.filter(item => item.createdBy === loggedInUser.username);
+                ownItems.sort((a, b) => (a.status === 'Bekliyor' ? -1 : 1));
+
+                sahaOwnList.innerHTML = '';
+                if(ownItems.length === 0) {
+                    sahaOwnList.innerHTML = `<p class="text-xs text-center text-gray-400 py-4">Henüz eklediğiniz bir bagaj bulunmuyor.</p>`;
+                } else {
+                    ownItems.forEach(item => {
+                        let statusBadge = '';
+                        if (item.status === 'Bekliyor') {
+                            statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">⏳ Bekliyor</span>`;
+                        } else if (item.status === 'İşlem OK') {
+                            statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-green-100 text-green-800 border border-green-200">✓ Onaylandı</span>`;
+                        } else {
+                            statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">📦 Kayıp Eşya</span>`;
+                        }
+
+                        sahaOwnList.innerHTML += `
+                            <div class="flex items-center justify-between p-2.5 border rounded-lg bg-gray-50 border-gray-200 hover:bg-gray-100 transition">
+                                <div class="flex items-center gap-3">
+                                    <img src="${item.imageUrl}" class="w-10 h-10 object-cover rounded border border-gray-300 shadow-sm">
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-900">${item.barcode}</p>
+                                        <p class="text-[10px] text-gray-400 font-mono">Kayıt Saat: ${item.createdAt || '-'}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    ${statusBadge}
+                                </div>
+                            </div>`;
+                    });
+                }
+            }
+
+            // 2. MEMUR PANELİ LİSTELEME
+            if(pendingList && loggedInUser.role === "Memur") {
+                pendingList.innerHTML = '';
+                if(pendingItems.length === 0) {
+                    pendingList.innerHTML = `<div class="col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm">✨ Bekleyen bagaj kaydı bulunmuyor. Her şey güncel!</div>`;
+                } else {
+                    pendingItems.forEach(item => {
+                        pendingList.innerHTML += `
+                            <div class="border rounded-xl p-4 bg-white shadow-sm border-gray-200">
+                                <img src="${item.imageUrl}" class="w-full h-44 object-cover rounded-lg mb-3">
+                                <div class="flex justify-between items-center font-bold mb-4 text-gray-800">
+                                    <span>Barkod: ${item.barcode}</span>
+                                    <span class="text-xs font-mono text-gray-400">Saat: ${item.createdAt || '-'}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="updateStatus('${item.id}', 'İşlem OK')" class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ İşlem OK</button>
+                                    <button onclick="updateStatus('${item.id}', 'Kayıp Eşya')" class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Kayıp Eşya</button>
+                                </div>
+                            </div>`;
+                    });
+                }
+            }
+
+            // 3. ADMIN PANELİ LOG TABLOSU LİSTELEME
+            if(logTableBody && loggedInUser.role === "Admin") {
+                logTableBody.innerHTML = '';
+                if(processedItems.length === 0) {
+                    logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-400 py-8">Henüz işlem görmüş bir bagaj kaydı bulunmuyor.</td></tr>`;
+                } else {
+                    processedItems.forEach(item => {
+                        const statusColor = item.status === 'İşlem OK' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-rose-100 text-rose-800 border border-rose-200';
+                        logTableBody.innerHTML += `
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="font-bold text-gray-950">${item.barcode}</td>
+                                <td><a href="${item.imageUrl}" target="_blank"><img src="${item.imageUrl}" class="w-12 h-12 object-cover rounded shadow-sm border border-gray-300"></a></td>
+                                <td><span class="px-2.5 py-1 rounded-full text-xs font-black inline-block ${statusColor}">${item.status}</span></td>
+                                <td class="text-gray-700 font-medium">${item.processedBy || '-'}</td>
+                                <td class="text-xs text-gray-500 font-mono">${item.processedAt || '-'}</td>
+                            </tr>`;
+                    });
+                }
+            }
+        }
 
         function renderUsers() {
             const userTableBody = document.getElementById('userTableBody');
@@ -234,153 +447,6 @@
             });
         }
 
-        // FOTOĞRAF SEÇİLDİĞİNDE ARKA PLANDA OTOMATİK SIKIŞTIRMA VE OPTİMİZASYON MANTIĞI
-        document.getElementById('cameraInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            document.getElementById('fileStatusText').innerText = "Görsel işleniyor ve optimize ediliyor...";
-            
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function(event) {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = function() {
-                    // Maksimum genişlik sınırlandırması (Mobil cihazların 12MP+ boyutunu web uyumlu hale getirir)
-                    const maxW = 1024;
-                    const scale = maxW / img.width;
-                    const canvas = document.createElement('canvas');
-                    
-                    canvas.width = img.width > maxW ? maxW : img.width;
-                    canvas.height = img.width > maxW ? img.height * scale : img.height;
-                    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // Görseli %75 kalitede JPEG formatına sıkıştırıp Blob'a çeviriyoruz (Boyut 10MB'dan ~200KB'a düşer!)
-                    canvas.toBlob(function(blob) {
-                        compressedBlobData = blob;
-                        document.getElementById('imagePreview').src = canvas.toDataURL('image/jpeg', 0.75);
-                        document.getElementById('previewContainer').classList.remove('hidden');
-                        document.getElementById('fileStatusText').innerText = "✅ Fotoğraf başarıyla hazırlandı (" + (blob.size/1024).toFixed(1) + " KB)";
-                    }, 'image/jpeg', 0.75);
-                };
-            };
-        });
-
-        // SIKIŞTIRILMIŞ RESMİ HIZLICA VERCEL BLOB'A GÖNDERME
-        document.getElementById('baggageForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if(!compressedBlobData) return alert("Lütfen önce bir fotoğraf çekin veya seçin!");
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Buluta Gönderiliyor...";
-
-            const barcode = document.getElementById('barcodeInput').value.trim();
-            const filename = `tgs-${barcode}-${Date.now()}.jpg`;
-
-            try {
-                const response = await fetch(`https://blob.vercel-storage.com/${filename}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${VERCEL_BLOB_TOKEN}`,
-                        'x-xss-protection': '1; mode=block'
-                    },
-                    body: compressedBlobData // Sıkıştırılmış optimize veri gidiyor
-                });
-
-                if(!response.ok) throw new Error("Yükleme sırasında Vercel sunucusu hata verdi.");
-                
-                const blobData = await response.json();
-                const bulutResimLinki = blobData.url;
-
-                const newBaggage = {
-                    id: 'BGG-' + Math.floor(100000 + Math.random() * 900000),
-                    barcode: barcode,
-                    imageUrl: bulutResimLinki,
-                    status: 'Bekliyor',
-                    processedBy: null,
-                    processedAt: null
-                };
-
-                localBaggageStore.push(newBaggage);
-                localStorage.setItem('tgs_blob_baggage', JSON.stringify(localBaggageStore));
-
-                alert("Bagaj fotoğrafı başarıyla buluta yüklendi ve sisteme kaydedildi!");
-                this.reset();
-                document.getElementById('previewContainer').classList.add('hidden');
-                document.getElementById('fileStatusText').innerText = "Kamera açılır veya galeriden seçilir";
-                compressedBlobData = null;
-
-            } catch (err) {
-                alert("Hata Oluştu: " + err.message + "\nLütfen tekrar deneyin.");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Sisteme Gönder";
-            }
-        });
-
-        function updateStatus(id, newStatus) {
-            localBaggageStore = localBaggageStore.map(item => {
-                if (item.id === id) {
-                    return { ...item, status: newStatus, processedBy: loggedInUser.name, processedAt: new Date().toLocaleString('tr-TR') };
-                }
-                return item;
-            });
-            localStorage.setItem('tgs_blob_baggage', JSON.stringify(localBaggageStore));
-            renderLists();
-        }
-
-        function renderLists() {
-            const pendingList = document.getElementById('pendingList');
-            const logTableBody = document.getElementById('logTableBody');
-            
-            const pendingItems = localBaggageStore.filter(item => item.status === 'Bekliyor');
-            const processedItems = localBaggageStore.filter(item => item.status !== 'Bekliyor');
-
-            if(document.getElementById('pendingCount')) {
-                document.getElementById('pendingCount').innerText = pendingItems.length;
-            }
-
-            if(pendingList) {
-                pendingList.innerHTML = '';
-                pendingItems.forEach(item => {
-                    pendingList.innerHTML += `
-                        <div class="border rounded-xl p-4 bg-white shadow-sm border-gray-200">
-                            <img src="${item.imageUrl}" class="w-full h-44 object-cover rounded-lg mb-3">
-                            <div class="flex justify-between items-center font-bold mb-4 text-gray-800">
-                                <span>Barkod: ${item.barcode}</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="updateStatus('${item.id}', 'İşlem OK')" class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ İşlem OK</button>
-                                <button onclick="updateStatus('${item.id}', 'Kayıp Eşya')" class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Kayıp Eşya</button>
-                            </div>
-                        </div>`;
-                });
-            }
-
-            if(logTableBody) {
-                logTableBody.innerHTML = '';
-                if(processedItems.length === 0) {
-                    logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-400 py-8">Henüz işlem görmüş bir bagaj kaydı bulunmuyor.</td></tr>`;
-                } else {
-                    processedItems.forEach(item => {
-                        const statusColor = item.status === 'İşlem OK' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-rose-100 text-rose-800 border border-rose-200';
-                        logTableBody.innerHTML += `
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="font-bold text-gray-950">${item.barcode}</td>
-                                <td><a href="${item.imageUrl}" target="_blank"><img src="${item.imageUrl}" class="w-12 h-12 object-cover rounded shadow-sm border border-gray-300"></a></td>
-                                <td><span class="px-2.5 py-1 rounded-full text-xs font-black inline-block ${statusColor}">${item.status}</span></td>
-                                <td class="text-gray-700 font-medium">${item.processedBy || '-'}</td>
-                                <td class="text-xs text-gray-500 font-mono">${item.processedAt || '-'}</td>
-                            </tr>`;
-                    });
-                }
-            }
-        }
-
         function exportToExcel() {
             if (localBaggageStore.length === 0) return alert("Raporlanacak herhangi bir veri bulunamadı!");
             
@@ -389,14 +455,18 @@
                 "Barkod No": item.barcode,
                 "Fotoğraf Linki (Bulut)": item.imageUrl,
                 "Durum": item.status,
-                "İşlem Yapan": item.processedBy || "Bekliyor",
+                "Ekleyen Personel": item.createdBy,
+                "İşlem Yapan Memur": item.processedBy || "Bekliyor",
                 "İşlem Zamanı": item.processedAt || "Bekliyor"
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(cleanData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "TGS Bagaj Raporu");
-            XLSX.writeFile(workbook, "TGS_Bulut_Bagaj_Raporu.xlsx");
+            
+            // Kullanıcı adına göre dosya ismini dinamik yapalım (Örn: TGS_Rapor_memur1.xlsx)
+            const prefix = loggedInUser ? loggedInUser.username : "Bulut";
+            XLSX.writeFile(workbook, `TGS_Bagaj_Raporu_${prefix}.xlsx`);
         }
     </script>
 </body>
