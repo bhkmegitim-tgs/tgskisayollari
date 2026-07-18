@@ -2,81 +2,90 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>TGS Yönetim Paneli</title>
+    <title>TGS Bagaj Operasyon - Tam Sistem</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCq656hCaM2FASRqspAZLDCAdJwqDW-wCQ",
             databaseURL: "https://bilinmeyen-3ef78-default-rtdb.firebaseio.com",
             projectId: "bilinmeyen-3ef78"
         };
-
         const app = initializeApp(firebaseConfig);
         window.db = getDatabase(app);
-        window.ref = ref;
-        window.set = set;
+        window.ref = ref; window.set = set; window.onValue = onValue;
     </script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 p-4">
 
-    <!-- GİRİŞ FORMU -->
-    <div id="loginCard" class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">TGS Giriş</h2>
-        <input type="text" id="u" placeholder="Kullanıcı Adı" class="w-full p-3 mb-3 border rounded-lg">
-        <input type="password" id="p" placeholder="Şifre" class="w-full p-3 mb-4 border rounded-lg">
-        <button onclick="checkLogin()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Giriş Yap</button>
+    <!-- GİRİŞ EKRANI -->
+    <div id="loginScreen" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg mt-10">
+        <h1 class="text-2xl font-bold mb-6 text-center">TGS Giriş</h1>
+        <input type="text" id="user" placeholder="Kullanıcı Adı" class="w-full p-3 mb-3 border rounded">
+        <input type="password" id="pass" placeholder="Şifre" class="w-full p-3 mb-4 border rounded">
+        <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded font-bold">Giriş Yap</button>
     </div>
 
-    <!-- ADMİN PANELİ -->
-    <div id="adminPanel" class="hidden bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
-        <h2 class="text-xl font-bold mb-6">Admin Paneli</h2>
-        <button onclick="clearDatabase()" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold mb-3 hover:bg-red-700 transition">Tüm Verileri Sil (Baggages) 🗑️</button>
-        <button onclick="logout()" class="w-full bg-gray-500 text-white py-3 rounded-lg font-bold">Çıkış Yap</button>
+    <!-- PANEL (Giriş yapınca görünür) -->
+    <div id="appPanel" class="hidden max-w-4xl mx-auto space-y-6">
+        <nav class="bg-slate-800 text-white p-4 rounded flex justify-between">
+            <span id="welcomeMsg" class="font-bold"></span>
+            <button onclick="logout()" class="bg-red-500 px-3 py-1 rounded text-sm">Çıkış</button>
+        </nav>
+
+        <!-- ADMIN PANELİ ÖZEL BÖLÜMÜ -->
+        <div id="adminControls" class="hidden bg-white p-6 rounded shadow border-l-4 border-red-600">
+            <h2 class="font-bold text-lg mb-4">Admin Kontrolleri</h2>
+            <button onclick="clearAllData()" class="bg-red-600 text-white px-6 py-2 rounded font-bold hover:bg-red-700">Tüm Verileri Sil (Baggages) 🗑️</button>
+        </div>
+
+        <!-- Buraya diğer panel içeriklerinizi (Saha/Memur listeleri) ekleyebilirsiniz -->
+        <div class="bg-white p-6 rounded shadow text-center text-gray-500">
+            Sistem aktif. Panele hoş geldiniz.
+        </div>
     </div>
 
     <script>
-        // Giriş Kontrolü
-        function checkLogin() {
-            const u = document.getElementById('u').value.trim();
-            const p = document.getElementById('p').value.trim();
-            
+        function login() {
+            const u = document.getElementById('user').value.trim();
+            const p = document.getElementById('pass').value.trim();
+
             if (u === "admin" && p === "333") {
-                sessionStorage.setItem('isLogged', 'true');
-                showAdmin();
+                sessionStorage.setItem('tgs_user', JSON.stringify({username: "admin", role: "Admin"}));
+                initUI();
             } else {
-                alert("Hatalı kullanıcı adı veya şifre!");
+                alert("Hatalı kullanıcı veya şifre!");
             }
         }
 
-        // Veri Silme Fonksiyonu
-        async function clearDatabase() {
-            if(confirm("DİKKAT: Tüm kayıtlar kalıcı olarak silinecek! Onaylıyor musunuz?")) {
-                try {
-                    await window.set(window.ref(window.db, 'baggages'), null);
-                    alert("Veritabanı başarıyla temizlendi.");
-                } catch(e) {
-                    alert("Hata oluştu, tekrar deneyin.");
-                }
+        function initUI() {
+            const user = JSON.parse(sessionStorage.getItem('tgs_user'));
+            if (!user) return;
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appPanel').classList.remove('hidden');
+            document.getElementById('welcomeMsg').innerText = "Hoş geldin, " + user.username;
+
+            if (user.role === "Admin") {
+                document.getElementById('adminControls').classList.remove('hidden');
             }
         }
 
-        function showAdmin() {
-            document.getElementById('loginCard').classList.add('hidden');
-            document.getElementById('adminPanel').classList.remove('hidden');
+        async function clearAllData() {
+            if(confirm("DİKKAT: Tüm veriler silinecek! Onaylıyor musunuz?")) {
+                await window.set(window.ref(window.db, 'baggages'), null);
+                alert("Veritabanı sıfırlandı.");
+            }
         }
 
         function logout() {
-            sessionStorage.removeItem('isLogged');
+            sessionStorage.removeItem('tgs_user');
             location.reload();
         }
 
-        // Sayfa açıldığında oturumu kontrol et
-        if(sessionStorage.getItem('isLogged') === 'true') {
-            showAdmin();
-        }
+        if(sessionStorage.getItem('tgs_user')) initUI();
     </script>
 </body>
 </html>
