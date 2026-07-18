@@ -9,7 +9,7 @@
     <!-- SheetJS (Excel Çıktısı Alabilmek İçin) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* Kaymaları önlemek için tabloya özel sabitleyici standart kurallar */
+        /* Tablolardaki hücre kaymalarını ve daralmaları önleyen sabitleyici kurallar */
         .tgs-table {
             width: 100% !important;
             border-collapse: collapse !important;
@@ -92,6 +92,28 @@
 
             <!-- ADMIN PANELİ -->
             <div id="adminPanel" class="hidden space-y-8">
+                
+                <!-- PERSONEL TANIMLAMA VE YÖNETİM ALANI -->
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">👥 Personel ve Rol Tanımlama</h2>
+                    <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                        <table class="tgs-table min-w-full text-sm text-gray-600">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 font-bold border-b border-gray-200">
+                                <tr>
+                                    <th>Personel Adı</th>
+                                    <th>Kullanıcı Adı</th>
+                                    <th>Mevcut Rolü</th>
+                                    <th>Giriş Şifresi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                <!-- Dinamik kullanıcı listesi buraya basılacak -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SİSTEM LOG RAPORU ALANI -->
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📊 Sistem Log Raporu</h2>
@@ -109,11 +131,12 @@
                                 </tr>
                             </thead>
                             <tbody id="logTableBody">
-                                <!-- Dinamik log verileri buraya sorunsuz eklenecek -->
+                                <!-- Dinamik bagaj hareketleri buraya eklenecek -->
                             </tbody>
                         </table>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -122,7 +145,7 @@
         // Vercel panelinden aldığımız güncel token şifreniz
         const VERCEL_BLOB_TOKEN = "vercel_blob_rw_JxN4iMyJK80kKLEO_CH3vun95ecpQGSWWE3yjZjqGeZWrfg";
 
-        // Kullanıcı Giriş Bilgileri
+        // Kullanıcı Giriş Bilgileri ve Tanımlamaları
         const users = [
             { username: "admin", name: "Sistem Yöneticisi", password: "333", role: "Admin" },
             { username: "saha1", name: "Mehmet Saha", password: "111", role: "Saha" },
@@ -151,6 +174,7 @@
                 
                 setupPanelVisibility();
                 renderLists();
+                renderUsers(); // Admin için kullanıcı yönetim tablosunu doldurur
                 
                 // Saha dışındaki paneller için verileri her 3 saniyede bir otomatik yenile
                 if(loggedInUser.role !== "Saha") {
@@ -171,6 +195,28 @@
         }
 
         function logout() { location.reload(); }
+
+        // Admin Paneli İçin Personel Listesini Çizen Fonksiyon
+        function renderUsers() {
+            const userTableBody = document.getElementById('userTableBody');
+            if (!userTableBody) return;
+            
+            userTableBody.innerHTML = '';
+            users.forEach(u => {
+                let roleColor = "bg-gray-100 text-gray-800";
+                if(u.role === "Admin") roleColor = "bg-purple-100 text-purple-800 border border-purple-200";
+                if(u.role === "Saha") roleColor = "bg-green-100 text-green-800 border border-green-200";
+                if(u.role === "Memur") roleColor = "bg-amber-100 text-amber-800 border border-amber-200";
+
+                userTableBody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="font-bold text-gray-900">${u.name}</td>
+                        <td class="font-mono text-gray-600">${u.username}</td>
+                        <td><span class="px-2.5 py-0.5 rounded-full text-xs font-black uppercase inline-block ${roleColor}">${u.role}</span></td>
+                        <td class="text-xs font-mono text-gray-400 bg-gray-50 rounded px-2 py-1 select-all border border-gray-200 inline-block mt-2">${u.password}</td>
+                    </tr>`;
+            });
+        }
 
         // Fotoğraf Seçildiğinde Önizleme Göster
         document.getElementById('cameraInput').addEventListener('change', function(e) {
@@ -249,7 +295,7 @@
             renderLists();
         }
 
-        // Listeleri ve Tabloyu Arayüze Ekleme
+        // Listeleri ve Rapor Tablosunu Arayüze Ekleme
         function renderLists() {
             const pendingList = document.getElementById('pendingList');
             const logTableBody = document.getElementById('logTableBody');
@@ -257,38 +303,44 @@
             const pendingItems = localBaggageStore.filter(item => item.status === 'Bekliyor');
             const processedItems = localBaggageStore.filter(item => item.status !== 'Bekliyor');
 
-            document.getElementById('pendingCount').innerText = pendingItems.length;
+            if(document.getElementById('pendingCount')) {
+                document.getElementById('pendingCount').innerText = pendingItems.length;
+            }
 
-            pendingList.innerHTML = '';
-            pendingItems.forEach(item => {
-                pendingList.innerHTML += `
-                    <div class="border rounded-xl p-4 bg-white shadow-sm border-gray-200">
-                        <img src="${item.imageUrl}" class="w-full h-44 object-cover rounded-lg mb-3">
-                        <div class="flex justify-between items-center font-bold mb-4 text-gray-800">
-                            <span>Barkod: ${item.barcode}</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="updateStatus('${item.id}', 'İşlem OK')" class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ İşlem OK</button>
-                            <button onclick="updateStatus('${item.id}', 'Kayıp Eşya')" class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Kayıp Eşya</button>
-                        </div>
-                    </div>`;
-            });
-
-            logTableBody.innerHTML = '';
-            if(processedItems.length === 0) {
-                logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-400 py-8">Henüz işlem görmüş bir bagaj kaydı bulunmuyor.</td></tr>`;
-            } else {
-                processedItems.forEach(item => {
-                    const statusColor = item.status === 'İşlem OK' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-rose-100 text-rose-800 border border-rose-200';
-                    logTableBody.innerHTML += `
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="font-bold text-gray-950">${item.barcode}</td>
-                            <td><a href="${item.imageUrl}" target="_blank"><img src="${item.imageUrl}" class="w-12 h-12 object-cover rounded shadow-sm border border-gray-300"></a></td>
-                            <td><span class="px-2.5 py-1 rounded-full text-xs font-black inline-block ${statusColor}">${item.status}</span></td>
-                            <td class="text-gray-700 font-medium">${item.processedBy || '-'}</td>
-                            <td class="text-xs text-gray-500 font-mono">${item.processedAt || '-'}</td>
-                        </tr>`;
+            if(pendingList) {
+                pendingList.innerHTML = '';
+                pendingItems.forEach(item => {
+                    pendingList.innerHTML += `
+                        <div class="border rounded-xl p-4 bg-white shadow-sm border-gray-200">
+                            <img src="${item.imageUrl}" class="w-full h-44 object-cover rounded-lg mb-3">
+                            <div class="flex justify-between items-center font-bold mb-4 text-gray-800">
+                                <span>Barkod: ${item.barcode}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="updateStatus('${item.id}', 'İşlem OK')" class="bg-blue-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-blue-700">✓ İşlem OK</button>
+                                <button onclick="updateStatus('${item.id}', 'Kayıp Eşya')" class="bg-red-600 text-white py-2 rounded text-xs font-bold cursor-pointer hover:bg-red-700">📦 Kayıp Eşya</button>
+                            </div>
+                        </div>`;
                 });
+            }
+
+            if(logTableBody) {
+                logTableBody.innerHTML = '';
+                if(processedItems.length === 0) {
+                    logTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-400 py-8">Henüz işlem görmüş bir bagaj kaydı bulunmuyor.</td></tr>`;
+                } else {
+                    processedItems.forEach(item => {
+                        const statusColor = item.status === 'İşlem OK' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-rose-100 text-rose-800 border border-rose-200';
+                        logTableBody.innerHTML += `
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="font-bold text-gray-950">${item.barcode}</td>
+                                <td><a href="${item.imageUrl}" target="_blank"><img src="${item.imageUrl}" class="w-12 h-12 object-cover rounded shadow-sm border border-gray-300"></a></td>
+                                <td><span class="px-2.5 py-1 rounded-full text-xs font-black inline-block ${statusColor}">${item.status}</span></td>
+                                <td class="text-gray-700 font-medium">${item.processedBy || '-'}</td>
+                                <td class="text-xs text-gray-500 font-mono">${item.processedAt || '-'}</td>
+                            </tr>`;
+                    });
+                }
             }
         }
 
