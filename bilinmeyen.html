@@ -2,151 +2,81 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGS Bagaj Operasyon - Admin</title>
+    <title>TGS Yönetim Paneli</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCq656hCaM2FASRqspAZLDCAdJwqDW-wCQ",
-            authDomain: "bilinmeyen-3ef78.firebaseapp.com",
             databaseURL: "https://bilinmeyen-3ef78-default-rtdb.firebaseio.com",
-            projectId: "bilinmeyen-3ef78",
-            storageBucket: "bilinmeyen-3ef78.firebasestorage.app",
-            messagingSenderId: "636444939099",
-            appId: "1:636444939099:web:0eb0820a8c71a58dfac07e",
-            measurementId: "G-HNG00C71HM"
+            projectId: "bilinmeyen-3ef78"
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        window.db = db;
+        window.db = getDatabase(app);
         window.ref = ref;
         window.set = set;
-        window.update = update;
-        window.remove = remove;
-        window.onValue = onValue;
-        
-        listenLiveBaggageData();
-        listenLiveUsers();
     </script>
-
-    <style>
-        .tgs-table { width: 100% !important; border-collapse: collapse !important; display: table !important; }
-        .tgs-table th, .tgs-table td { padding: 12px 14px !important; border-bottom: 1px solid #e2e8f0 !important; text-align: left !important; }
-    </style>
 </head>
-<body class="bg-gray-100 font-sans min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <!-- GİRİŞ EKRANI -->
-    <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50 px-4">
-        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
-            <div class="text-center mb-6">
-                <span class="text-5xl block mb-2">🧳</span>
-                <h1 class="text-2xl font-black text-slate-800">TGS Bagaj Operasyon</h1>
-            </div>
-            <form id="loginForm" class="space-y-4">
-                <input type="text" id="usernameInput" required placeholder="Kullanıcı Adı" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
-                <input type="password" id="passwordInput" required placeholder="Şifre" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none">
-                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition cursor-pointer">Giriş Yap</button>
-            </form>
-            <p id="loginError" class="text-red-500 text-xs font-semibold mt-3 text-center hidden">❌ Hatalı kullanıcı adı veya şifre!</p>
-        </div>
+    <!-- GİRİŞ FORMU -->
+    <div id="loginCard" class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">TGS Giriş</h2>
+        <input type="text" id="u" placeholder="Kullanıcı Adı" class="w-full p-3 mb-3 border rounded-lg">
+        <input type="password" id="p" placeholder="Şifre" class="w-full p-3 mb-4 border rounded-lg">
+        <button onclick="checkLogin()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Giriş Yap</button>
     </div>
 
-    <!-- ANA İÇERİK -->
-    <div id="mainContent" class="hidden">
-        <nav class="bg-slate-800 text-white p-4 shadow-md flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-lg font-bold">🧳 TGS Bagaj Yönetimi</h1>
-                <div class="flex items-center gap-2 mt-0.5">
-                    <span id="activeUserBadge" class="text-xs font-medium text-gray-300">-</span>
-                    <span id="roleBadge" class="text-[10px] bg-blue-500 text-white font-black px-2 py-0.5 rounded-full uppercase">Rol</span>
-                </div>
-            </div>
-            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Çıkış ↩</button>
-        </nav>
-
-        <div class="max-w-7xl mx-auto px-4 space-y-8">
-            
-            <!-- PANEL SEÇİMLERİ (Saha/Memur/Admin) -->
-            <div id="sahaPanel" class="hidden max-w-lg mx-auto space-y-6">
-                <!-- Saha Paneli kodları... -->
-            </div>
-
-            <div id="memurPanel" class="hidden bg-white p-6 rounded-lg shadow-md border-t-4 border-amber-500">
-                <!-- Memur Paneli kodları... -->
-            </div>
-
-            <!-- ADMIN PANELİ (Güncellenmiş) -->
-            <div id="adminPanel" class="hidden space-y-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-fit">
-                        <h2 id="formTitle" class="text-lg font-bold text-gray-900 mb-4">➕ Yeni Personel</h2>
-                        <form id="newUserForm" class="space-y-4">
-                            <input type="text" id="newFullName" placeholder="Ad Soyad" required class="w-full p-2.5 border rounded-lg text-sm">
-                            <input type="text" id="newUsername" placeholder="Kullanıcı Adı" required class="w-full p-2.5 border rounded-lg text-sm">
-                            <input type="text" id="newPassword" placeholder="Şifre" required class="w-full p-2.5 border rounded-lg text-sm">
-                            <select id="newRole" class="w-full p-2.5 border rounded-lg text-sm bg-white">
-                                <option value="Saha">Saha</option>
-                                <option value="Memur">Memur</option>
-                                <option value="Admin">Admin</option>
-                            </select>
-                            <button type="submit" id="userFormSubmitBtn" class="w-full bg-blue-600 text-white font-bold p-2.5 rounded-lg text-sm">Kaydet</button>
-                        </form>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 lg:col-span-2">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4">👥 Personel Listesi</h2>
-                        <table class="tgs-table text-sm"><tbody id="userTableBody"></tbody></table>
-                    </div>
-                </div>
-
-                <!-- GÜNCEL RAPOR PANELİ -->
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900">📊 Tüm Bulut Hareketleri</h2>
-                        <div>
-                            <button onclick="exportToExcel()" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-sm mr-2">Excel İndir</button>
-                            <button onclick="clearAllBaggage()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-sm">Tüm Verileri Sil 🗑️</button>
-                        </div>
-                    </div>
-                    <table class="tgs-table text-sm"><thead class="bg-gray-50 font-bold"><tr><th>Barkod</th><th>Durum</th><th>Saha</th><th>Saat</th></tr></thead><tbody id="logTableBody"></tbody></table>
-                </div>
-            </div>
-        </div>
+    <!-- ADMİN PANELİ -->
+    <div id="adminPanel" class="hidden bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
+        <h2 class="text-xl font-bold mb-6">Admin Paneli</h2>
+        <button onclick="clearDatabase()" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold mb-3 hover:bg-red-700 transition">Tüm Verileri Sil (Baggages) 🗑️</button>
+        <button onclick="logout()" class="w-full bg-gray-500 text-white py-3 rounded-lg font-bold">Çıkış Yap</button>
     </div>
 
     <script>
-        const adminFallback = { username: "admin", name: "Yönetici", password: "333", role: "Admin" };
-        let localUsers = [adminFallback];
-        let localBaggageStore = [];
-        let loggedInUser = null;
+        // Giriş Kontrolü
+        function checkLogin() {
+            const u = document.getElementById('u').value.trim();
+            const p = document.getElementById('p').value.trim();
+            
+            if (u === "admin" && p === "333") {
+                sessionStorage.setItem('isLogged', 'true');
+                showAdmin();
+            } else {
+                alert("Hatalı kullanıcı adı veya şifre!");
+            }
+        }
 
-        // --- SİLME FONKSİYONU ---
-        async function clearAllBaggage() {
-            if(confirm("DİKKAT: Veritabanındaki tüm bagaj kayıtları kalıcı olarak silinecektir. Emin misiniz?")) {
+        // Veri Silme Fonksiyonu
+        async function clearDatabase() {
+            if(confirm("DİKKAT: Tüm kayıtlar kalıcı olarak silinecek! Onaylıyor musunuz?")) {
                 try {
                     await window.set(window.ref(window.db, 'baggages'), null);
-                    alert("Tüm veriler başarıyla temizlendi.");
-                } catch (e) {
-                    alert("Silme işlemi başarısız oldu.");
+                    alert("Veritabanı başarıyla temizlendi.");
+                } catch(e) {
+                    alert("Hata oluştu, tekrar deneyin.");
                 }
             }
         }
 
-        // --- DİĞER GEREKLİ FONKSİYONLAR ---
-        function listenLiveUsers() { window.onValue(window.ref(window.db, 'users'), (s) => { const d = s.val(); localUsers = [adminFallback]; if(d) Object.keys(d).forEach(k => localUsers.push(d[k])); renderUsersTable(); }); }
-        function listenLiveBaggageData() { window.onValue(window.ref(window.db, 'baggages'), (s) => { const d = s.val(); localBaggageStore = d ? Object.keys(d).map(k => d[k]).sort((a,b) => b.timestamp - a.timestamp) : []; renderLists(); }); }
-        
-        // (Diğer fonksiyonlarınız burada kalmaya devam edecek...)
-        function logout() { sessionStorage.removeItem('tgs_session_user'); location.reload(); }
-        // ... (Render ve diğer işlemler aynen korunmuştur)
+        function showAdmin() {
+            document.getElementById('loginCard').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+        }
+
+        function logout() {
+            sessionStorage.removeItem('isLogged');
+            location.reload();
+        }
+
+        // Sayfa açıldığında oturumu kontrol et
+        if(sessionStorage.getItem('isLogged') === 'true') {
+            showAdmin();
+        }
     </script>
 </body>
 </html>
