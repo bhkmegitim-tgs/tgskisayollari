@@ -12,6 +12,7 @@
             --dark-color: #2c3e50;
             --light-bg: #f5f7fa;
             --success-color: #27ae60;
+            --danger-color: #e74c3c;
         }
         * {
             box-sizing: border-box;
@@ -138,6 +139,10 @@
             background-color: var(--dark-color);
             color: white;
         }
+        .btn-admin {
+            background-color: var(--primary-color);
+            color: white;
+        }
         .status-msg {
             margin-top: 15px;
             padding: 10px;
@@ -149,6 +154,59 @@
         }
         .status-success { background: #d4edda; color: #155724; }
         .status-error { background: #f8d7da; color: #721c24; }
+
+        /* ADMIN PANELİ STİLLERİ */
+        #adminPanel {
+            display: none;
+            margin-top: 30px;
+            border-top: 3px solid var(--primary-color);
+            padding-top: 20px;
+        }
+        .admin-search {
+            margin-bottom: 15px;
+        }
+        .kayit-listesi {
+            list-style: none;
+        }
+        .kayit-item {
+            border: 1px solid #eee;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .kayit-bilgi {
+            font-size: 13px;
+            line-height: 1.6;
+            flex: 1;
+            min-width: 200px;
+        }
+        .kayit-bilgi strong {
+            color: var(--dark-color);
+            font-size: 14px;
+        }
+        .btn-sil {
+            background-color: var(--danger-color);
+            color: white;
+            width: auto;
+            padding: 8px 14px;
+            font-size: 13px;
+            margin-top: 0;
+            flex-shrink: 0;
+        }
+        .admin-kapat {
+            text-align: center;
+            margin-top: 15px;
+            color: #3498db;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -225,21 +283,36 @@
         <div class="btn-group">
             <button type="submit" class="btn-submit">Veritabanına Kaydet</button>
             <button type="button" id="btnExcel" class="btn-excel">Excel Raporu İndir (Şifreli)</button>
+            <button type="button" id="btnAdmin" class="btn-admin">Yönetici Paneli (Kayıt Sil)</button>
         </div>
     </form>
 
     <div id="statusMsg" class="status-msg"></div>
+
+    <!-- ADMIN PANELİ: KAYITLARI LİSTELE VE SİL -->
+    <div id="adminPanel">
+        <div class="section-title">Yönetici Paneli - Kayıtlı İhlaller</div>
+        <input type="text" id="adminArama" class="admin-search" placeholder="🔍 Sicil, isim veya ihlal türüne göre ara...">
+        <ul id="kayitListesi" class="kayit-listesi"></ul>
+        <div id="adminKapat" class="admin-kapat">Yönetici panelini kapat</div>
+    </div>
 </div>
 
 <script>
     const SUPABASE_URL = "https://rnlzklchhdndlzgmatkw.supabase.co";
     const SUPABASE_KEY = "sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"; 
+    const ADMIN_SIFRE = "bhkm2026";
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const form = document.getElementById('kuralForm');
     const statusMsg = document.getElementById('statusMsg');
     const btnExcel = document.getElementById('btnExcel');
+    const btnAdmin = document.getElementById('btnAdmin');
+    const adminPanel = document.getElementById('adminPanel');
+    const adminKapat = document.getElementById('adminKapat');
+    const kayitListesi = document.getElementById('kayitListesi');
+    const adminArama = document.getElementById('adminArama');
 
     const sicilInput = document.getElementById('sicil');
     const isimInput = document.getElementById('isim_soyisim');
@@ -247,6 +320,8 @@
     const ekibiInput = document.getElementById('ekibi');
     const tespitSicilInput = document.getElementById('tespit_eden_sicil');
     const tespitIsimInput = document.getElementById('tespit_eden_isim');
+
+    let tumKayitlar = [];
 
     // Bugünün tarihini varsayılan seçtir
     document.getElementById('tarih').valueAsDate = new Date();
@@ -346,8 +421,7 @@
     btnExcel.addEventListener('click', async () => {
         const sfre = prompt("Excel raporunu indirmek için yönetici şifresini giriniz:");
         
-        // Şifre: bhkm2026
-        if (sfre !== "bhkm2026") {
+        if (sfre !== ADMIN_SIFRE) {
             alert("Hatalı şifre girdiniz! Yetkiniz yok.");
             return;
         }
@@ -387,9 +461,101 @@
         const dosyaAdi = `kural_ihlalleri_${new Date().toISOString().slice(0,10)}.xlsx`;
         XLSX.writeFile(workbook, dosyaAdi);
     });
+
+    // ========================================================
+    // 3. YÖNETİCİ PANELİ - KAYIT SİLME (ŞİFRE KORUMALI)
+    // ========================================================
+    btnAdmin.addEventListener('click', async () => {
+        const sfre = prompt("Yönetici paneline girmek için şifreyi giriniz:");
+
+        if (sfre !== ADMIN_SIFRE) {
+            alert("Hatalı şifre girdiniz! Yetkiniz yok.");
+            return;
+        }
+
+        adminPanel.style.display = 'block';
+        await kayitlariYukle();
+        adminPanel.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    adminKapat.addEventListener('click', () => {
+        adminPanel.style.display = 'none';
+        adminArama.value = '';
+    });
+
+    async function kayitlariYukle() {
+        kayitListesi.innerHTML = '<p style="text-align:center; color:#888; padding:15px">Yükleniyor...</p>';
+
+        const { data, error } = await supabaseClient
+            .from('kural_ihlalleri')
+            .select('*')
+            .order('tarih', { ascending: false });
+
+        if (error) {
+            kayitListesi.innerHTML = `<p style="text-align:center; color:#e74c3c; padding:15px">Hata: ${error.message}</p>`;
+            return;
+        }
+
+        tumKayitlar = data || [];
+        renderKayitlar(tumKayitlar);
+    }
+
+    function renderKayitlar(data) {
+        kayitListesi.innerHTML = '';
+
+        if (data.length === 0) {
+            kayitListesi.innerHTML = '<p style="text-align:center; color:#888; padding:15px">Kayıt bulunamadı.</p>';
+            return;
+        }
+
+        data.forEach(kayit => {
+            const li = document.createElement('li');
+            li.className = 'kayit-item';
+
+            const bilgi = document.createElement('div');
+            bilgi.className = 'kayit-bilgi';
+            bilgi.innerHTML = `
+                <strong>${kayit.isim_soyisim || '-'}</strong> (Sicil: ${kayit.sicil || '-'})<br>
+                Tarih: ${kayit.tarih || '-'} • Ünvan: ${kayit.unvan || '-'} • Ekip: ${kayit.ekibi || '-'}<br>
+                İhlal: ${kayit.kural_ihlali || '-'}<br>
+                Tespit Eden: ${kayit.tespit_eden_isim || '-'}
+            `;
+
+            const silBtn = document.createElement('button');
+            silBtn.textContent = 'Sil';
+            silBtn.className = 'btn-sil';
+            silBtn.onclick = async () => {
+                if (!confirm(`${kayit.isim_soyisim} (${kayit.tarih}) tarihli kayıt silinsin mi?`)) return;
+
+                const { error } = await supabaseClient
+                    .from('kural_ihlalleri')
+                    .delete()
+                    .eq('id', kayit.id);
+
+                if (error) {
+                    alert("Silme sırasında hata oluştu: " + error.message);
+                } else {
+                    await kayitlariYukle();
+                }
+            };
+
+            li.appendChild(bilgi);
+            li.appendChild(silBtn);
+            kayitListesi.appendChild(li);
+        });
+    }
+
+    adminArama.addEventListener('input', (e) => {
+        const v = e.target.value.toLowerCase();
+        const filtreli = tumKayitlar.filter(k =>
+            (k.sicil || '').toLowerCase().includes(v) ||
+            (k.isim_soyisim || '').toLowerCase().includes(v) ||
+            (k.kural_ihlali || '').toLowerCase().includes(v) ||
+            (k.tespit_eden_isim || '').toLowerCase().includes(v)
+        );
+        renderKayitlar(filtreli);
+    });
 </script>
 
 </body>
 </html>
-
-```
