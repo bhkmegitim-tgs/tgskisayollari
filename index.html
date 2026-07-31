@@ -9,23 +9,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#080c16;
-    --panel:#111a2e;
-    --panel-2:#182342;
-    --line:rgba(237,239,245,0.09);
-    --line-soft:rgba(237,239,245,0.05);
-    --ink:#edeff5;
-    --muted:#7c88a8;
-    --muted-dim:#4d5878;
-    --amber:#f5a623;
-    --amber-dim:rgba(245,166,35,0.35);
+    --bg:#f3f5fa;
+    --panel:#ffffff;
+    --panel-2:#eef1f8;
+    --line:rgba(26,35,50,0.10);
+    --line-soft:rgba(26,35,50,0.05);
+    --ink:#161d2b;
+    --muted:#5b6780;
+    --muted-dim:#95a0b8;
+    --amber:#e08300;
+    --amber-dim:rgba(224,131,0,0.25);
 
-    --t-egt:#f5a623;
-    --t-sifre:#4fd1c5;
-    --t-mail:#8b93ff;
-    --t-giris:#ff7a7a;
-    --t-dok:#67d67a;
-    --t-op:#e0a8ff;
+    --t-egt:#e08300;
+    --t-sifre:#0d9488;
+    --t-mail:#4f46e5;
+    --t-giris:#e11d48;
+    --t-dok:#15803d;
+    --t-op:#9333ea;
   }
 
   *{ box-sizing:border-box; }
@@ -67,7 +67,7 @@
     width:900px;
     height:900px;
     border-radius:50%;
-    background:conic-gradient(from 0deg, transparent 0deg, rgba(245,166,35,0.14) 18deg, transparent 40deg, transparent 360deg);
+    background:conic-gradient(from 0deg, transparent 0deg, rgba(224,131,0,0.10) 18deg, transparent 40deg, transparent 360deg);
     animation:sweep 14s linear infinite;
   }
 
@@ -76,12 +76,12 @@
   .glow-a{
     position:absolute; top:-10%; left:5%;
     width:600px; height:600px; border-radius:50%;
-    background:radial-gradient(circle, rgba(245,166,35,0.08), transparent 70%);
+    background:radial-gradient(circle, rgba(224,131,0,0.07), transparent 70%);
   }
   .glow-b{
     position:absolute; top:0; right:0;
     width:700px; height:500px; border-radius:50%;
-    background:radial-gradient(circle, rgba(139,147,255,0.09), transparent 70%);
+    background:radial-gradient(circle, rgba(79,70,229,0.06), transparent 70%);
   }
 
   .mono{ font-family:'Space Mono', 'Consolas', monospace; }
@@ -90,7 +90,7 @@
     position:fixed;
     top:0; left:0; right:0;
     z-index:1000;
-    background:rgba(8,12,22,0.78);
+    background:rgba(243,245,250,0.82);
     backdrop-filter:blur(14px) saturate(140%);
     border-bottom:1px solid var(--line);
   }
@@ -123,6 +123,7 @@
     letter-spacing:2px;
     font-size:14px;
     white-space:nowrap;
+    color:var(--ink);
   }
   .brand-text span{ color:var(--amber); }
 
@@ -212,6 +213,7 @@
     letter-spacing:-0.6px;
     margin:0 0 12px;
     line-height:1.14;
+    color:var(--ink);
   }
 
   .hero p{
@@ -256,7 +258,7 @@
     font-size:11px;
     font-weight:700;
     letter-spacing:1px;
-    color:var(--bg);
+    color:#fff;
     background:var(--muted);
     border-radius:4px;
     padding:3px 7px;
@@ -283,8 +285,8 @@
     border:1px solid var(--line);
     border-radius:12px;
     overflow:hidden;
-    background:linear-gradient(180deg, var(--panel), rgba(17,26,46,0.85));
-    box-shadow:0 24px 48px -28px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.03);
+    background:var(--panel);
+    box-shadow:0 20px 40px -28px rgba(22,29,43,0.18), 0 1px 0 rgba(255,255,255,0.6) inset;
   }
 
   .row{
@@ -309,7 +311,7 @@
     inset:0;
     left:-100%;
     background:linear-gradient(90deg, transparent, var(--row-accent, var(--amber)) 6%, transparent 60%);
-    opacity:.12;
+    opacity:.08;
     transition:left .5s cubic-bezier(.2,.7,.2,1);
     z-index:-1;
   }
@@ -337,19 +339,19 @@
     border-radius:6px;
     text-align:center;
     padding:5px 0;
-    opacity:.85;
+    opacity:.92;
     transition:opacity .25s ease, background .25s ease;
   }
 
   .row:hover .row-code{
     opacity:1;
-    background:color-mix(in srgb, var(--row-accent, var(--amber)) 14%, transparent);
+    background:color-mix(in srgb, var(--row-accent, var(--amber)) 12%, transparent);
   }
 
   .row-title{ font-size:14.5px; font-weight:600; letter-spacing:.2px; }
 
   .row-arrow{
-    color:var(--muted);
+    color:var(--muted-dim);
     font-size:15px;
     transition:transform .25s ease, color .25s ease;
   }
@@ -454,6 +456,11 @@
       <a class="row egt" href="https://drive.google.com/file/d/16AX8stURSrkZojB0Ladv8GGyJEhxkLSU/view?usp=sharing" target="_blank" rel="noopener">
         <span class="row-code mono">E4</span>
         <span class="row-title">E-Learning Kılavuzu</span>
+        <span class="row-arrow">↗</span>
+      </a>
+      <a class="row egt" href="https://drive.google.com/file/d/1heNevagBNsl8s5Np5b3qjYjgsQgquIzW/view" target="_blank" rel="noopener">
+        <span class="row-code mono">E5</span>
+        <span class="row-title">Güvenlik Bilinci Eğitim Sınav Öncesi Hazırlık</span>
         <span class="row-arrow">↗</span>
       </a>
     </div>
