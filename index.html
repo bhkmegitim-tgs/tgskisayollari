@@ -24,6 +24,7 @@
     --t-mail:#8b93ff;
     --t-giris:#ff7a7a;
     --t-dok:#67d67a;
+    --t-op:#e0a8ff;
   }
 
   *{ box-sizing:border-box; }
@@ -273,6 +274,7 @@
   .row.mail{ --row-accent: var(--t-mail); }
   .row.giris{ --row-accent: var(--t-giris); }
   .row.dok{ --row-accent: var(--t-dok); }
+  .row.op{ --row-accent: var(--t-op); }
 
   /* Giriş animasyonu */
   .row{
@@ -313,6 +315,7 @@
       <a href="#mail">Mail</a>
       <a href="#giris">Giriş</a>
       <a href="#dokuman">Doküman</a>
+      <a href="#operasyon">Operasyon</a>
     </nav>
     <div class="clock mono" id="clock">--<span class="colon">:</span>--<span class="colon">:</span>--</div>
   </div>
@@ -443,9 +446,23 @@
         <span class="row-title">Gümrüklü / Gümrüksüz İstasyonlar</span>
         <span class="row-arrow">↗</span>
       </a>
-      <a class="row dok" href="https://www.istairport.com/ucuslar/ucus-bilgileri/gelen-ucuslar" target="_blank" rel="noopener">
-        <span class="row-code mono">D6</span>
+    </div>
+  </div>
+
+  <div id="operasyon" class="section">
+    <div class="section-head">
+      <span class="section-code mono">SEC.06</span>
+      <span class="section-title">Operasyon</span>
+    </div>
+    <div class="board">
+      <a class="row op" href="https://www.istairport.com/ucuslar/ucus-bilgileri/gelen-ucuslar" target="_blank" rel="noopener">
+        <span class="row-code mono">O1</span>
         <span class="row-title">Dahili Bantlar (Gelen Uçuşlar)</span>
+        <span class="row-arrow">↗</span>
+      </a>
+      <a class="row op" href="https://www.istairport.com/ucuslar/ucus-bilgileri/giden-ucuslar" target="_blank" rel="noopener">
+        <span class="row-code mono">O2</span>
+        <span class="row-title">Departure (Giden Uçuşlar)</span>
         <span class="row-arrow">↗</span>
       </a>
     </div>
