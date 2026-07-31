@@ -1,0 +1,17 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    - cron: '0 6 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          curl -s -o /dev/null -w "HTTP durumu: %{http_code}\n" \
+            "https://rnlzklchhdndlzgmatkw.supabase.co/rest/v1/personeller?select=SİCİL&limit=1" \
+            -H "apikey: sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu" \
+            -H "Authorization: Bearer sb_publishable_k61-JSZFN2npZfZWiR05Ng_lqAV8Jiu"
