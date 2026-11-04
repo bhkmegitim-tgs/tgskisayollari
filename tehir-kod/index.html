@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tehir Kodu Sorgu</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f3f6f7;--card:#fff;--ink:#14272e;--mut:#5b7078;--teal:#25687a;--teal2:#1b4f5d;--line:#d5e0e4;--ok:#1c7a4b;--bad:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b1f;--card:#16272d;--ink:#e6f0f3;--mut:#93a8af;--teal:#4aa3b9;--teal2:#2f7f92;--line:#28404a;--ok:#5fd09a;--bad:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:22px;margin:8px 0 4px}
+.sub{color:var(--mut);margin:0 0 18px;font-size:14px}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font:inherit;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--teal);border-color:var(--teal);color:#fff}
+input,textarea{width:100%;padding:12px 14px;font:inherit;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+input{font-size:22px;letter-spacing:.06em;text-transform:uppercase}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
+.res{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.row{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}
+.row b{background:var(--teal);color:#fff;padding:10px 12px;font-weight:600}
+.row span{padding:10px 12px}
+.none{margin-top:16px;color:var(--bad);font-weight:600}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line)}
+th{background:var(--teal);color:#fff;text-align:left;padding:8px 10px;font-size:14px}
+td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top;font-size:14px}
+td.nf{color:var(--bad);font-weight:600}
+.wrap{overflow-x:auto;margin-top:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:28px;padding-top:16px;border-top:1px solid var(--line);color:var(--mut);font-size:14px}
+.bar button,.btn{padding:8px 14px;border:1px solid var(--teal);background:transparent;color:var(--teal);border-radius:8px;font:inherit;cursor:pointer}
+.btn.fill{background:var(--teal);color:#fff;margin-top:8px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Tehir kodu sorgu</h1>
+<p class="sub" id="info"></p>
+<div class="tabs" role="tablist">
+  <button role="tab" id="t1" aria-selected="true">Tek kod</button>
+  <button role="tab" id="t2" aria-selected="false">Toplu kod</button>
+  <button role="tab" id="t3" aria-selected="false">Tüm liste</button>
+</div>
+
+<section id="p1">
+  <input id="q" placeholder="Kod yazın, örn. 31P" autocomplete="off" aria-label="Tehir kodu">
+  <div id="out"></div>
+</section>
+
+<section id="p2" hidden>
+  <textarea id="bulk" rows="6" placeholder="Her satıra bir kod yazın veya Excel'den kodları yapıştırın" aria-label="Kodlar"></textarea>
+  <div class="wrap"><table id="bt" hidden><thead><tr><th>Kod</th><th>Sorumlu</th><th>Birim</th><th>Açıklama</th></tr></thead><tbody></tbody></table></div>
+  <button class="btn fill" id="copy" hidden>Sonucu kopyala (Excel'e yapıştırılır)</button>
+</section>
+
+<section id="p3" hidden>
+  <input id="f" placeholder="Kod veya açıklamada ara" style="font-size:16px;text-transform:none;letter-spacing:0" aria-label="Listede ara">
+  <div class="wrap"><table id="lt"><thead><tr><th>Kod</th><th>Sorumlu</th><th>Birim</th><th>Açıklama</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<div id="pastebox" hidden style="margin-top:24px"><textarea id="paste" rows="6" placeholder="Excel'den Kod, Sorumlu, Birim, Açıklama sütunlarını kopyalayıp buraya yapıştırın" aria-label="Liste"></textarea><button class="btn fill" id="pgo">Listeyi kullan</button></div>
+<div class="bar">
+  <input type="file" id="file" accept=".xlsx,.xls,.xlsm" hidden>
+  <button id="load">Excel dosyasını yükle</button>
+  <button id="pastebtn">Listeyi yapıştır</button>
+  <button id="reset">Başa dön</button>
+  <span id="msg"></span>
+</div>
+</main>
+
+<!-- TAM LİSTE: Excel'de B1:E sütunlarını kopyalayıp aşağıdaki veri etiketinin ARASINA yapıştırın (başlık satırı olabilir). -->
+<script type="text/plain" id="veri">
+01A	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların teknik nedenle tehirleri
+01B	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların teknik kaynaklı uçak değişiklik tehirleri
+01C	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların planlama kaynaklı tehirleri
+01D	KONTROL DIŞI	RGFD	Uçuş planı/Uçuş dokümanlarının geç tamamlanması ya da değişmesi
+01E	KONTROL DIŞI	RGFD	THY A.O. birimleri dışında kalan uçakların ekip (kokpit) kaynaklı uçağa geç gelişler
+01F	KONTROL DIŞI	RGFD	THY A.O. uçakları dışında kalanların ekip planlama (kokpit) kaynaklı rötarlar
+01G	KONTROL DIŞI	RGFD	THY A.O. uçakları dışında kalanların (kokpit) ekip kaynaklı diğer rötarlar
+01H	KONTROL DIŞI	RGFD	THY A.O. uçakları dışında kalan uçakların ekip (kabin) geç geçişi kaynaklı rötarlar
+01I	KONTROL DIŞI	RGFD	THY A.O. uçakları dışında kalanların (kabin) ekip kaynaklı diğer rötarlar
+01J	KONTROL DIŞI	RGFD	Kabin ekibi hatası veya özel isteği (Operasyonel gereklilikler dışında)
+01K	KONTROL DIŞI	RGFD	Devir alacak kabin ekibinin gecikmesi (Diğer bir uçuştan kabin ekibinin beklenmesi)
+01L	KONTROL DIŞI	RGFD	Devir alacak ekibin gecikmesi (Diğer bir uçuştan kokpit ekibinin veya pass ekip dahil tüm ekibin beklenmesi)
+01M	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların teknik kaynaklı ikincil tehirleri
+01N	KONTROL DIŞI	CRGO	Kargo wetlease seferlerinde load master kaynaklı hatalar
+01O	KONTROL DIŞI	CRGO	Kargo wetlease seferlerinde uçak içi yükleme sistem arızası kaynaklı geçikmeler
+01X	KONTROL DIŞI	RGFD	Bu nedenle slot kaçırma
+01Y	KONTROL DIŞI	RGFD/CRGO	Diğer
+02A	KONTROL DIŞI	TECH	Uçağın APU'sunun gayri faal olması nedeniyle uçağın push-back öncesi park yerinde motor çalıştırması
+02B	KONTROL DIŞI	ARPT	Uçağın park pozisyonundan kendi gücü ile harekete başlaması
+03A	KONTROL DIŞI	QLTY	Şirket içi denetim
+03B	KONTROL DIŞI	QLTY	Şirket dışı denetim
+03X	KONTROL DIŞI	QLTY	Bu nedenle slot kaçırma
+04A	KONTROL DIŞI	GOPS/IOCC	Üzerinde inceleme süren tehirler
+09B	KONTROL DIŞI	SCHD	Ticari
+09C	KONTROL DIŞI	SCHD	Planlama
+09D	KONTROL DIŞI	CRGO	Kargo Operasyon Kontrol Planlama
+09E	KONTROL DIŞI	TECH	Bakım uzaması nedeniyle planlanan uçuş tarifesinin değişikliği
+09F	KONTROL DIŞI	TECH	Uçak/Komponent arızası nedeniyle planlanan uçuş tarifesinin değişikliği
+09G	KONTROL DIŞI	TECH	Yerde/Havada hasarlanma nedeniyle planlanan uçuş tarifesinin değişikliği
+09X	KONTROL DIŞI	SCHD	Bu nedenle slot kaçırma
+11A	TGS	YHM	Transfer yolcuların geç check-in işlemi
+11B	TGS	YHM	Yedek liste işlemleri
+11C	TGS	YHM	Rezervasyonu onaylı yolcuların geç kabulü
+11D	TGS	YHM	Çalışan hatası nedeniyle
+11E	KONTROL DIŞI	GOPS	Grup check-in
+11F	KONTROL DIŞI	ARPT	Havalimanına ulaşımda/girişde yaşanan gecikmeler (kapanma, birikme, kaza vb.)
+11G	TGS	YHM	Fazla bagaj ücret alımı nedeniyle
+11O	KONTROL DIŞI	GOPS	Operasyonel aksaklıklardan dolayı re-route işlemi
+11X	TGS	YHM	Bu nedenle slot kaçırma
+12A	KONTROL DIŞI	GOPS	Check-in bölgesinde yoğunluk
+12B	TGS	YHM	Çalışan eksikliği nedeniyle
+12C	TGS	YHM	Transfer bölgesinde yolcu yoğunluğu
+12D	TGS	YHM	Grup check-in
+12E	KONTROL DIŞI	ARPT/GOPS	Havalimanına ulaşımda/girişte yaşanan gecikmeler (kapanma, birikme, kaza vb.)
+12F	TGS	YHM	Yedek liste işlemleri
+12X	TGS	YHM	Bu nedenle slot kaçırma
+13A	TGS	YHM	İstasyonda check-in işlemi hatası
+13J	KONTROL DIŞI	ITEC	Kontuar dışı check-in işlemi hatası
+13L	TGS	YHM	Dokümantasyon hatası (bilet/vize/pasaport vb.)
+13M	TGS	OCC	“Editing” hatası
+13X	TGS	YHM	Bu nedenle slot kaçırma
+14A	KONTROL DIŞI	RESE	Ticari gerekçelerle uçağın overbook olması
+14B	KONTROL DIŞI	RESE	Rezervasyon hatası
+14O	TGS	YHM	“Overbook” sürecinde istasyon tarafından gerekli tedbirlerin alınmaması
+14P	KONTROL DIŞI	RESE	Fazla satış yapılan başka bir seferden yolcu alınması
+14T	KONTROL DIŞI	GOPS	Kontrol içi operasyonel nedenlerle overbook durumu oluşması
+14X	KONTROL DIŞI	RESE	Bu nedenle slot kaçırma
+15A	TGS	VİZE - PASAPORT	“Boarding” hatası/yolcu figürleri uyuşmazlığı
+15B	TGS	VİZE - PASAPORT	“Boarding”e geç başlama
+15C	TGS	VİZE - PASAPORT	Yavaş “boarding”
+15D	KONTROL DIŞI	GOPS	Kaybolan/geç “check-in” işlemi yapılan yolcu
+15F	TGS	VİZE - PASAPORT	Dokümantasyon (bilet, pasaport, vize, sağlık raporu, pcr testi vb.)
+15G	TGS	VİZE - PASAPORT	Çalışan sayısının eksikliği
+15I	KONTROL DIŞI	GOPS	Boarding esnasında kapıda el bagajı toplanması ve yüklenmesi veya “excess” kesimi
+15O	TGS	VİZE - PASAPORT	Bagaj ayırım bilgisinin bagaj eşleştirmeye geç/yanlış ikazı
+15Q	TGS	VİZE - PASAPORT	Gösterilmeyen bagajların yolcu anons edilerek yüklenmesi
+15R	TGS	VİZE - PASAPORT	Yolcunun yanlış park pozisyonuna/yanlış çıkış kapısına yönlendirilmesi
+15U	KONTROL DIŞI	GOPS	Uçak konfigürasyonu ya da tip değişikliğinden dolayı yolculara yeni yer numarası verilmesi ve yolcuların yerleştirilmesi
+15X	TGS	VİZE - PASAPORT	Bu nedenle slot kaçırma
+16A	KONTROL DIŞI	GOPS	VIP “boarding”
+16B	KONTROL DIŞI	GOPS	Rahatsız eden yolcu handling’i
+16D	KONTROL DIŞI	GOPS	Kaybolan şahsi eşyalar
+16E	KONTROL DIŞI	GOPS	Deporte/INAD yolcu handling’i
+16F	KONTROL DIŞI	GOPS	Aksaklık nedeniyle yolcuya yerde iken verilen ikram
+16G	KONTROL DIŞI	GOPS	Kendi isteği ile uçaktan inen yolcu
+16H	KONTROL DIŞI	GOPS	Uçak içerisinde yolcu rahatsızlığı/ölümü
+16K	KONTROL DIŞI	GOPS	Yavaş deboarding
+16L	KONTROL DIŞI	GOPS	Yavaş boarding
+16N	KONTROL DIŞI	GOPS	Basın yayın organlarının uçaktaki faaliyetleri
+16P	KONTROL DIŞI	GOPS	Pass yolcu problemleri
+16S	KONTROL DIŞI	GOPS	Diğer bir havayolundan ticari amaçlı bağlantısı olmayan yolcu kabulü
+16U	KONTROL DIŞI	GOPS	Yolcu nedeni ile yapılan Return to Ramp
+16V	KONTROL DIŞI	GOPS	Yolcu rahatsızlığı/ölümü nedeni ile yapılan Return to Ramp
+16X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
+17A	TGS	YHM	İkram geç talebi/yanlış talep
+17B	KONTROL DIŞI	CTRG	THY İkram Operasyon ve Kontrol Şefliği ikram geç talebi/yanlış talep
+17P	KONTROL DIŞI	GOPS	Dönüş ikramlarına ilavenin karşı meydandan geç talebi
+17Q	KONTROL DIŞI	CTRG	Rötar nedeniyle değişen ikram (kahvaltıdan öğle yemeğine çevirme vb.)
+17X	KONTROL DIŞI	CTRG/GOPS	Bu nedenle slot kaçırma
+18A	TGS	BAGAJ HİZ.	Bagajların uçak altına geç teslimi
+18C	TGS	BAGAJ HİZ.	Bagaj eşleştirme ve ayırma problemleri
+18N	TGS	BAGAJ HİZ.	Bagajların “rush” etiketi takılarak sevkiyatı (diğer seferlerden kalan bagajlar dâhil)
+18O	TGS	BAGAJ HİZ.	Diğer hava yollarından alınan “rush” bagaj sevkiyatı
+18Q	TGS	BAGAJ HİZ.	Bagaj eşleştirme cihazlarının yetersizliği/eksikliği
+18R	TGS	BAGAJ HİZ.	Bagajların yanlış uçağa sevkiyatı
+18S	TGS	BAGAJ HİZ.	Bagaj Eşleştirme Koordinasyon Ofisi hataları
+18X	TGS	BAGAJ HİZ.	Bu nedenle slot kaçırma
+19A	KONTROL DIŞI	GOPS	Hareket kabiliyeti kısıtlı yolcuların uçağa binişi
+19B	KONTROL DIŞI	GOPS	Hareket kabiliyeti kısıtlı yolcuların uçaktan inişi
+19C	TGS	AIR CLINIC	WCHR, STCR taşımasını gerçekleştiren yer hizmetleri kuruluşu kaynaklı gecikmeler
+19X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
+21A	KONTROL DIŞI	CRGO	Geç/yanlış kargo figürü
+21C	KONTROL DIŞI	CRGO	Geç/yanlış kargo dokümanları
+21E	KONTROL DIŞI	CRGO	Loadmaster hatasından kaynaklanan gecikmeler
+21F	KONTROL DIŞI	CRGO	Loadmaster kit arızaları
+21X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+22A	KONTROL DIŞI	CRGO	Apronda bulunamayan kargo/posta nedeniyle ramp firmasına geç teslim
+22D	TGS	KARGO	Yanlış park yerine getirme, eksik getirme veya hiç getirilmemesi
+22N	KONTROL DIŞI	CRGO	Yükleme materyallerinin geç sağlanması
+22P	KONTROL DIŞI	CRGO	Thru Palet kontür bilgilerinin geç gelmesi
+22R	TGS	KARGO	Kargoların ramp transferinde yaşanan aksaklıklar
+22S	KONTROL DIŞI	CRGO	Depo çıkış hatları yoğunluğu sebebiyle ramp firmasına geç teslim
+22X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+23A	KONTROL DIŞI	CRGO	Operasyonel sebepler nedeni ile kargonun geç kabulü/değiştirilmesi
+23C	KONTROL DIŞI	CRGO	Çalışan sayısının eksikliği
+23D	KONTROL DIŞI	CRGO	Expres kargo (VIC vb.)
+23E	KONTROL DIŞI	CRGO	Diplomatik posta
+23X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+24B	KONTROL DIŞI	CRGO	ULD içerisinde hasarlı Tehlikeli madde Tespiti (Depo hazırlık)
+24C	KONTROL DIŞI	CRGO	ULD içerisinde hasarlı Tehlikeli madde Tespiti (Thru)
+24D	KONTROL DIŞI	CRGO	Kargonun uçak altında hasarlı olarak tespiti (Depo hazırlık)
+24E	KONTROL DIŞI	CRGO	Kargonun uçak altında hasarlı olarak tespiti (Thru Palet)
+24F	KONTROL DIŞI	CRGO	ULD hasarı (Depo hazırlık)
+24G	KONTROL DIŞI	CRGO	ULD hasarı (Thru Palet)
+24H	KONTROL DIŞI	CRGO	Tehlikeli Maddelerin hatalı hazırlanması (Depo hazırlık)
+24I	KONTROL DIŞI	CRGO	Tehlikeli Maddelerin hatalı hazırlanması (Thru Palet)
+24J	KONTROL DIŞI	CRGO	Hasarlı veya yanlış palet hazırlanması (Depo hazırlık)
+24K	KONTROL DIŞI	CRGO	Hasarlı veya yanlış palet hazırlanması (Thru Palet)
+24X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+25A	KONTROL DIŞI	CRGO	Fazla satış/planlama
+25B	KONTROL DIŞI	CRGO	Rezervasyon hataları
+25C	KONTROL DIŞI	CRGO	Ticari sebepler nedeni ile kargonun geç kabulü/değiştirilmesi
+25D	KONTROL DIŞI	CRGO	Transit bağlantılı kargo veya posta beklenmesi
+25X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+26C	KONTROL DIŞI	CRGO	Depo yoğunluğu sebebi ile geç hazırlama
+26D	KONTROL DIŞI	CRGO	Uçağa sevk edilen yükte değişiklik
+26E	KONTROL DIŞI	CRGO	Özel kargo sebebiyle hazırlığın gecikmesi
+26F	KONTROL DIŞI	CRGO	Uçak Tip değişikliği nedeni ile kargo hazırlığının değişmesi
+26G	KONTROL DIŞI	CRGO	Bulunamayan kargo nedeniyle yeniden hazırlık
+26H	KONTROL DIŞI	CRGO	Çalışan sayısının eksikliği
+26I	KONTROL DIŞI	CRGO	Kargo teçhizat yetersizliği/yokluğu (forklift, paletmaster, palet vb.)
+26J	KONTROL DIŞI	CRGO	Sistem arızası yazılım (COMIS, workorder)
+26T	KONTROL DIŞI	CRGO	Sistem arızası donanım (ASRS, PCHS, ETV)
+26X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+27A	KONTROL DIŞI	CRGO	Geç/yanlış posta figürleri
+27C	KONTROL DIŞI	CRGO	Geç/yanlış posta dokümanları
+27D	KONTROL DIŞI	CRGO	Sistem arızası
+27E	KONTROL DIŞI	CRGO	Depo yoğunluğu sebebi ile geç hazırlama
+27F	KONTROL DIŞI	CRGO	Hasarlı veya yanlış palet hazırlanması
+27X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+28A	KONTROL DIŞI	CRGO	Kaybolan posta nedeniyle yeniden yükleme
+28B	KONTROL DIŞI	CRGO	Personel eksikliği/personel nedeniyle
+28C	KONTROL DIŞI	CRGO	Teçhizat yetersizliği/yokluğu (Paletmaster, forklift vb.)
+28D	KONTROL DIŞI	CRGO	Yanlış park yerine getirme veya eksik getirme veya hiç getirilmemesi
+28X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+29A	KONTROL DIŞI	CRGO	Postanın geç kabulü-ticari nedenler
+29B	KONTROL DIŞI	CRGO	Yedek posta kabulü
+29X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
+31A	TGS	HAREKAT	Geç dokümantasyon
+31B	TGS	HAREKAT	Yanlış dokümantasyon
+31C	TGS	HAREKAT	Geç "LOAD AND TRIM SHEET"
+31D	TGS	HAREKAT	Yanlış "LOAD AND TRIM SHEET"
+31E	TGS	HAREKAT	“Trim out” nedeniyle yolcu/yüklerin yer değiştirmesi
+31F	KONTROL DIŞI	GOPS	DCS’teki yanlış veri (oturma planı, “hold versiyon” vb.)
+31G	TGS	HAREKAT	Çalışan sayısının eksikliği
+31H	TGS	HAREKAT	Load plan hataları
+31N	KONTROL DIŞI	GOPS	Son dakika değişiklikleri nedeniyle doküman yenilenmesi
+31P	TGS	HAREKAT	Harekat koordinatörü hatası
+31R	TGS	RAMP	Headset çalışanı hatası
+31S	KONTROL DIŞI	GOPS	Sorumlu kaptan pilota uçuş dokümanlarının (uçuş planı, gümrük evrakları) geç teslimi
+31X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
+32A	TGS	RAMP	Kabin yükü, kuru yük, hacimli yük, şekilsiz yük, özel yük (HEA, PER, RRY, AVIH vb.)
+32B	TGS	RAMP	Geç yükleme
+32C	TGS	RAMP	Çalışan sayısının eksikliği
+32D	TGS	RAMP	Yanlış yükleme (Yük planı veya yükleme prensiplerine uygun olmayan)
+32E	TGS	RAMP	ULD hasarı
+32F	KONTROL DIŞI	GOPS/CRGO	Uçak içi yükleme sistemlerinin çalışmaması
+32G	TGS	RAMP	Yükleme materyallerinin geç sağlanması
+32M	TGS	RAMP	Geç boşaltma
+32R	TGS	RAMP	Bagaj ayrımının hatalı yapılması veya uzun sürmesi
+32S	KONTROL DIŞI	GOPS/CRGO	Son dakika değişiklikleri nedeniyle yükleme değişiklikleri
+32T	KONTROL DIŞI	CRGO	Varış meydanındaki ramp çalışanı /teçhizatı eksikliği
+32X	KONTROL DIŞI	GOPS/CRGO	Bu nedenle slot kaçırma
+33A	TGS	RAMP	Geç teçhizat (forklift, traktör, high loader, konveyör vb.)
+33B	TGS	RAMP	Teçhizat eksikliği
+33C	TGS	ATÖLYE	Teçhizat operatörü eksikliği
+33D	TGS	ATÖLYE	Teçhizatın arızalı olması/ performansının yeterli olmaması
+33E	TGS	RAMP	Yanlış teçhizat
+33X	TGS	RAMP/ATÖLYE	Bu nedenle slot kaçırma
+34B	TGS	RAMP	Merdiven eksikliği/geç gelmesi
+34C	TGS	RAMP	Otobüs/midibüs eksikliği/geç gelmesi
+34D	TGS	UÇAK TEMİZLİK	Su aracı eksikliği/geç gelmesi
+34E	TGS	UÇAK TEMİZLİK	Foseptik aracı eksikliği/geç gelmesi
+34F	TGS	RAMP	Çalışan eksikliği
+34G	TGS	ATÖLYE	Merdivenin arızalı olması
+34H	TGS	ATÖLYE	Otobüsün/midibüsün arızalı olması
+34J	TGS	ATÖLYE	Su aracının arızalı olması
+34K	TGS	UÇAK TEMİZLİK	Foseptik aracının arızalı olması
+34L	TGS	ATÖLYE	Harekat aracının arızalı olması
+34M	TGS	ATÖLYE	Ambulift aracının arızalı olması
+34N	TGS	HAREKAT	Harekat aracı eksikliği/geç gelmesi
+34O	TGS	RAMP	Ambulift veya operatörün eksikliği/geç gelmesi
+34X	TGS	RAMP/ATÖLYE	Bu nedenle slot kaçırma
+35A	TGS	UÇAK TEMİZLİK	Temizliği geç bitirme
+35B	TGS	UÇAK TEMİZLİK	Eksik/yanlış temizlik teçhizatı
+35C	TGS	UÇAK TEMİZLİK	Teçhizat arızası
+35D	TGS	UÇAK TEMİZLİK	Çalışan sayısı eksikliği
+35E	TGS	UÇAK TEMİZLİK	Eksik yapılan temizlikten dolayı ekibin geri çağrılması
+35F	KONTROL DIŞI	GOPS/CRGO	Operasyon esnasında oluşan ilave temizlik talepleri
+35G	KONTROL DIŞI	TECH/CRGO	Kokpit camı temizliği
+35H	TGS	UÇAK TEMİZLİK	Operasyon tarafından uçağa yüklenen, temizlik ve uçak içi ürünlerin, uçak tipine ve sefere uygunsuz, eksik ya da geç teslimatı (uyku seti, battaniye, kulaklık, yastık vb.)
+35I	TGS	UÇAK TEMİZLİK	İlaçlama (geç veya hatalı)
+35T	KONTROL DIŞI	GOPS/CRGO	Temizlik ekibi tarafından secure cleaning uygulamasının geç bitirilmesi
+35W	KONTROL DIŞI	GOPS/CRGO	Hava durumundan dolayı ilave temizlik
+35X	KONTROL DIŞI	GOPS/CRGO	Bu nedenle slot kaçırma
+36A	KONTROL DIŞI	FUEL	Yakıt ikmal aracı olmaması/yetersiz olması
+36B	KONTROL DIŞI	FUEL	Yakıt ikmal aracının geç gelmesi
+36C	KONTROL DIŞI	FUEL	Operasyon esnasında yakıt ikmal aracının arızalanması
+36D	KONTROL DIŞI	FUEL	Geç yakıt çekilmesi
+36E	KONTROL DIŞI	FUEL	Çalışan sayısı eksikliği
+36F	KONTROL DIŞI	FUEL	Yakıt ikmal hatası
+36G	KONTROL DIŞI	TECH	Teknik nedenlerden dolayı özel prosedür uygulanması
+36H	KONTROL DIŞI	FUEL	Yakıt Hidrant Sistemi
+36I	KONTROL DIŞI	FUEL	Off-spec/kontamine yakıt olması
+36J	KONTROL DIŞI	FUEL	Yakıtın taşması
+36K	KONTROL DIŞI	FUEL	Uçağın yanlış park etmesinden dolayı yakıt alınamaması
+36L	KONTROL DIŞI	SFTY	Yakıt alımının emniyet gerekçesiyle uzun sürmesi
+36M	KONTROL DIŞI	FUEL	Varış meydanındaki yakıt sağlayıcı ile ilgili tüm problemler
+36X	KONTROL DIŞI	FUEL	Bu nedenle slot kaçırma
+37C	KONTROL DIŞI	CTRG	İkram teçhizatının arızalanması
+37D	KONTROL DIŞI	CTRG	İkramın geç gelmesi/geç yüklenmesi veya boşaltılması
+37E	KONTROL DIŞI	CTRG	Yanlış ya da yetersiz ikram yüklenmesi [kabin malzemeleri dâhil (gazete, relax set, amenity kit vb.)]
+37G	KONTROL DIŞI	CTRG	Dönüş ikramının eksik yüklenmesi
+37H	KONTROL DIŞI	CTRG	Uçağa yüklenecek Inflight malzemelerin depodan eksik veya geç teslim edilmesi (uyku seti, battaniye, kulaklık, yastık vb.)
+37R	KONTROL DIŞI	CTRG	Uçak değişikliği nedeniyle ikram yüklemesinin değişmesi
+37S	KONTROL DIŞI	CTRG	Uçağın yerde kalış süresinin ikram anlaşmasında bulunan ikram yükleme süresinin altında kalması
+37T	KONTROL DIŞI	CTRG	“Flying chef” ve “Flying service chef” uygulaması kapsamında yaşanan gecikmeler
+37U	KONTROL DIŞI	CTRG	“Flying chef” ve “Flying service chef” hastalanması veya yaralanması
+37X	KONTROL DIŞI	CTRG	Bu nedenle slot kaçırma
+38A	KONTROL DIŞI	GOPS	ULD eksikliği
+38B	KONTROL DIŞI	GOPS	Hasarlı veya hizmet dışı ULD
+38C	KONTROL DIŞI	GOPS	Handling birimine geç ULD tedariki
+38X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
+39A	TGS	RAMP	GPU eksikliği/geç gelişi/yeterli gelmemesi
+39B	TGS	RAMP	De-icing aracı eksikliği/geç gelişi
+39C	TGS	RAMP	Towbar eksikliği/geç gelişi
+39D	TGS	RAMP	Air starter aracı eksikliği/geç gelişi/yeterli gelmemesi
+39E	TGS	RAMP	Air conditioner aracı eksikliği/geç gelişi/yeterli gelmemesi
+39F	TGS	RAMP	Push-back aracı eksikliği/geç gelişi
+39G	TGS	RAMP	Çalışan sayısı eksikliği
+39H	TGS	RAMP	Diğer teknik teçhizatın eksikliği/geç gelişi
+39I	KONTROL DIŞI	GOPS/CRGO	Varış meydanında teçhizat eksikliği
+39J	TGS	ATÖLYE	GPU'nun arızalı olması
+39K	TGS	ATÖLYE	De-icing aracının arızalı olması
+39L	TGS	ATÖLYE	Towbar'ın arızalı olması
+39M	TGS	ATÖLYE	Air starter aracının arızalı olması
+39N	TGS	ATÖLYE	Air conditioner aracının arızalı olması
+39O	TGS	ATÖLYE	Push-back aracının arızalı olması
+39P	TGS	RAMP	Diğer teknik teçhizatın arızalı olması
+39X	TGS	RAMP	Bu nedenle slot kaçırma
+41A	KONTROL DIŞI	TECH	Uçak sistemleri ve motor arızaları
+41B	KONTROL DIŞI	TECH	Kabin içi teçhizat arızaları (koltuk, galley vb.)
+41C	KONTROL DIŞI	TECH	Uçak içi eğlence cihazları arızaları
+41D	KONTROL DIŞI	TECH	Uçak yükleme sistem arızası
+41E	KONTROL DIŞI	TECH	Gidiş donanım beklemesi
+41N	KONTROL DIŞI	TECH	Kabin-kokpit arıza defteri beklenmesi
+41O	KONTROL DIŞI	TECH	MEL veya CDL oluru beklenmesi (go to)
+41P	KONTROL DIŞI	TECH	MEL durumunun değişmesi (go-to dan no-go ya geçiş)
+41Q	KONTROL DIŞI	TECH	Çalışan sayısı eksikliği
+41R	KONTROL DIŞI	TECH	“Emergency equipment” ların arızalı olması/tekrar doldurulması
+41S	KONTROL DIŞI	TECH	Teknik dokümanların kaybolması
+41T	KONTROL DIŞI	TECH	Teknik arızanın teknisyen tarafından geç bildirilmesi
+41V	KONTROL DIŞI	TECH	Arıza nedeni ile yapılan Return to Ramp
+41X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+42A	KONTROL DIŞI	TECH	Geç dokümantasyon
+42B	KONTROL DIŞI	TECH	Bakımdan geç teslim
+42X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+43A	KONTROL DIŞI	TECH	Çalışan yetersizliği
+43B	KONTROL DIŞI	TECH	Geç dokümantasyon
+43C	KONTROL DIŞI	TECH	Periyot dışı özel bakımlar
+43N	KONTROL DIŞI	TECH	Yerde yapılan check işleminin geç yapılması
+43P	KONTROL DIŞI	TECH	Lastik/fren değişimi
+43X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+44A	KONTROL DIŞI	TECH	Yedek parça eksikliği
+44B	KONTROL DIŞI	TECH	Bakım teçhizatının eksikliği ya da bozulması
+44C	KONTROL DIŞI	TECH	Yedek parça geç teslimi (depodan geç çekim)
+44N	KONTROL DIŞI	TECH	Mefruşat eksikliği (koltuk kılıfı, perde vb.)
+44Q	KONTROL DIŞI	TECH	Depodan gelen parçanın uygun olmaması
+44X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+45A	KONTROL DIŞI	TECH	Yedek parçanın uçağa geç gönderimi/geç gelmesi
+45B	KONTROL DIŞI	TECH	AOG parçaların dokümanlarının geç/yanlış gelmesi
+45D	KONTROL DIŞI	TECH	Parçanın uçağa yüklenmesi/uçağın tekrar yüklenmesi
+45F	KONTROL DIŞI	TECH	Third Party için AOG
+45N	KONTROL DIŞI	TECH	Arızalı uçağın bulunduğu istasyona teknik çalışan gönderilmesi
+45X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+46E	KONTROL DIŞI	TECH	Planlı bakımdan (Harf Bakımı ve slotu önden girilmiş MEL & Hold Item giderim işlemleri dahil) geç teslim nedeniyle uçak değişikliği
+46N	KONTROL DIŞI	TECH	Teknik arıza veya plansız arıza bakımından (Arıza AOG süreçlerinin uzaması veya slotu önden girilmemiş MEL giderim işlemleri dahil) geç teslim nedeniyle uçak değişikliği
+46X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+47A	KONTROL DIŞI	TECH	Yedek uçak
+47X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+48A	TGS	HAREKAT	Kabin ayırıcı/yer düzenlenmesi (C/CL perde ve koltuk ayarı)
+48B	KONTROL DIŞI	TECH	Sedye kurulması
+48C	KONTROL DIŞI	TECH/MDCL	Tıbbi teçhizat
+48D	KONTROL DIŞI	TECH	Ekip istirahat yeri
+48X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+51A	KONTROL DIŞI	SFTY	Yıldırım çarpması
+51B	KONTROL DIŞI	SFTY	Kuş çarpması
+51C	KONTROL DIŞI	SFTY	Uçuş esnasında diğer hasarlanmalar (kargo ve bagaj hasarlamaları dâhil)
+51D	KONTROL DIŞI	SFTY	Kötü/ hava koşulları nedeniyle
+51E	KONTROL DIŞI	SFTY	Fazla yüklenme (sert iniş)
+51F	KONTROL DIŞI	SFTY	Taksi sırasında çarpışma
+51G	KONTROL DIŞI	SFTY	Uçağın pistten ya da taksi yolundan çıkması
+51H	KONTROL DIŞI	SFTY	FOD hasarı
+51I	KONTROL DIŞI	CCPT	Uçağın kokpit ekibi tarafından hasarlanması
+51J	KONTROL DIŞI	TECH	Uçağın yolcu tarafından hasarlanması (tuvalet ve lavabo tıkanması dâhil)
+51K	KONTROL DIŞI	TECH	Uçağın frenlerinin soğuması
+51L	KONTROL DIŞI	SFTY	Uçağın geliş istasyonundan hasarlı gelmesi
+51M	KONTROL DIŞI	CBN	Uçağın kabin ekibi tarafından hasarlanması
+51N	KONTROL DIŞI	IOCC	Havada hasarlanmadan dolayı uçak değişikliği
+51U	KONTROL DIŞI	SFTY	Kuş çarpması nedeni ile yapılan Return to Ramp
+51V	KONTROL DIŞI	SFTY	Yıldırım çarpması nedeni ile yapılan Return to Ramp
+51X	KONTROL DIŞI	SFTY	Bu nedenle slot kaçırma
+52A	KONTROL DIŞI	GOPS/TECH	Çarpışma (taksi hariç), çekme sırasında hasarlanması
+52B	KONTROL DIŞI	IOCC/GOPS	Kötü hava koşulları nedeniyle hasarlanması
+52C	TGS	RAMP	Yer teçhizatı ve apron araçları tarafından hasarlanması
+52D	KONTROL DIŞI	ARPT	Köprü tarafından hasarlanması
+52F	KONTROL DIŞI	FUEL	Yakıt teçhizatı tarafından hasarlanması
+52G	KONTROL DIŞI	TECH	Teknik destek teçhizatı tarafından hasarlanması
+52H	KONTROL DIŞI	CTRG	İkram teçhizatı tarafından hasarlanması
+52I	KONTROL DIŞI	CCPT	Uçağın yerde kokpit ekibi tarafından hasarlanması
+52K	KONTROL DIŞI	SFTY	Kazara kaçış slide’ının açılması (düşmesi, patlaması)
+52M	KONTROL DIŞI	CBN	Uçağın yerde kabin ekibi tarafından hasarlanması
+52N	KONTROL DIŞI	TECH	Teknik çalışan tarafından hasarlanması
+52P	KONTROL DIŞI	IOCC	Yerde hasarlanma nedeniyle uçak değişikliği
+52X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
+55A	KONTROL DIŞI	ITEC	Local DCS arızaları (TROYA hariç)
+55B	KONTROL DIŞI	ITEC	DCS host arızası
+55C	KONTROL DIŞI	ITEC	Host/network arızası
+55D	KONTROL DIŞI	ITEC	Lokal network arızası
+55E	KONTROL DIŞI	ITEC	Self servis cihazlarının arızalanması
+55F	KONTROL DIŞI	ITEC	Üçüncü taraf firmaların sebep olduğu sistem aksaklıkları
+55N	KONTROL DIŞI	ITEC	Trafik sistem arızası (check-in, boarding, APIS vb.)
+55O	KONTROL DIŞI	ITEC	Harekat sistem arızası
+55P	KONTROL DIŞI	ITEC	Bagaj eşleştirme sistem arızası
+55S	KONTROL DIŞI	ITEC	Operasyon takip sistemleri arızası
+55T	KONTROL DIŞI	ITEC	Bilet satış/rezervasyon sistem arızası
+55U	KONTROL DIŞI	ITEC	Haberleşme sistem arızası
+55X	KONTROL DIŞI	ITEC	Bu nedenle slot kaçırma
+56A	KONTROL DIŞI	ITEC	Lokal teçhizat arızaları
+56B	KONTROL DIŞI	ITEC	Host/network arızası
+56D	KONTROL DIŞI	ITEC	Lokal network arızası
+56E	KONTROL DIŞI	ITEC	Otomatik gümrük muayene sistem arızası
+56X	KONTROL DIŞI	ITEC	Bu nedenle slot kaçırma
+57A	KONTROL DIŞI	ITEC	Lokal teçhizat arızaları
+57B	KONTROL DIŞI	ITEC	Host/network arızası
+57D	KONTROL DIŞI	ITEC	Lokal network arızası
+57E	KONTROL DIŞI	ITEC	ATC Sistemi ile iletişim aksaklıkları
+57X	KONTROL DIŞI	ITEC	Bu nedenle slot kaçırma
+58A	TGS	ITEC	Handling firmasının kullandığı kendine ait sistem hatası veya arızası
+58B	KONTROL DIŞI	ITEC	Diğer sistem hataları veya arızaları (Teknik, ikram, yakıt vb.)
+58C	KONTROL DIŞI	ITEC	Acars arızası
+58X	KONTROL DIŞI	ITEC	Bu nedenle slot kaçırma
+61A	KONTROL DIŞI	IOCC	FMS – OFP uyuşmazlığı nedeniyle ilave yakıt ikmal talebi
+61B	KONTROL DIŞI	IOCC	Dispeç uçuş dokümanlarının geç veya hatalı tamamlanması/gönderilmesi, geç "release"
+61D	KONTROL DIŞI	IOCC	Operasyon başladıktan sonra ATC uçuş planının geç bildirilmesi veya hatalı bildirilmesi/geç güncellenmesi
+61F	KONTROL DIŞI	IOCC	Brifingden sonra operasyonel sebeplerle uçuş planı değişikliği (release)
+61G	KONTROL DIŞI	IOCC	Çalışan sayısı eksikliği
+61H	KONTROL DIŞI	IOCC	Uçak hard copy doküman eksikliği (MEL, QRH, FCOM vb.)
+61X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
+62B	KONTROL DIŞI	IOCC/GOPS	Son ağırlığın beklenmesi (yakıt kritik uçuşlar)
+62D	KONTROL DIŞI	IOCC/CCPT	Brifing sonrasında operasyonel sebeplerle yakıt değişimi
+62E	KONTROL DIŞI	IOCC/CCPT	Brifing sonrasında operasyonel sebeplerle yük değişimi
+62M	KONTROL DIŞI	GOPS	Planlamadan sonra son anda meydana gelen ağırlık değişimleri
+62N	KONTROL DIŞI	IOCC	Uçuş işletme talimatları
+62X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
+63A	KONTROL DIŞI	CCPT/CBN	Tüm ekibin uçağa geç gelişi
+63B	KONTROL DIŞI	CCPT	Kokpit ekibinin uçağa geç gelişi
+63C	TGS	RAMP	Ekip aracı nedeniyle tüm ekibin uçağa geç gelmesi
+63D	TGS	RAMP	Ekip aracı nedeniyle kokpit ekibinin uçağa geç gelmesi
+63F	KONTROL DIŞI	CCPT/CBN	Havalimanı ulaşım/giriş yoğunluğu/kapalılık
+63G	KONTROL DIŞI	CCPT	Güvenlik usulleri (tüm ekip brifingi vb.)
+63H	KONTROL DIŞI	CCPT/CBN	Uçuş öncesi tüm ekip sorumluluğundaki işlemler
+63J	KONTROL DIŞI	CCPT	Uçuş öncesi kokpit ekibinin sorumluluğundaki işlemler
+63K	KONTROL DIŞI	GOPS	Ekibin havalimanına geç intikali (Ekip aracı hazır olmadığı durumlarda)
+63L	KONTROL DIŞI	CCPT/CBN	Ekibin havalimanına geç intikali (Ekip aracı hazır olmasına rağmen)
+63M	KONTROL DIŞI	CCPT/CBN	Geliş ekibinin uçağı geç teslimi
+63X	KONTROL DIŞI	CCPT/CBN	Bu nedenle slot kaçırma
+64A	KONTROL DIŞI	CCPT/CRWP	Hastalık/yaralanma
+64B	KONTROL DIŞI	CRWP	Yedek ekip beklenmesi
+64C	KONTROL DIŞI	CCPT/CRWP	Operasyonel aksaklık sebebi ile uçuş zamanı sınırlandırması
+64D	KONTROL DIŞI	CCPT	Seyahat evrakları
+64E	KONTROL DIŞI	CRWP	Ekip planlaması veya ekip kontrol hatası
+64H	KONTROL DIŞI	IOCC/CCPT/CRWP	Operasyonel oranlama yetersizliği (CAT 1- CAT 2 vb.)
+64R	KONTROL DIŞI	CCPT/CRWP	Operasyonel aksaklık sebebi ile zorunlu/minimum ekip dinlenme süresi
+64V	KONTROL DIŞI	CRWP	Kokpit ekibi görev süresinin aşılması nedeni ile yapılan Return to Ramp
+64X	KONTROL DIŞI	CCPT/CRWP	Bu nedenle slot kaçırma
+65A	KONTROL DIŞI	CCPT	Ekip tarafından yolcu boarding anonsunun bekletilmesi
+65B	KONTROL DIŞI	CCPT	Minimum Teçhizat Listesi’nde olmayan bakım kontrolleri
+65C	KONTROL DIŞI	CCPT	Özel veya ilave ikram talebi
+65D	KONTROL DIŞI	CCPT	Bildirilmiş teknik arızanın mevcudiyetinin teşhis edilememesi
+65E	KONTROL DIŞI	CCPT	Arızanın geç bildirilmesi
+65N	KONTROL DIŞI	CCPT	Kokpitin (harekat, dispatch oluruna rağmen) değişiklik talebi
+65O	KONTROL DIŞI	CCPT	Ekip yakınlarının yedek, pass problemleri
+65P	KONTROL DIŞI	CCPT	Hasta yolcu kabul şartlarına uygun yolcunun kabul edilmemesi
+65R	KONTROL DIŞI	CCPT	Kokpit ekibinin özel sebeplerle uçuştan ayrılma ya da uçuş ekibinde değişiklik talebi
+65S	KONTROL DIŞI	CCPT	Geç clearance (Pushback ve motor çalıştırma) talebi
+65T	KONTROL DIŞI	CCPT	Alıştırma/kontrol uçuşu kaynaklı gecikmeler
+65X	KONTROL DIŞI	CCPT	Bu nedenle slot kaçırma
+65Y	KONTROL DIŞI	CCPT	Kokpit ekibi tarafından harekat koordinatörüne teslim edilecek dokümanların geç teslimi
+65Z	KONTROL DIŞI	CCPT	Diğer nedenler
+66A	KONTROL DIŞI	CBN	Kabin ekibi geç gelişi
+66B	TGS	RAMP	Ekip aracı nedeniyle kabin ekibinin uçağa geç gelmesi
+66D	KONTROL DIŞI	CBN	Havalimanı ulaşım/giriş yoğunluğu/kapalılık
+66E	KONTROL DIŞI	CBN	Güvenlik usulleri (kabin ekibi brifingi vb.)
+66F	KONTROL DIŞI	GOPS	Ekibin havalimanına geç intikali (Ekip aracı hazır olmadığı durumlarda)
+66G	KONTROL DIŞI	CBN	Ekibin havalimanına geç intikali (Ekip aracı hazır olmasına rağmen)
+66H	KONTROL DIŞI	CBN	Uçuş öncesi kabin ekibi sorumluluğundaki işlemler
+66X	KONTROL DIŞI	CBN	Bu nedenle slot kaçırma
+67A	KONTROL DIŞI	CBN/CRWP	Hastalık/yaralanma
+67B	KONTROL DIŞI	CRWP	Yedek ekip beklenmesi
+67C	KONTROL DIŞI	CBN/CRWP	Uçuş zamanı sınırlandırması
+67D	KONTROL DIŞI	CBN	Seyahat evrakları eksikliği
+67E	KONTROL DIŞI	CRWP	Ekip planlaması veya ekip kontrol hatası
+67R	KONTROL DIŞI	CBN/CRWP	Zorunlu/minimum ekip dinlenme süresi
+67V	KONTROL DIŞI	CRWP	Kabin ekibi görev süresinin aşılması nedeni ile yapılan Return to Ramp
+67X	KONTROL DIŞI	CBN/CRWP	Bu nedenle slot kaçırma
+68A	KONTROL DIŞI	CBN	Belirlenmiş sürelerden uzun süren yolcu sayımı
+68B	KONTROL DIŞI	CBN	Yanlış/geç talep-ikram
+68C	KONTROL DIŞI	CBN	Yanlış/geç talep-tuvalet servisi
+68D	KONTROL DIŞI	CBN	Yanlış/geç talep-temizlik
+68E	KONTROL DIŞI	CBN	Tahliye şutu açılması (slide)
+68G	KONTROL DIŞI	CBN	Belirlenmiş sürelerden uzun süren uçak güvenlik araması (ASSC) işlemi
+68H	KONTROL DIŞI	CBN	Ekipman (acil durum malzemeleri) kontrolünün belirlenen süreden uzun sürmesi
+68O	KONTROL DIŞI	CBN	Standart olmayan ihtiyaçların talebi (battaniye, kulaklık vb.)
+68R	KONTROL DIŞI	CBN	Kabin ekibinin özel sebeplerle uçuştan ayrılma ya da uçuş ekibinde değişiklik talebi
+68S	KONTROL DIŞI	CBN	Arızanın geç bildirilmesi
+68T	KONTROL DIŞI	FLTD	Alıştırma/kontrol uçuşu kaynaklı gecikmeler
+68X	KONTROL DIŞI	CBN	Bu nedenle slot kaçırma
+69A	KONTROL DIŞI	CCPT	Sorumlu kaptan pilotun güvenlik araması isteği
+69X	KONTROL DIŞI	CCPT	Bu nedenle slot kaçırma
+71A	KONTROL DIŞI	IOCC	Uçak limitleri dışında
+71B	KONTROL DIŞI	IOCC	Ekip limitleri dışında (CAT 1, CAT 2 vb.)
+71R	KONTROL DIŞI	IOCC	Operasyonel limitler dışındaki hava durumu
+71V	KONTROL DIŞI	IOCC	Kalkış meydanındaki hava durumu nedeni ile yapılan Return to Ramp
+71X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
+72A	KONTROL DIŞI	IOCC	Uçak limitleri dışında
+72B	KONTROL DIŞI	IOCC	Ekip limitleri dışında (CAT 1, CAT 2 vb.)
+72R	KONTROL DIŞI	IOCC	Operasyonel limitler dışındaki hava durumu
+72V	KONTROL DIŞI	IOCC	Varış meydanındaki hava durumu nedeni ile yapılan Return to Ramp
+72X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
+73A	KONTROL DIŞI	IOCC	Uçak limitleri dışında
+73B	KONTROL DIŞI	IOCC	Ekip limitleri dışında (CAT 1, CAT 2 vb.)
+73R	KONTROL DIŞI	IOCC	Operasyonel limitler dışındaki hava durumu
+73X	KONTROL DIŞI	ATFM	ETOPS (A/C tipine göre 2 ve 4 motor inebilecek meydanlar)
+73Y	KONTROL DIŞI	ATFM	Ekip limitleri dışında (CAT 1, CAT 2 vb.)
+73Z	KONTROL DIŞI	ATFM	Uçak limitleri dışında
+75A	KONTROL DIŞI	GOPS	Pist başı cep’te De-icing/Anti-icing işlemi uygulanması
+75B	KONTROL DIŞI	GOPS	Park yerinde De-icing/Anti-icing işlemi uygulanması
+75C	KONTROL DIŞI	GOPS	Koruma süresinin (HOT) aşılması durumunda tekrar De-icing/Anti-icing işlemi uygulaması
+75E	TGS	RAMP	Teçhizat arızası
+75F	TGS	RAMP	Çalışan yetersizliği
+75G	KONTROL DIŞI	GOPS	Sıvıların yetersizliği
+75H	KONTROL DIŞI	GOPS/TECH	Fan blade’lerin kar ve buzdan temizlenmesi
+75X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
+76A	KONTROL DIŞI	ARPT	Kötü hava koşulları nedeniyle havalimanının kapanması
+76B	KONTROL DIŞI	ARPT	Hava koşullarından dolayı park yeri olmaması
+76C	KONTROL DIŞI	ARPT	Havalimanından kar, buz, su ve kum temizlenmesi
+76X	KONTROL DIŞI	ARPT	Bu nedenle slot kaçırma
+77A	KONTROL DIŞI	ARPT	Yakıt veya hizmetin kesilmesi
+77B	KONTROL DIŞI	ARPT	Apron koşulları
+77C	KONTROL DIŞI	ARPT	Güçlü rüzgârlar-kapı operasyon limitleri
+77X	KONTROL DIŞI	ARPT	Bu nedenle slot kaçırma
+81G	KONTROL DIŞI	ATFM	Diğer
+81W	KONTROL DIŞI	ATFM	Hava durumu
+81X	KONTROL DIŞI	ATFM	Çevresel sorunlar
+81Y	KONTROL DIŞI	ATFM	Fazla talep veya kapasite
+81Z	KONTROL DIŞI	ATFM	ATC yol boyu kısıtlamalar
+82V	KONTROL DIŞI	ATFM	Özel olaylar
+82W	KONTROL DIŞI	ATFM	Askeri harekat
+82X	KONTROL DIŞI	ATFM	Uçuş güzergahındaki çalışan yetersizliği
+82Y	KONTROL DIŞI	ATFM	Uçuş güzergâhındaki ekipman kapasitesinin düşük/arızalı olması (radar, vor vb.)
+82Z	KONTROL DIŞI	ATFM	Endüstriyel hareketler
+83G	KONTROL DIŞI	ATFM	Diğer
+83L	KONTROL DIŞI	ATFM	Politik huzursuzluk
+83O	KONTROL DIŞI	ATFM	Havalimanı/pist kapalılığı
+83P	KONTROL DIŞI	ATFM	Fazla talep/Havalimanı olanakları
+83S	KONTROL DIŞI	ATFM	Gece uçuş/gürültü kısıtlaması
+83T	KONTROL DIŞI	ATFM	Özel olaylar
+83U	KONTROL DIŞI	ATFM	Askeri harekat
+83V	KONTROL DIŞI	ATFM	Kaza/olay
+83W	KONTROL DIŞI	ATFM	Çalışan yetersizliği
+83X	KONTROL DIŞI	ATFM	Ekipman arızaları
+83Y	KONTROL DIŞI	ATFM	Endüstriyel hareketler (grev vb.)
+83Z	KONTROL DIŞI	ATFM	Fazla talep/ATC kapasitesi
+84A	KONTROL DIŞI	ATFM	ATFM-varış meydanı hava durumu
+85A	KONTROL DIŞI	ARPT	Güvenlik noktasında yoğunluk
+85B	KONTROL DIŞI	SECR	Bagaj eşleştirme boarding’e müracaat etmeyen veya uçağa bindikten sonra inen yolcunun bagajının indirilmesi
+85C	KONTROL DIŞI	SECR	Ekstra/özel havaalanı güvenliği buluntu/sahipsiz paketler
+85D	KONTROL DIŞI	SECR	Bomba ihbarı
+85E	KONTROL DIŞI	SECR	Güvenlik ihlali
+85F	KONTROL DIŞI	SECR	Özel/ilave güvenlik araştırmaları
+85G	KONTROL DIŞI	SECR	Zorunlu yolcu indirimi
+85H	KONTROL DIŞI	SECR	Çalışan yetersizliği
+85I	KONTROL DIŞI	SECR	Teçhizat arızaları (bilgisayar, x-ray arızaları)
+85N	KONTROL DIŞI	SECR	Uçağa binmeden önce son kontrol noktasındaki güvenliğin geç açılması
+85O	KONTROL DIŞI	SECR	Güvenlik uyuşmazlıkları
+85P	KONTROL DIŞI	SECR	Havaalanı içerisinde özel güvenlik gereksinimleri (yolcu-bagaj-el bagajı)
+85Q	KONTROL DIŞI	SECR	Havacılık güvenlik operasyon çalışanı geç gelişi, eleman yetersizliği veya hatası
+85R	KONTROL DIŞI	SECR	Türk Hava Yolları Havacılık güvenlik operasyon çalışanı geç gelişi, yetersizliği veya hatası
+85S	KONTROL DIŞI	SECR	Şüpheli paket nedeniyle güvenlik araması (uçak içerisinde)
+85T	KONTROL DIŞI	SECR	Uçak altında bagajların x-ray’den geçmesi
+85U	KONTROL DIŞI	SECR	Yolcuya ait elektronik cihazların koltuk arasına düşmesi/sıkışması
+85V	KONTROL DIŞI	SECR	Güvenlik nedeni ile yapılan Return to Ramp
+85X	KONTROL DIŞI	SECR	Bu nedenle slot kaçırma
+86A	KONTROL DIŞI	ARPT	Göçmen (pasaport)/gümrük altyapı sistemi
+86B	KONTROL DIŞI	ARPT	Çalışan yetersizliği
+86C	KONTROL DIŞI	ARPT	Sağlık
+86D	KONTROL DIŞI	ARPT	Uygun olmayan/yetersiz dokümanlar ile seyahat eden yolcu (INAD/Deporte vb.)
+86E	KONTROL DIŞI	ARPT	Gelen/giden yolcu kontrolü
+86F	KONTROL DIŞI	ARPT	Uçak ilaçlanması
+86G	KONTROL DIŞI	ARPT	Uçak gümrük işlemleri
+86H	KONTROL DIŞI	ARPT	Karantina
+86J	KONTROL DIŞI	ARPT	Pasaport yoğunluğu
+86N	KONTROL DIŞI	ARPT	Dâhili/transfer bagajların gümrük tarafından kontrolü
+86O	KONTROL DIŞI	ARPT	Pasaport bilgisayar sistem arızası
+86T	KONTROL DIŞI	ARPT	Geç Deporte/INAD yolcu boarding’i
+86U	KONTROL DIŞI	GOPS	Canlı organ sevki
+86X	KONTROL DIŞI	ARPT	Bu nedenle slot kaçırma
+87G	KONTROL DIŞI	ARPT	Diğer
+87H	KONTROL DIŞI	ARPT	Push-back için follow-me araçlarının geç gelmesi veya yetersiz olması
+87I	KONTROL DIŞI	ARPT	Körük operatörü olmaması/geç gelmesi
+87J	KONTROL DIŞI	ARPT	Havalimanı yakıt sistemlerinin arızalanması
+87K	KONTROL DIŞI	ARPT	İnşaat nedeniyle push-back clearance verilmemesi
+87L	KONTROL DIŞI	ARPT	Yer iletişim sistem arızası
+87M	KONTROL DIŞI	ARPT	Yetersiz yangın söndürücü
+87N	KONTROL DIŞI	ARPT	Uçuş bilgi görüntüleme sistem arızası
+87P	KONTROL DIŞI	ARPT	Yolcu ulaşım sistem arızası
+87Q	KONTROL DIŞI	ARPT	Temiz su operatörünün olmaması/geç gelmesi
+87R	KONTROL DIŞI	ARPT	Elektrik sistem arızası
+87S	KONTROL DIŞI	ARPT	Check-in kontuarlarının yetersiz olması
+87T	KONTROL DIŞI	ARPT	Köprü arızası
+87U	KONTROL DIŞI	ARPT	Altyapı yetersizliğinden push-back yapılamaması
+87V	KONTROL DIŞI	ARPT	Bagaj Ayırma Sistemi arızası (durma ve yavaşlama) (şut sorter arızası)
+87W	KONTROL DIŞI	ARPT	Kapı sınırlandırmaları/kapı olmaması
+87X	KONTROL DIŞI	ARPT	Binalar
+87Y	KONTROL DIŞI	ARPT	Ramp karışıklığı
+87Z	KONTROL DIŞI	ARPT	Park yeri olmaması
+88A	KONTROL DIŞI	ARPT	Sokağa çıkma yasağı sebebiyle kısıtlamalar
+88B	KONTROL DIŞI	ARPT	Endüstriyel hareket (grev vb.)
+88C	KONTROL DIŞI	ARPT	Politik huzursuzluk
+88D	KONTROL DIŞI	ARPT	Havalimanı kapalılığı
+88E	KONTROL DIŞI	ARPT	Pist kapalılığı
+88F	KONTROL DIŞI	ARPT	Varış meydan iniş izinlerinin beklenmesi
+88N	KONTROL DIŞI	ARPT	Gürültü kısıtlamaları
+88O	KONTROL DIŞI	ARPT	Çalışan yetersizliği
+88P	KONTROL DIŞI	ARPT	Gece uçuşu kısıtlamaları
+88Q	KONTROL DIŞI	ARPT	Özel uçuşlar (VIP, askeri, kutlama amaçlı vb.)
+89F	KONTROL DIŞI	ARPT	“De-icing” sıralandırması
+89G	KONTROL DIŞI	ARPT	Diğer
+89H	KONTROL DIŞI	ARPT	İnşaat işleri/bakım
+89I	KONTROL DIŞI	ARPT	Altyapı dışı bir nedenle geç pushback verilmesi
+89J	KONTROL DIŞI	ARPT	Kayıp uçuş planları
+89K	KONTROL DIŞI	ARPT	Lokal ATC kaynaklı start-up/push-back clearance gecikmesi
+89L	KONTROL DIŞI	ARPT	Pist/taxi yolu kapalılığı
+89M	KONTROL DIŞI	ARPT	Havalimanı kapalılığı
+89N	KONTROL DIŞI	ARPT	ATC çevresel
+89O	KONTROL DIŞI	ARPT	Çevre Menfaati, Standart Taksi Süresinin Kısıtlanması Nedeniyle Gecikmeli Motor Çalıştırma/Pushback
+89P	KONTROL DIŞI	ARPT	Politik huzursuzluk
+89R	KONTROL DIŞI	ARPT	Havaalanı yasaklamalarından dolayı ATC kısıtlaması
+89S	KONTROL DIŞI	ARPT	ATC hava durumu
+89T	KONTROL DIŞI	ARPT	ATC özel olay
+89U	KONTROL DIŞI	ARPT	Askeri hareketlilik/Özel uçuşlar/VIP
+89V	KONTROL DIŞI	ARPT	ATC kaza/olay
+89W	KONTROL DIŞI	ARPT	ATC ekipman
+89X	KONTROL DIŞI	ARPT	ATC çalışanı
+89Y	KONTROL DIŞI	ARPT	Endüstriyel hareket (grev vb.)
+89Z	KONTROL DIŞI	ARPT	ATC talep/kapasitesi
+91N	KONTROL DIŞI	GOPS	Bağlantılı yolcu ve bagaj beklenmesi
+91O	KONTROL DIŞI	GOPS	Bağlantılı kargo veya posta beklenmesi
+91P	KONTROL DIŞI	GOPS	Short connection (yolcu/bagaj)
+91R	KONTROL DIŞI	GOPS	Marketing Carrier olduğumuz uçuştan yolcu ve bagaj beklenmesi
+91S	KONTROL DIŞI	GOPS	Yüklerin geliş istasyondan hatalı yüklenmesi/hatalı mesaj çekilmesi
+91T	KONTROL DIŞI	GOPS	Transfer yolcu/bagaj yönetimi hataları
+91X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
+92A	KONTROL DIŞI	GOPS	Through check-in işlemi yapılmaması-yanlış transit/transfer yolcu ve bagaj figürleri
+92B	KONTROL DIŞI	GOPS	Transit/transfer yüklerin yanlış (karışık) yüklenmesi
+92N	KONTROL DIŞI	GOPS	Check-in işlemi hatası-yolcu ve bagaj
+92O	KONTROL DIŞI	GOPS	Check-in işlemi hatası-yolcu ve bagaj (yetersiz doküman)
+92X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
+93U	KONTROL DIŞI	REAC	Teknik nedenlerden dolayı uçağın geç varışı
+93V	KONTROL DIŞI	REAC	Varış istasyonundaki hava durumundan dolayı uçağın geç varışı
+93W	KONTROL DIŞI	REAC	Varış istasyonundaki fazla kapasite talebinden ve/veya kısıtlamalardan dolayı uçağın geç varışı
+93X	KONTROL DIŞI	REAC	İnişten sonra yaşanan gecikmeden dolayı uçağın geç varışı
+93Y	KONTROL DIŞI	REAC	Yol boyundan dolayı uçağın geç varışı
+93Z	KONTROL DIŞI	REAC	Bir önceki istasyonda kalkışta yaşanan gecikmeden dolayı uçağın geç varışı
+94A	KONTROL DIŞI	CRWP	Seferin kendi kabin ekibinin beklenmesi
+94B	KONTROL DIŞI	CRWP	Seferden pass kabin ekibi/ekipleri beklenmesi
+94X	KONTROL DIŞI	CRWP	Bu nedenle slot kaçırma
+95A	KONTROL DIŞI	CRWP	Seferin kendi tüm ekibinin beklenmesi
+95B	KONTROL DIŞI	CRWP	Seferden pass ekip beklenmesi (tüm ekip)
+95C	KONTROL DIŞI	CRWP	Seferin kendi kokpit ekibinin beklenmesi
+95X	KONTROL DIŞI	CRWP	Bu nedenle slot kaçırma
+96A	KONTROL DIŞI	IOCC	Uçuş rotası değişikliği
+96B	KONTROL DIŞI	IOCC	Uçuşların birleştirilmesi (tevhid)
+96C	KONTROL DIŞI	IOCC	Uçak/teçhizat değişikliği-teknik neden dışı
+96D	KONTROL DIŞI	IOCC	Divert
+96E	KONTROL DIŞI	IOCC	Yerde kalış süresinin, belirlenen minimum yerde kalış süresinden daha az olarak tekrar planlanması
+96G	KONTROL DIŞI	IOCC	Kontroller/planlayıcı hatası
+96S	KONTROL DIŞI	IOCC	Teknik arıza veya hasar nedeniyle ikincil sebep oluşması
+96T	KONTROL DIŞI	IOCC	Zorunlu operasyonel değişiklik veya planlama
+96V	KONTROL DIŞI	IOCC	IOCC kararı nedeni ile yapılan Return to Ramp
+96X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
+97A	KONTROL DIŞI	KONTROL DIŞI	Yerel istasyon bünyesinde
+97B	KONTROL DIŞI	KONTROL DIŞI	Tüm şirket bünyesinde
+97C	KONTROL DIŞI	KONTROL DIŞI	Yolcu hizmetleri/handling bünyesinde
+97D	KONTROL DIŞI	KONTROL DIŞI	Ramp hizmetleri/handling bünyesinde
+97E	KONTROL DIŞI	KONTROL DIŞI	Kargo bünyesinde
+97F	KONTROL DIŞI	KONTROL DIŞI	İkram bünyesinde
+97G	KONTROL DIŞI	KONTROL DIŞI	Uçuş kokpit ekibi bünyesinde
+97H	KONTROL DIŞI	KONTROL DIŞI	Uçuş kabin ekibi bünyesinde
+97I	KONTROL DIŞI	KONTROL DIŞI	Teknik birim bünyesinde
+97J	KONTROL DIŞI	KONTROL DIŞI	Destek birimleri
+97K	KONTROL DIŞI	KONTROL DIŞI	Yakıt şirketi bünyesinde
+97L	KONTROL DIŞI	KONTROL DIŞI	Diğer operasyonel faaliyetler
+97X	KONTROL DIŞI	KONTROL DIŞI	Bu nedenle slot kaçırma
+98A	KONTROL DIŞI	KONTROL DIŞI	Ulusal grev
+98B	KONTROL DIŞI	KONTROL DIŞI	Handling şirketinin tüm birimleri
+98C	KONTROL DIŞI	KONTROL DIŞI	Yolcu hizmetleri/handling
+98D	KONTROL DIŞI	KONTROL DIŞI	Ramp hizmetleri/handling
+98E	KONTROL DIŞI	KONTROL DIŞI	Kargo
+98F	KONTROL DIŞI	KONTROL DIŞI	İkram
+98G	KONTROL DIŞI	KONTROL DIŞI	Teknik
+98H	KONTROL DIŞI	KONTROL DIŞI	Temizlik
+98I	KONTROL DIŞI	KONTROL DIŞI	Destek birimleri
+98J	KONTROL DIŞI	KONTROL DIŞI	Yakıt
+98K	KONTROL DIŞI	KONTROL DIŞI	Diğer operasyonel faaliyetler
+98L	KONTROL DIŞI	KONTROL DIŞI	Güvenlik
+98M	KONTROL DIŞI	KONTROL DIŞI	İtfaiye
+98N	KONTROL DIŞI	KONTROL DIŞI	Otoriteler
+98O	KONTROL DIŞI	KONTROL DIŞI	Havalimanı
+98X	KONTROL DIŞI	KONTROL DIŞI	Bu nedenle slot kaçırma
+99A	KONTROL DIŞI	KONTROL DIŞI	Diğer nedenler
+99V	KONTROL DIŞI	NULL	Diğer sebeplerle yapılan Return to Ramp
+N/A	TEHİR YOK	TEHİRYOK	#N/A
+</script>
+<script>
+const SAMPLE=[
+["01A","KONTROL DIŞI","RGFD/CRGO","THY A.O. uçakları dışında kalanların teknik nedenle tehirleri"],
+["01B","KONTROL DIŞI","RGFD/CRGO","THY A.O. uçakları dışında kalanların teknik kaynaklı uçak değişiklik tehirleri"],
+["01C","KONTROL DIŞI","RGFD/CRGO","THY A.O. uçakları dışında kalanların planlama kaynaklı tehirleri"],
+["01D","KONTROL DIŞI","RGFD","Uçuş planı/Uçuş dokümanlarının geç tamamlanması ya da değişmesi"],
+["01F","KONTROL DIŞI","RGFD","THY A.O. uçakları dışında kalanların ekip planlama (kokpit) kaynaklı rötarlar"],
+["01G","KONTROL DIŞI","RGFD","THY A.O. uçakları dışında kalanların (kokpit) ekip kaynaklı diğer rötarlar"],
+["01I","KONTROL DIŞI","RGFD","THY A.O. uçakları dışında kalanların (kabin) ekip kaynaklı diğer rötarlar"],
+["01J","KONTROL DIŞI","RGFD","Kabin ekibi hatası veya özel isteği (Operasyonel gereklilikler dışında)"],
+["01M","KONTROL DIŞI","RGFD/CRGO","THY A.O. uçakları dışında kalanların teknik kaynaklı ikincil tehirleri"],
+["01N","KONTROL DIŞI","CRGO","Kargo wetlease seferlerinde load master kaynaklı hatalar"],
+["01X","KONTROL DIŞI","RGFD","Bu nedenle slot kaçırma"],
+["01Y","KONTROL DIŞI","RGFD/CRGO","Diğer"],
+["02B","KONTROL DIŞI","ARPT","Uçağın park pozisyonundan kendi gücü ile harekete başlaması"],
+["03A","KONTROL DIŞI","QLTY","Şirket içi denetim"],
+["03B","KONTROL DIŞI","QLTY","Şirket dışı denetim"],
+["03X","KONTROL DIŞI","QLTY","Bu nedenle slot kaçırma"],
+["04A","KONTROL DIŞI","GOPS/IOCC","Üzerinde inceleme süren tehirler"],
+["09B","KONTROL DIŞI","SCHD","Ticari"],
+["09C","KONTROL DIŞI","SCHD","Planlama"],
+["09D","KONTROL DIŞI","CRGO","Kargo Operasyon Kontrol Planlama"],
+["09E","KONTROL DIŞI","TECH","Bakım uzaması nedeniyle planlanan uçuş tarifesinin değişikliği"],
+["09F","KONTROL DIŞI","TECH","Uçak/Komponent arızası nedeniyle planlanan uçuş tarifesinin değişikliği"],
+["09G","KONTROL DIŞI","TECH","Yerde/Havada hasarlanma nedeniyle planlanan uçuş tarifesinin değişikliği"],
+["09X","KONTROL DIŞI","SCHD","Bu nedenle slot kaçırma"],
+["11A","TGS","YHM","Transfer yolcuların geç check-in işlemi"],
+["11B","TGS","YHM","Yedek liste işlemleri"],
+["11C","TGS","YHM","Rezervasyonu onaylı yolcuların geç kabulü"],
+["31P","TGS","HAREKAT","Harekat koordinatörü hatası"]
+];
+const $=id=>document.getElementById(id);
+const norm=s=>String(s==null?"":s).trim().toUpperCase().replace(/\s+/g,"");
+const SEED=parseTsv(($("veri")||{textContent:""}).textContent);
+let data=SEED.length?SEED:SAMPLE, custom=false;
+
+try{const s=SEED.length?null:localStorage.getItem("tehir-data");if(s){const d=JSON.parse(s);if(Array.isArray(d)&&d.length){data=d;custom=true}}}catch(e){}
+
+let map;
+function build(){map=new Map();data.forEach(r=>map.set(norm(r[0]),r));
+  $("info").textContent=custom?data.length+" kod yüklü (kendi Excel dosyanız, bu tarayıcıda saklanır)":SEED.length?data.length+" tehir kodu":"Örnek veri: "+data.length+" kod. Tam liste için aşağıdan listeyi yapıştırın veya Excel yükleyin.";
+  one();bulk();list()}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function one(){const k=norm($("q").value);const o=$("out");
+  if(!k){o.innerHTML="";return}
+  const r=map.get(k);
+  o.innerHTML=r?'<div class="res"><div class="row"><b>TEHİR KODU</b><span>'+esc(r[0])+'</span></div><div class="row"><b>SORUMLU</b><span>'+esc(r[1])+'</span></div><div class="row"><b>BİRİM</b><span>'+esc(r[2])+'</span></div><div class="row"><b>AÇIKLAMA</b><span>'+esc(r[3])+'</span></div></div>':'<div class="none">Bulunamadı: '+esc($("q").value.trim())+'</div>'}
+
+let lastTsv="";
+function bulk(){const lines=$("bulk").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const tb=$("bt").tBodies[0];tb.innerHTML="";lastTsv="";
+  $("bt").hidden=$("copy").hidden=!lines.length;
+  const out=[];
+  lines.forEach(l=>{const r=map.get(norm(l));
+    const tr=document.createElement("tr");
+    if(r){tr.innerHTML="<td>"+esc(l)+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td>";out.push([r[1],r[2],r[3]].join("\t"))}
+    else{tr.innerHTML='<td>'+esc(l)+'</td><td class="nf" colspan="3">Bulunamadı</td>';out.push("Bulunamadı\t\t")}
+    tb.appendChild(tr)});
+  lastTsv=out.join("\n")}
+
+function list(){const f=$("f").value.trim().toLocaleLowerCase("tr");const tb=$("lt").tBodies[0];
+  tb.innerHTML=data.filter(r=>!f||r.join(" ").toLocaleLowerCase("tr").includes(f)).map(r=>"<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>").join("")}
+
+["t1","t2","t3"].forEach((t,i)=>$(t).onclick=()=>{["t1","t2","t3"].forEach((x,j)=>{$(x).setAttribute("aria-selected",i===j);$("p"+(j+1)).hidden=i!==j})});
+$("q").oninput=one;$("bulk").oninput=bulk;$("f").oninput=list;
+$("copy").onclick=()=>{const done=()=>$("msg").textContent="Kopyalandı. Excel'de ilk hücreye yapıştırın.";
+  if(navigator.clipboard)navigator.clipboard.writeText(lastTsv).then(done,()=>{$("bulk").select()});else done()};
+
+$("load").onclick=()=>$("file").click();
+$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{
+    const wb=XLSX.read(rd.result,{type:"array"});
+    const name=wb.SheetNames.find(n=>n.toLocaleUpperCase("tr")==="LİSTE")||wb.SheetNames[0];
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:""});
+    let h=rows.findIndex(r=>r.some(c=>/TEH[İI]R/i.test(String(c))));
+    if(h<0)h=0;
+    const hdr=rows[h].map(c=>String(c).toLocaleUpperCase("tr"));
+    const ix=k=>hdr.findIndex(c=>c.includes(k));
+    let a=ix("TEHİR"),b=ix("SORUMLU"),c=ix("BİRİM"),d=ix("AÇIKLAMA");
+    if([a,b,c,d].some(x=>x<0)){const s=rows[h].findIndex(x=>String(x).trim()!=="");a=s;b=s+1;c=s+2;d=s+3}
+    const out=rows.slice(h+1).filter(r=>String(r[a]).trim()).map(r=>[String(r[a]).trim(),String(r[b]).trim(),String(r[c]).trim(),String(r[d]).trim()]);
+    if(!out.length)throw new Error("boş");
+    data=out;custom=true;
+    try{localStorage.setItem("tehir-data",JSON.stringify(out))}catch(x){}
+    $("msg").textContent=out.length+" kod yüklendi ("+name+" sayfası)";build()
+  }catch(x){$("msg").textContent="Dosya okunamadı. Sütunlar: Tehir Kodları, Sorumlu, Birim, Açıklama olmalı."}};
+  rd.readAsArrayBuffer(f);e.target.value=""};
+$("reset").onclick=()=>{data=SEED.length?SEED:SAMPLE;custom=false;try{localStorage.removeItem("tehir-data")}catch(x){}$("msg").textContent="";build()};
+function parseTsv(t){const rows=[];let r=[],c="",q=false;
+ for(let i=0;i<t.length;i++){const ch=t[i];
+  if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
+  else if(ch==='"'&&c==="")q=true;
+  else if(ch==="\t"){r.push(c);c=""}
+  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&t[i+1]==="\n")i++;r.push(c);rows.push(r);r=[];c=""}
+  else c+=ch}
+ if(c!==""||r.length){r.push(c);rows.push(r)}
+ return rows.map(x=>x.map(s=>s.trim())).filter(x=>x[0]&&!/^TEH[İI]R/i.test(x[0])).map(x=>[x[0],x[1]||"",x[2]||"",x[3]||""])}
+$("pastebtn").onclick=()=>{$("pastebox").hidden=!$("pastebox").hidden};
+$("pgo").onclick=()=>{const out=parseTsv($("paste").value);
+ if(!out.length){$("msg").textContent="Veri okunamadı. Dört sütunu (Kod, Sorumlu, Birim, Açıklama) kopyalayın.";return}
+ data=out;custom=true;try{localStorage.setItem("tehir-data",JSON.stringify(out))}catch(x){}
+ $("paste").value="";$("pastebox").hidden=true;$("msg").textContent=out.length+" kod yüklendi";build()};
+build();
+</script>
+</body>
+</html>
