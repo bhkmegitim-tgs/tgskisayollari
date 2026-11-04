@@ -6,33 +6,27 @@
 <title>Tehir Kodu Sorgu</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#f3f6f7;--card:#fff;--ink:#14272e;--mut:#5b7078;--teal:#25687a;--teal2:#1b4f5d;--line:#d5e0e4;--ok:#1c7a4b;--bad:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b1f;--card:#16272d;--ink:#e6f0f3;--mut:#93a8af;--teal:#4aa3b9;--teal2:#2f7f92;--line:#28404a;--ok:#5fd09a;--bad:#ff8a80}}
+:root{--bg:#f3f6f7;--card:#fff;--ink:#14272e;--mut:#5b7078;--teal:#25687a;--line:#d5e0e4;--bad:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b1f;--card:#16272d;--ink:#e6f0f3;--mut:#93a8af;--teal:#4aa3b9;--line:#28404a;--bad:#ff8a80}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
 main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
 h1{font-size:22px;margin:8px 0 4px}
 .sub{color:var(--mut);margin:0 0 18px;font-size:14px}
-.tabs{display:flex;gap:6px;margin-bottom:14px}
-.tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font:inherit;cursor:pointer}
-.tabs button[aria-selected=true]{background:var(--teal);border-color:var(--teal);color:#fff}
-input,textarea{width:100%;padding:12px 14px;font:inherit;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
-input{font-size:22px;letter-spacing:.06em;text-transform:uppercase}
-input:focus,textarea:focus,button:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
+#q{width:100%;padding:12px 14px;font:inherit;font-size:22px;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+#pw{padding:8px 12px;font:inherit;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);width:160px}
+#q:focus,#pw:focus,button:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 .res{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .row{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid var(--line)}
 .row:last-child{border:0}
 .row b{background:var(--teal);color:#fff;padding:10px 12px;font-weight:600}
 .row span{padding:10px 12px}
 .none{margin-top:16px;color:var(--bad);font-weight:600}
-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line)}
-th{background:var(--teal);color:#fff;text-align:left;padding:8px 10px;font-size:14px}
-td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top;font-size:14px}
-td.nf{color:var(--bad);font-weight:600}
-.wrap{overflow-x:auto;margin-top:12px}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:28px;padding-top:16px;border-top:1px solid var(--line);color:var(--mut);font-size:14px}
-.bar button,.btn{padding:8px 14px;border:1px solid var(--teal);background:transparent;color:var(--teal);border-radius:8px;font:inherit;cursor:pointer}
-.btn.fill{background:var(--teal);color:#fff;margin-top:8px}
+.bar{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:var(--mut);font-size:14px}
+.rw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+button{padding:8px 14px;border:1px solid var(--teal);background:transparent;color:var(--teal);border-radius:8px;font:inherit;cursor:pointer}
+button.fill{background:var(--teal);color:#fff}
+button.warn{border-color:var(--bad);color:var(--bad)}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -40,39 +34,21 @@ td.nf{color:var(--bad);font-weight:600}
 <main>
 <h1>Tehir kodu sorgu</h1>
 <p class="sub" id="info"></p>
-<div class="tabs" role="tablist">
-  <button role="tab" id="t1" aria-selected="true">Tek kod</button>
-  <button role="tab" id="t2" aria-selected="false">Toplu kod</button>
-  <button role="tab" id="t3" aria-selected="false">Tüm liste</button>
-</div>
+<input id="q" placeholder="Kod yazın, örn. 31P" autocomplete="off" aria-label="Tehir kodu">
+<div id="out"></div>
 
-<section id="p1">
-  <input id="q" placeholder="Kod yazın, örn. 31P" autocomplete="off" aria-label="Tehir kodu">
-  <div id="out"></div>
-</section>
-
-<section id="p2" hidden>
-  <textarea id="bulk" rows="6" placeholder="Her satıra bir kod yazın veya Excel'den kodları yapıştırın" aria-label="Kodlar"></textarea>
-  <div class="wrap"><table id="bt" hidden><thead><tr><th>Kod</th><th>Sorumlu</th><th>Birim</th><th>Açıklama</th></tr></thead><tbody></tbody></table></div>
-  <button class="btn fill" id="copy" hidden>Sonucu kopyala (Excel'e yapıştırılır)</button>
-</section>
-
-<section id="p3" hidden>
-  <input id="f" placeholder="Kod veya açıklamada ara" style="font-size:16px;text-transform:none;letter-spacing:0" aria-label="Listede ara">
-  <div class="wrap"><table id="lt"><thead><tr><th>Kod</th><th>Sorumlu</th><th>Birim</th><th>Açıklama</th></tr></thead><tbody></tbody></table></div>
-</section>
-
-<div id="pastebox" hidden style="margin-top:24px"><textarea id="paste" rows="6" placeholder="Excel'den Kod, Sorumlu, Birim, Açıklama sütunlarını kopyalayıp buraya yapıştırın" aria-label="Liste"></textarea><button class="btn fill" id="pgo">Listeyi kullan</button></div>
 <div class="bar">
-  <input type="file" id="file" accept=".xlsx,.xls,.xlsm" hidden>
-  <button id="load">Excel dosyasını yükle</button>
-  <button id="pastebtn">Listeyi yapıştır</button>
-  <button id="reset">Başa dön</button>
-  <span id="msg"></span>
+  <button id="adm">Yönetici</button> <span id="msg"></span>
+  <div class="rw" id="login" hidden><input id="pw" type="password" placeholder="Şifre" aria-label="Şifre"><button class="fill" id="ok">Giriş</button></div>
+  <div class="rw" id="panel" hidden>
+    <input type="file" id="file" accept=".xlsx,.xls,.xlsm" hidden>
+    <button class="fill" id="load">Excel yükle (listeyi değiştir)</button>
+    <button class="warn" id="del">Listeyi sil</button>
+    <button id="reset">Varsayılan listeye dön</button>
+    <button id="exit">Çıkış</button>
+  </div>
 </div>
 </main>
-
-<!-- TAM LİSTE: Excel'de B1:E sütunlarını kopyalayıp aşağıdaki veri etiketinin ARASINA yapıştırın (başlık satırı olabilir). -->
 <script type="text/plain" id="veri">
 01A	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların teknik nedenle tehirleri
 01B	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların teknik kaynaklı uçak değişiklik tehirleri
@@ -720,95 +696,9 @@ td.nf{color:var(--bad);font-weight:600}
 N/A	TEHİR YOK	TEHİRYOK	#N/A
 </script>
 <script>
-const SAMPLE=[
-["01A","KONTROL DIŞI","RGFD/CRGO","THY A.O. uçakları dışında kalanların teknik nedenle tehirleri"],
-["01B","KONTROL DIŞI","RGFD/CRGO","THY A.O. uçakları dışında kalanların teknik kaynaklı uçak değişiklik tehirleri"],
-["01C","KONTROL DIŞI","RGFD/CRGO","THY A.O. uçakları dışında kalanların planlama kaynaklı tehirleri"],
-["01D","KONTROL DIŞI","RGFD","Uçuş planı/Uçuş dokümanlarının geç tamamlanması ya da değişmesi"],
-["01F","KONTROL DIŞI","RGFD","THY A.O. uçakları dışında kalanların ekip planlama (kokpit) kaynaklı rötarlar"],
-["01G","KONTROL DIŞI","RGFD","THY A.O. uçakları dışında kalanların (kokpit) ekip kaynaklı diğer rötarlar"],
-["01I","KONTROL DIŞI","RGFD","THY A.O. uçakları dışında kalanların (kabin) ekip kaynaklı diğer rötarlar"],
-["01J","KONTROL DIŞI","RGFD","Kabin ekibi hatası veya özel isteği (Operasyonel gereklilikler dışında)"],
-["01M","KONTROL DIŞI","RGFD/CRGO","THY A.O. uçakları dışında kalanların teknik kaynaklı ikincil tehirleri"],
-["01N","KONTROL DIŞI","CRGO","Kargo wetlease seferlerinde load master kaynaklı hatalar"],
-["01X","KONTROL DIŞI","RGFD","Bu nedenle slot kaçırma"],
-["01Y","KONTROL DIŞI","RGFD/CRGO","Diğer"],
-["02B","KONTROL DIŞI","ARPT","Uçağın park pozisyonundan kendi gücü ile harekete başlaması"],
-["03A","KONTROL DIŞI","QLTY","Şirket içi denetim"],
-["03B","KONTROL DIŞI","QLTY","Şirket dışı denetim"],
-["03X","KONTROL DIŞI","QLTY","Bu nedenle slot kaçırma"],
-["04A","KONTROL DIŞI","GOPS/IOCC","Üzerinde inceleme süren tehirler"],
-["09B","KONTROL DIŞI","SCHD","Ticari"],
-["09C","KONTROL DIŞI","SCHD","Planlama"],
-["09D","KONTROL DIŞI","CRGO","Kargo Operasyon Kontrol Planlama"],
-["09E","KONTROL DIŞI","TECH","Bakım uzaması nedeniyle planlanan uçuş tarifesinin değişikliği"],
-["09F","KONTROL DIŞI","TECH","Uçak/Komponent arızası nedeniyle planlanan uçuş tarifesinin değişikliği"],
-["09G","KONTROL DIŞI","TECH","Yerde/Havada hasarlanma nedeniyle planlanan uçuş tarifesinin değişikliği"],
-["09X","KONTROL DIŞI","SCHD","Bu nedenle slot kaçırma"],
-["11A","TGS","YHM","Transfer yolcuların geç check-in işlemi"],
-["11B","TGS","YHM","Yedek liste işlemleri"],
-["11C","TGS","YHM","Rezervasyonu onaylı yolcuların geç kabulü"],
-["31P","TGS","HAREKAT","Harekat koordinatörü hatası"]
-];
 const $=id=>document.getElementById(id);
 const norm=s=>String(s==null?"":s).trim().toUpperCase().replace(/\s+/g,"");
-const SEED=parseTsv(($("veri")||{textContent:""}).textContent);
-let data=SEED.length?SEED:SAMPLE, custom=false;
-
-try{const s=SEED.length?null:localStorage.getItem("tehir-data");if(s){const d=JSON.parse(s);if(Array.isArray(d)&&d.length){data=d;custom=true}}}catch(e){}
-
-let map;
-function build(){map=new Map();data.forEach(r=>map.set(norm(r[0]),r));
-  $("info").textContent=custom?data.length+" kod yüklü (kendi Excel dosyanız, bu tarayıcıda saklanır)":SEED.length?data.length+" tehir kodu":"Örnek veri: "+data.length+" kod. Tam liste için aşağıdan listeyi yapıştırın veya Excel yükleyin.";
-  one();bulk();list()}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-function one(){const k=norm($("q").value);const o=$("out");
-  if(!k){o.innerHTML="";return}
-  const r=map.get(k);
-  o.innerHTML=r?'<div class="res"><div class="row"><b>TEHİR KODU</b><span>'+esc(r[0])+'</span></div><div class="row"><b>SORUMLU</b><span>'+esc(r[1])+'</span></div><div class="row"><b>BİRİM</b><span>'+esc(r[2])+'</span></div><div class="row"><b>AÇIKLAMA</b><span>'+esc(r[3])+'</span></div></div>':'<div class="none">Bulunamadı: '+esc($("q").value.trim())+'</div>'}
-
-let lastTsv="";
-function bulk(){const lines=$("bulk").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  const tb=$("bt").tBodies[0];tb.innerHTML="";lastTsv="";
-  $("bt").hidden=$("copy").hidden=!lines.length;
-  const out=[];
-  lines.forEach(l=>{const r=map.get(norm(l));
-    const tr=document.createElement("tr");
-    if(r){tr.innerHTML="<td>"+esc(l)+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td>";out.push([r[1],r[2],r[3]].join("\t"))}
-    else{tr.innerHTML='<td>'+esc(l)+'</td><td class="nf" colspan="3">Bulunamadı</td>';out.push("Bulunamadı\t\t")}
-    tb.appendChild(tr)});
-  lastTsv=out.join("\n")}
-
-function list(){const f=$("f").value.trim().toLocaleLowerCase("tr");const tb=$("lt").tBodies[0];
-  tb.innerHTML=data.filter(r=>!f||r.join(" ").toLocaleLowerCase("tr").includes(f)).map(r=>"<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td><td>"+esc(r[3])+"</td></tr>").join("")}
-
-["t1","t2","t3"].forEach((t,i)=>$(t).onclick=()=>{["t1","t2","t3"].forEach((x,j)=>{$(x).setAttribute("aria-selected",i===j);$("p"+(j+1)).hidden=i!==j})});
-$("q").oninput=one;$("bulk").oninput=bulk;$("f").oninput=list;
-$("copy").onclick=()=>{const done=()=>$("msg").textContent="Kopyalandı. Excel'de ilk hücreye yapıştırın.";
-  if(navigator.clipboard)navigator.clipboard.writeText(lastTsv).then(done,()=>{$("bulk").select()});else done()};
-
-$("load").onclick=()=>$("file").click();
-$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;
-  const rd=new FileReader();
-  rd.onload=()=>{try{
-    const wb=XLSX.read(rd.result,{type:"array"});
-    const name=wb.SheetNames.find(n=>n.toLocaleUpperCase("tr")==="LİSTE")||wb.SheetNames[0];
-    const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:""});
-    let h=rows.findIndex(r=>r.some(c=>/TEH[İI]R/i.test(String(c))));
-    if(h<0)h=0;
-    const hdr=rows[h].map(c=>String(c).toLocaleUpperCase("tr"));
-    const ix=k=>hdr.findIndex(c=>c.includes(k));
-    let a=ix("TEHİR"),b=ix("SORUMLU"),c=ix("BİRİM"),d=ix("AÇIKLAMA");
-    if([a,b,c,d].some(x=>x<0)){const s=rows[h].findIndex(x=>String(x).trim()!=="");a=s;b=s+1;c=s+2;d=s+3}
-    const out=rows.slice(h+1).filter(r=>String(r[a]).trim()).map(r=>[String(r[a]).trim(),String(r[b]).trim(),String(r[c]).trim(),String(r[d]).trim()]);
-    if(!out.length)throw new Error("boş");
-    data=out;custom=true;
-    try{localStorage.setItem("tehir-data",JSON.stringify(out))}catch(x){}
-    $("msg").textContent=out.length+" kod yüklendi ("+name+" sayfası)";build()
-  }catch(x){$("msg").textContent="Dosya okunamadı. Sütunlar: Tehir Kodları, Sorumlu, Birim, Açıklama olmalı."}};
-  rd.readAsArrayBuffer(f);e.target.value=""};
-$("reset").onclick=()=>{data=SEED.length?SEED:SAMPLE;custom=false;try{localStorage.removeItem("tehir-data")}catch(x){}$("msg").textContent="";build()};
 function parseTsv(t){const rows=[];let r=[],c="",q=false;
  for(let i=0;i<t.length;i++){const ch=t[i];
   if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
@@ -818,11 +708,50 @@ function parseTsv(t){const rows=[];let r=[],c="",q=false;
   else c+=ch}
  if(c!==""||r.length){r.push(c);rows.push(r)}
  return rows.map(x=>x.map(s=>s.trim())).filter(x=>x[0]&&!/^TEH[İI]R/i.test(x[0])).map(x=>[x[0],x[1]||"",x[2]||"",x[3]||""])}
-$("pastebtn").onclick=()=>{$("pastebox").hidden=!$("pastebox").hidden};
-$("pgo").onclick=()=>{const out=parseTsv($("paste").value);
- if(!out.length){$("msg").textContent="Veri okunamadı. Dört sütunu (Kod, Sorumlu, Birim, Açıklama) kopyalayın.";return}
- data=out;custom=true;try{localStorage.setItem("tehir-data",JSON.stringify(out))}catch(x){}
- $("paste").value="";$("pastebox").hidden=true;$("msg").textContent=out.length+" kod yüklendi";build()};
+
+const SEED=parseTsv($("veri").textContent);
+let data=SEED,over=false,map;
+try{const s=localStorage.getItem("tehir-data");if(s){const d=JSON.parse(s);if(Array.isArray(d)){data=d;over=true}}}catch(e){}
+function save(){try{localStorage.setItem("tehir-data",JSON.stringify(data))}catch(e){}}
+
+function build(){map=new Map();data.forEach(r=>map.set(norm(r[0]),r));
+ $("info").textContent=!data.length?"Liste boş":data.length+" tehir kodu"+(over?" (bu cihazda değiştirilmiş liste)":"");
+ one()}
+function one(){const k=norm($("q").value),o=$("out");
+ if(!k){o.innerHTML="";return}
+ const r=map.get(k);
+ o.innerHTML=r?'<div class="res"><div class="row"><b>TEHİR KODU</b><span>'+esc(r[0])+'</span></div><div class="row"><b>SORUMLU</b><span>'+esc(r[1])+'</span></div><div class="row"><b>BİRİM</b><span>'+esc(r[2])+'</span></div><div class="row"><b>AÇIKLAMA</b><span>'+esc(r[3])+'</span></div></div>':'<div class="none">Bulunamadı: '+esc($("q").value.trim())+'</div>'}
+$("q").oninput=one;
+
+$("adm").onclick=()=>{if(!$("panel").hidden)return;$("login").hidden=!$("login").hidden;$("pw").focus()};
+$("ok").onclick=()=>{if($("pw").value==="1453"){$("login").hidden=true;$("panel").hidden=false;$("pw").value="";$("msg").textContent=""}else $("msg").textContent="Şifre yanlış."};
+$("pw").onkeydown=e=>{if(e.key==="Enter")$("ok").click()};
+$("exit").onclick=()=>{$("panel").hidden=true;$("msg").textContent=""};
+
+let armed=false;
+$("del").onclick=()=>{
+ if(!armed){armed=true;$("del").textContent="Emin misiniz? Tekrar basın";setTimeout(()=>{armed=false;$("del").textContent="Listeyi sil"},4000);return}
+ armed=false;$("del").textContent="Listeyi sil";data=[];over=true;save();$("msg").textContent="Liste silindi.";build()};
+$("reset").onclick=()=>{data=SEED;over=false;try{localStorage.removeItem("tehir-data")}catch(e){}$("msg").textContent="Varsayılan liste geri yüklendi.";build()};
+
+$("load").onclick=()=>$("file").click();
+$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;
+ const rd=new FileReader();
+ rd.onload=()=>{try{
+  const wb=XLSX.read(rd.result,{type:"array"});
+  const name=wb.SheetNames.find(n=>n.toLocaleUpperCase("tr")==="LİSTE")||wb.SheetNames[0];
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:""});
+  let h=rows.findIndex(r=>r.some(c=>/TEH[İI]R/i.test(String(c))));if(h<0)h=0;
+  const hdr=rows[h].map(c=>String(c).toLocaleUpperCase("tr"));
+  const ix=k=>hdr.findIndex(c=>c.includes(k));
+  let a=ix("TEHİR"),b=ix("SORUMLU"),c=ix("BİRİM"),d=ix("AÇIKLAMA");
+  if([a,b,c,d].some(x=>x<0)){const s=rows[h].findIndex(x=>String(x).trim()!=="");a=s;b=s+1;c=s+2;d=s+3}
+  const cl=v=>String(v==null?"":v).replace(/\s+/g," ").trim();
+  const out=rows.slice(h+1).filter(r=>cl(r[a])).map(r=>[cl(r[a]),cl(r[b]),cl(r[c]),cl(r[d])]);
+  if(!out.length)throw new Error("boş");
+  data=out;over=true;save();$("msg").textContent=out.length+" kod yüklendi ("+name+" sayfası).";build()
+ }catch(x){$("msg").textContent="Dosya okunamadı. Sütunlar: Tehir Kodları, Sorumlu, Birim, Açıklama olmalı."}};
+ rd.readAsArrayBuffer(f);e.target.value=""};
 build();
 </script>
 </body>
