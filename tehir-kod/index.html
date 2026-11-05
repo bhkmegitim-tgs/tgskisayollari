@@ -3,756 +3,181 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tehir Kodu Sorgu</title>
+<title>Tehir kodu sorgu</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#f3f6f7;--card:#fff;--ink:#14272e;--mut:#5b7078;--teal:#25687a;--line:#d5e0e4;--bad:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b1f;--card:#16272d;--ink:#e6f0f3;--mut:#93a8af;--teal:#4aa3b9;--line:#28404a;--bad:#ff8a80}}
+:root{color-scheme:dark;--bg:#0f1a20;--card:#17252c;--line:#2a3d46;--acc:#4aa3ba;--tx:#f2f6f8;--mut:#8fa3ad;--err:#ff7b7b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
-main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
-h1{font-size:22px;margin:8px 0 4px}
-.sub{color:var(--mut);margin:0 0 18px;font-size:14px}
-#q{width:100%;padding:12px 14px;font:inherit;font-size:22px;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
-#pw{padding:8px 12px;font:inherit;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);width:160px}
-#q:focus,#pw:focus,button:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
-.res{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.row{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid var(--line)}
-.row:last-child{border:0}
-.row b{background:var(--teal);color:#fff;padding:10px 12px;font-weight:600}
-.row span{padding:10px 12px}
-.none{margin-top:16px;color:var(--bad);font-weight:600}
-.bar{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:var(--mut);font-size:14px}
-.rw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
-button{padding:8px 14px;border:1px solid var(--teal);background:transparent;color:var(--teal);border-radius:8px;font:inherit;cursor:pointer}
-button.fill{background:var(--teal);color:#fff}
-button.warn{border-color:var(--bad);color:var(--bad)}
-[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1090px;margin:0 auto;padding:40px 20px 60px}
+h1{margin:0 0 6px;font-size:28px}
+.head{display:flex;align-items:center;gap:18px;margin-bottom:24px}.head .sub{margin-bottom:0}.logo{height:64px;width:auto;background:#fff;border-radius:10px;padding:6px 10px;flex:none}
+.sub{color:var(--mut);margin-bottom:24px}
+input,textarea{width:100%;background:var(--card);color:var(--tx);border:2px solid var(--line);border-radius:10px;font:inherit;padding:10px 14px;outline:none}
+input:focus,textarea:focus{border-color:var(--acc)}
+#q{font-size:28px;padding:16px 22px;text-transform:uppercase}
+table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:24px}
+th{background:var(--acc);color:#fff;text-align:left;padding:16px 18px;width:165px;font-size:18px;vertical-align:top}
+td{padding:16px 18px;font-size:18px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+tr:not(:last-child) th{border-bottom:1px solid #3a8aa0}
+.list{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.item{display:flex;gap:16px;padding:12px 18px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:last-child{border-bottom:0}.item:hover{background:#1d313a}
+.item b{min-width:70px;color:var(--acc)}.item span{color:var(--mut)}
+.msg{margin-top:24px;color:var(--mut)}
+#q2{font-size:20px;padding:14px 22px;margin-top:16px}
+.rt{margin-top:8px}.rt th{width:auto;font-size:15px;padding:12px 14px}.rt td{font-size:16px;padding:12px 14px}
+.rt tr[data-k]{cursor:pointer}.rt tr[data-k]:hover td{background:#1d313a}
+hr{border:0;border-top:1px solid var(--line);margin:36px 0 22px}
+button{font:inherit;cursor:pointer;border-radius:8px;padding:10px 18px;border:1px solid var(--acc);background:transparent;color:var(--acc)}
+button.p{background:var(--acc);color:#fff}
+button.d{border-color:var(--err);color:var(--err)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.row input{width:240px}
+.err{color:var(--err)}
+#admin{display:none;margin-top:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+textarea{min-height:110px;font-size:14px;margin-top:12px}
+small{color:var(--mut)}
+@media(max-width:600px){th{width:110px;font-size:15px;padding:12px}td{font-size:16px;padding:12px}#q{font-size:22px}}
 </style>
 </head>
 <body>
-<main>
-<h1>Tehir kodu sorgu</h1>
-<p class="sub" id="info"></p>
-<input id="q" placeholder="Kod yazın, örn. 31P" autocomplete="off" aria-label="Tehir kodu">
-<div id="out"></div>
+<div class="wrap">
+  <div class="head"><div><h1>Tehir kodu sorgu</h1>
+  <div class="sub" id="count"></div></div></div>
+  <input id="q" placeholder="Kod yaz… (örn. 31P)" autocomplete="off" autofocus>
+  <div id="out"></div>
+  <input id="q2" placeholder="Açıklamada ara… (kelime veya cümle)" autocomplete="off">
+  <div id="out2"></div>
 
-<div class="bar">
-  <button id="adm">Yönetici</button> <span id="msg"></span>
-  <div class="rw" id="login" hidden><input id="pw" type="password" placeholder="Şifre" aria-label="Şifre"><button class="fill" id="ok">Giriş</button></div>
-  <div class="rw" id="panel" hidden>
-    <input type="file" id="file" accept=".xlsx,.xls,.xlsm" hidden>
-    <button class="fill" id="load">Excel yükle (listeyi değiştir)</button>
-    <button class="warn" id="del">Listeyi sil</button>
-    <button id="reset">Varsayılan listeye dön</button>
-    <button id="exit">Çıkış</button>
+  <hr>
+  <div class="row"><button id="yb">Yönetici</button><span id="ymsg"></span></div>
+  <div class="row" id="login"><input id="pw" type="password" placeholder="Şifre"><button class="p" id="gb">Giriş</button></div>
+
+  <div id="admin">
+    <div class="grid">
+      <input id="f_kod" placeholder="Tehir kodu">
+      <input id="f_sor" placeholder="Sorumlu">
+      <input id="f_bir" placeholder="Birim">
+      <input id="f_ack" placeholder="Açıklama">
+    </div>
+    <div class="row">
+      <button class="p" id="save">Kaydet / Güncelle</button>
+      <button class="d" id="del">Sil</button>
+      <button id="xl">Excel indir</button>
+      <button id="exp">Dışa aktar</button>
+      <button id="imp">İçe aktar</button>
+      <button id="cikis">Çıkış</button>
+    </div>
+    <textarea id="bulk" placeholder="Toplu yükleme: her satıra KOD;SORUMLU;BİRİM;AÇIKLAMA (Excel'den 4 sütunu kopyalayıp da yapıştırabilirsin)"></textarea>
+    <small>Not: Veriler bu tarayıcıda saklanır. Dışa aktar ile listeyi kutuya döker, kopyalayıp yedekleyebilirsin.</small>
   </div>
 </div>
-</main>
-<script type="text/plain" id="veri">
-01A	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların teknik nedenle tehirleri
-01B	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların teknik kaynaklı uçak değişiklik tehirleri
-01C	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların planlama kaynaklı tehirleri
-01D	KONTROL DIŞI	RGFD	Uçuş planı/Uçuş dokümanlarının geç tamamlanması ya da değişmesi
-01E	KONTROL DIŞI	RGFD	THY A.O. birimleri dışında kalan uçakların ekip (kokpit) kaynaklı uçağa geç gelişler
-01F	KONTROL DIŞI	RGFD	THY A.O. uçakları dışında kalanların ekip planlama (kokpit) kaynaklı rötarlar
-01G	KONTROL DIŞI	RGFD	THY A.O. uçakları dışında kalanların (kokpit) ekip kaynaklı diğer rötarlar
-01H	KONTROL DIŞI	RGFD	THY A.O. uçakları dışında kalan uçakların ekip (kabin) geç geçişi kaynaklı rötarlar
-01I	KONTROL DIŞI	RGFD	THY A.O. uçakları dışında kalanların (kabin) ekip kaynaklı diğer rötarlar
-01J	KONTROL DIŞI	RGFD	Kabin ekibi hatası veya özel isteği (Operasyonel gereklilikler dışında)
-01K	KONTROL DIŞI	RGFD	Devir alacak kabin ekibinin gecikmesi (Diğer bir uçuştan kabin ekibinin beklenmesi)
-01L	KONTROL DIŞI	RGFD	Devir alacak ekibin gecikmesi (Diğer bir uçuştan kokpit ekibinin veya pass ekip dahil tüm ekibin beklenmesi)
-01M	KONTROL DIŞI	RGFD/CRGO	THY A.O. uçakları dışında kalanların teknik kaynaklı ikincil tehirleri
-01N	KONTROL DIŞI	CRGO	Kargo wetlease seferlerinde load master kaynaklı hatalar
-01O	KONTROL DIŞI	CRGO	Kargo wetlease seferlerinde uçak içi yükleme sistem arızası kaynaklı geçikmeler
-01X	KONTROL DIŞI	RGFD	Bu nedenle slot kaçırma
-01Y	KONTROL DIŞI	RGFD/CRGO	Diğer
-02A	KONTROL DIŞI	TECH	Uçağın APU'sunun gayri faal olması nedeniyle uçağın push-back öncesi park yerinde motor çalıştırması
-02B	KONTROL DIŞI	ARPT	Uçağın park pozisyonundan kendi gücü ile harekete başlaması
-03A	KONTROL DIŞI	QLTY	Şirket içi denetim
-03B	KONTROL DIŞI	QLTY	Şirket dışı denetim
-03X	KONTROL DIŞI	QLTY	Bu nedenle slot kaçırma
-04A	KONTROL DIŞI	GOPS/IOCC	Üzerinde inceleme süren tehirler
-09B	KONTROL DIŞI	SCHD	Ticari
-09C	KONTROL DIŞI	SCHD	Planlama
-09D	KONTROL DIŞI	CRGO	Kargo Operasyon Kontrol Planlama
-09E	KONTROL DIŞI	TECH	Bakım uzaması nedeniyle planlanan uçuş tarifesinin değişikliği
-09F	KONTROL DIŞI	TECH	Uçak/Komponent arızası nedeniyle planlanan uçuş tarifesinin değişikliği
-09G	KONTROL DIŞI	TECH	Yerde/Havada hasarlanma nedeniyle planlanan uçuş tarifesinin değişikliği
-09X	KONTROL DIŞI	SCHD	Bu nedenle slot kaçırma
-11A	TGS	YHM	Transfer yolcuların geç check-in işlemi
-11B	TGS	YHM	Yedek liste işlemleri
-11C	TGS	YHM	Rezervasyonu onaylı yolcuların geç kabulü
-11D	TGS	YHM	Çalışan hatası nedeniyle
-11E	KONTROL DIŞI	GOPS	Grup check-in
-11F	KONTROL DIŞI	ARPT	Havalimanına ulaşımda/girişde yaşanan gecikmeler (kapanma, birikme, kaza vb.)
-11G	TGS	YHM	Fazla bagaj ücret alımı nedeniyle
-11O	KONTROL DIŞI	GOPS	Operasyonel aksaklıklardan dolayı re-route işlemi
-11X	TGS	YHM	Bu nedenle slot kaçırma
-12A	KONTROL DIŞI	GOPS	Check-in bölgesinde yoğunluk
-12B	TGS	YHM	Çalışan eksikliği nedeniyle
-12C	TGS	YHM	Transfer bölgesinde yolcu yoğunluğu
-12D	TGS	YHM	Grup check-in
-12E	KONTROL DIŞI	ARPT/GOPS	Havalimanına ulaşımda/girişte yaşanan gecikmeler (kapanma, birikme, kaza vb.)
-12F	TGS	YHM	Yedek liste işlemleri
-12X	TGS	YHM	Bu nedenle slot kaçırma
-13A	TGS	YHM	İstasyonda check-in işlemi hatası
-13J	KONTROL DIŞI	ITEC	Kontuar dışı check-in işlemi hatası
-13L	TGS	YHM	Dokümantasyon hatası (bilet/vize/pasaport vb.)
-13M	TGS	OCC	“Editing” hatası
-13X	TGS	YHM	Bu nedenle slot kaçırma
-14A	KONTROL DIŞI	RESE	Ticari gerekçelerle uçağın overbook olması
-14B	KONTROL DIŞI	RESE	Rezervasyon hatası
-14O	TGS	YHM	“Overbook” sürecinde istasyon tarafından gerekli tedbirlerin alınmaması
-14P	KONTROL DIŞI	RESE	Fazla satış yapılan başka bir seferden yolcu alınması
-14T	KONTROL DIŞI	GOPS	Kontrol içi operasyonel nedenlerle overbook durumu oluşması
-14X	KONTROL DIŞI	RESE	Bu nedenle slot kaçırma
-15A	TGS	VİZE - PASAPORT	“Boarding” hatası/yolcu figürleri uyuşmazlığı
-15B	TGS	VİZE - PASAPORT	“Boarding”e geç başlama
-15C	TGS	VİZE - PASAPORT	Yavaş “boarding”
-15D	KONTROL DIŞI	GOPS	Kaybolan/geç “check-in” işlemi yapılan yolcu
-15F	TGS	VİZE - PASAPORT	Dokümantasyon (bilet, pasaport, vize, sağlık raporu, pcr testi vb.)
-15G	TGS	VİZE - PASAPORT	Çalışan sayısının eksikliği
-15I	KONTROL DIŞI	GOPS	Boarding esnasında kapıda el bagajı toplanması ve yüklenmesi veya “excess” kesimi
-15O	TGS	VİZE - PASAPORT	Bagaj ayırım bilgisinin bagaj eşleştirmeye geç/yanlış ikazı
-15Q	TGS	VİZE - PASAPORT	Gösterilmeyen bagajların yolcu anons edilerek yüklenmesi
-15R	TGS	VİZE - PASAPORT	Yolcunun yanlış park pozisyonuna/yanlış çıkış kapısına yönlendirilmesi
-15U	KONTROL DIŞI	GOPS	Uçak konfigürasyonu ya da tip değişikliğinden dolayı yolculara yeni yer numarası verilmesi ve yolcuların yerleştirilmesi
-15X	TGS	VİZE - PASAPORT	Bu nedenle slot kaçırma
-16A	KONTROL DIŞI	GOPS	VIP “boarding”
-16B	KONTROL DIŞI	GOPS	Rahatsız eden yolcu handling’i
-16D	KONTROL DIŞI	GOPS	Kaybolan şahsi eşyalar
-16E	KONTROL DIŞI	GOPS	Deporte/INAD yolcu handling’i
-16F	KONTROL DIŞI	GOPS	Aksaklık nedeniyle yolcuya yerde iken verilen ikram
-16G	KONTROL DIŞI	GOPS	Kendi isteği ile uçaktan inen yolcu
-16H	KONTROL DIŞI	GOPS	Uçak içerisinde yolcu rahatsızlığı/ölümü
-16K	KONTROL DIŞI	GOPS	Yavaş deboarding
-16L	KONTROL DIŞI	GOPS	Yavaş boarding
-16N	KONTROL DIŞI	GOPS	Basın yayın organlarının uçaktaki faaliyetleri
-16P	KONTROL DIŞI	GOPS	Pass yolcu problemleri
-16S	KONTROL DIŞI	GOPS	Diğer bir havayolundan ticari amaçlı bağlantısı olmayan yolcu kabulü
-16U	KONTROL DIŞI	GOPS	Yolcu nedeni ile yapılan Return to Ramp
-16V	KONTROL DIŞI	GOPS	Yolcu rahatsızlığı/ölümü nedeni ile yapılan Return to Ramp
-16X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
-17A	TGS	YHM	İkram geç talebi/yanlış talep
-17B	KONTROL DIŞI	CTRG	THY İkram Operasyon ve Kontrol Şefliği ikram geç talebi/yanlış talep
-17P	KONTROL DIŞI	GOPS	Dönüş ikramlarına ilavenin karşı meydandan geç talebi
-17Q	KONTROL DIŞI	CTRG	Rötar nedeniyle değişen ikram (kahvaltıdan öğle yemeğine çevirme vb.)
-17X	KONTROL DIŞI	CTRG/GOPS	Bu nedenle slot kaçırma
-18A	TGS	BAGAJ HİZ.	Bagajların uçak altına geç teslimi
-18C	TGS	BAGAJ HİZ.	Bagaj eşleştirme ve ayırma problemleri
-18N	TGS	BAGAJ HİZ.	Bagajların “rush” etiketi takılarak sevkiyatı (diğer seferlerden kalan bagajlar dâhil)
-18O	TGS	BAGAJ HİZ.	Diğer hava yollarından alınan “rush” bagaj sevkiyatı
-18Q	TGS	BAGAJ HİZ.	Bagaj eşleştirme cihazlarının yetersizliği/eksikliği
-18R	TGS	BAGAJ HİZ.	Bagajların yanlış uçağa sevkiyatı
-18S	TGS	BAGAJ HİZ.	Bagaj Eşleştirme Koordinasyon Ofisi hataları
-18X	TGS	BAGAJ HİZ.	Bu nedenle slot kaçırma
-19A	KONTROL DIŞI	GOPS	Hareket kabiliyeti kısıtlı yolcuların uçağa binişi
-19B	KONTROL DIŞI	GOPS	Hareket kabiliyeti kısıtlı yolcuların uçaktan inişi
-19C	TGS	AIR CLINIC	WCHR, STCR taşımasını gerçekleştiren yer hizmetleri kuruluşu kaynaklı gecikmeler
-19X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
-21A	KONTROL DIŞI	CRGO	Geç/yanlış kargo figürü
-21C	KONTROL DIŞI	CRGO	Geç/yanlış kargo dokümanları
-21E	KONTROL DIŞI	CRGO	Loadmaster hatasından kaynaklanan gecikmeler
-21F	KONTROL DIŞI	CRGO	Loadmaster kit arızaları
-21X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-22A	KONTROL DIŞI	CRGO	Apronda bulunamayan kargo/posta nedeniyle ramp firmasına geç teslim
-22D	TGS	KARGO	Yanlış park yerine getirme, eksik getirme veya hiç getirilmemesi
-22N	KONTROL DIŞI	CRGO	Yükleme materyallerinin geç sağlanması
-22P	KONTROL DIŞI	CRGO	Thru Palet kontür bilgilerinin geç gelmesi
-22R	TGS	KARGO	Kargoların ramp transferinde yaşanan aksaklıklar
-22S	KONTROL DIŞI	CRGO	Depo çıkış hatları yoğunluğu sebebiyle ramp firmasına geç teslim
-22X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-23A	KONTROL DIŞI	CRGO	Operasyonel sebepler nedeni ile kargonun geç kabulü/değiştirilmesi
-23C	KONTROL DIŞI	CRGO	Çalışan sayısının eksikliği
-23D	KONTROL DIŞI	CRGO	Expres kargo (VIC vb.)
-23E	KONTROL DIŞI	CRGO	Diplomatik posta
-23X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-24B	KONTROL DIŞI	CRGO	ULD içerisinde hasarlı Tehlikeli madde Tespiti (Depo hazırlık)
-24C	KONTROL DIŞI	CRGO	ULD içerisinde hasarlı Tehlikeli madde Tespiti (Thru)
-24D	KONTROL DIŞI	CRGO	Kargonun uçak altında hasarlı olarak tespiti (Depo hazırlık)
-24E	KONTROL DIŞI	CRGO	Kargonun uçak altında hasarlı olarak tespiti (Thru Palet)
-24F	KONTROL DIŞI	CRGO	ULD hasarı (Depo hazırlık)
-24G	KONTROL DIŞI	CRGO	ULD hasarı (Thru Palet)
-24H	KONTROL DIŞI	CRGO	Tehlikeli Maddelerin hatalı hazırlanması (Depo hazırlık)
-24I	KONTROL DIŞI	CRGO	Tehlikeli Maddelerin hatalı hazırlanması (Thru Palet)
-24J	KONTROL DIŞI	CRGO	Hasarlı veya yanlış palet hazırlanması (Depo hazırlık)
-24K	KONTROL DIŞI	CRGO	Hasarlı veya yanlış palet hazırlanması (Thru Palet)
-24X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-25A	KONTROL DIŞI	CRGO	Fazla satış/planlama
-25B	KONTROL DIŞI	CRGO	Rezervasyon hataları
-25C	KONTROL DIŞI	CRGO	Ticari sebepler nedeni ile kargonun geç kabulü/değiştirilmesi
-25D	KONTROL DIŞI	CRGO	Transit bağlantılı kargo veya posta beklenmesi
-25X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-26C	KONTROL DIŞI	CRGO	Depo yoğunluğu sebebi ile geç hazırlama
-26D	KONTROL DIŞI	CRGO	Uçağa sevk edilen yükte değişiklik
-26E	KONTROL DIŞI	CRGO	Özel kargo sebebiyle hazırlığın gecikmesi
-26F	KONTROL DIŞI	CRGO	Uçak Tip değişikliği nedeni ile kargo hazırlığının değişmesi
-26G	KONTROL DIŞI	CRGO	Bulunamayan kargo nedeniyle yeniden hazırlık
-26H	KONTROL DIŞI	CRGO	Çalışan sayısının eksikliği
-26I	KONTROL DIŞI	CRGO	Kargo teçhizat yetersizliği/yokluğu (forklift, paletmaster, palet vb.)
-26J	KONTROL DIŞI	CRGO	Sistem arızası yazılım (COMIS, workorder)
-26T	KONTROL DIŞI	CRGO	Sistem arızası donanım (ASRS, PCHS, ETV)
-26X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-27A	KONTROL DIŞI	CRGO	Geç/yanlış posta figürleri
-27C	KONTROL DIŞI	CRGO	Geç/yanlış posta dokümanları
-27D	KONTROL DIŞI	CRGO	Sistem arızası
-27E	KONTROL DIŞI	CRGO	Depo yoğunluğu sebebi ile geç hazırlama
-27F	KONTROL DIŞI	CRGO	Hasarlı veya yanlış palet hazırlanması
-27X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-28A	KONTROL DIŞI	CRGO	Kaybolan posta nedeniyle yeniden yükleme
-28B	KONTROL DIŞI	CRGO	Personel eksikliği/personel nedeniyle
-28C	KONTROL DIŞI	CRGO	Teçhizat yetersizliği/yokluğu (Paletmaster, forklift vb.)
-28D	KONTROL DIŞI	CRGO	Yanlış park yerine getirme veya eksik getirme veya hiç getirilmemesi
-28X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-29A	KONTROL DIŞI	CRGO	Postanın geç kabulü-ticari nedenler
-29B	KONTROL DIŞI	CRGO	Yedek posta kabulü
-29X	KONTROL DIŞI	CRGO	Bu nedenle slot kaçırma
-31A	TGS	HAREKAT	Geç dokümantasyon
-31B	TGS	HAREKAT	Yanlış dokümantasyon
-31C	TGS	HAREKAT	Geç "LOAD AND TRIM SHEET"
-31D	TGS	HAREKAT	Yanlış "LOAD AND TRIM SHEET"
-31E	TGS	HAREKAT	“Trim out” nedeniyle yolcu/yüklerin yer değiştirmesi
-31F	KONTROL DIŞI	GOPS	DCS’teki yanlış veri (oturma planı, “hold versiyon” vb.)
-31G	TGS	HAREKAT	Çalışan sayısının eksikliği
-31H	TGS	HAREKAT	Load plan hataları
-31N	KONTROL DIŞI	GOPS	Son dakika değişiklikleri nedeniyle doküman yenilenmesi
-31P	TGS	HAREKAT	Harekat koordinatörü hatası
-31R	TGS	RAMP	Headset çalışanı hatası
-31S	KONTROL DIŞI	GOPS	Sorumlu kaptan pilota uçuş dokümanlarının (uçuş planı, gümrük evrakları) geç teslimi
-31X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
-32A	TGS	RAMP	Kabin yükü, kuru yük, hacimli yük, şekilsiz yük, özel yük (HEA, PER, RRY, AVIH vb.)
-32B	TGS	RAMP	Geç yükleme
-32C	TGS	RAMP	Çalışan sayısının eksikliği
-32D	TGS	RAMP	Yanlış yükleme (Yük planı veya yükleme prensiplerine uygun olmayan)
-32E	TGS	RAMP	ULD hasarı
-32F	KONTROL DIŞI	GOPS/CRGO	Uçak içi yükleme sistemlerinin çalışmaması
-32G	TGS	RAMP	Yükleme materyallerinin geç sağlanması
-32M	TGS	RAMP	Geç boşaltma
-32R	TGS	RAMP	Bagaj ayrımının hatalı yapılması veya uzun sürmesi
-32S	KONTROL DIŞI	GOPS/CRGO	Son dakika değişiklikleri nedeniyle yükleme değişiklikleri
-32T	KONTROL DIŞI	CRGO	Varış meydanındaki ramp çalışanı /teçhizatı eksikliği
-32X	KONTROL DIŞI	GOPS/CRGO	Bu nedenle slot kaçırma
-33A	TGS	RAMP	Geç teçhizat (forklift, traktör, high loader, konveyör vb.)
-33B	TGS	RAMP	Teçhizat eksikliği
-33C	TGS	ATÖLYE	Teçhizat operatörü eksikliği
-33D	TGS	ATÖLYE	Teçhizatın arızalı olması/ performansının yeterli olmaması
-33E	TGS	RAMP	Yanlış teçhizat
-33X	TGS	RAMP/ATÖLYE	Bu nedenle slot kaçırma
-34B	TGS	RAMP	Merdiven eksikliği/geç gelmesi
-34C	TGS	RAMP	Otobüs/midibüs eksikliği/geç gelmesi
-34D	TGS	UÇAK TEMİZLİK	Su aracı eksikliği/geç gelmesi
-34E	TGS	UÇAK TEMİZLİK	Foseptik aracı eksikliği/geç gelmesi
-34F	TGS	RAMP	Çalışan eksikliği
-34G	TGS	ATÖLYE	Merdivenin arızalı olması
-34H	TGS	ATÖLYE	Otobüsün/midibüsün arızalı olması
-34J	TGS	ATÖLYE	Su aracının arızalı olması
-34K	TGS	UÇAK TEMİZLİK	Foseptik aracının arızalı olması
-34L	TGS	ATÖLYE	Harekat aracının arızalı olması
-34M	TGS	ATÖLYE	Ambulift aracının arızalı olması
-34N	TGS	HAREKAT	Harekat aracı eksikliği/geç gelmesi
-34O	TGS	RAMP	Ambulift veya operatörün eksikliği/geç gelmesi
-34X	TGS	RAMP/ATÖLYE	Bu nedenle slot kaçırma
-35A	TGS	UÇAK TEMİZLİK	Temizliği geç bitirme
-35B	TGS	UÇAK TEMİZLİK	Eksik/yanlış temizlik teçhizatı
-35C	TGS	UÇAK TEMİZLİK	Teçhizat arızası
-35D	TGS	UÇAK TEMİZLİK	Çalışan sayısı eksikliği
-35E	TGS	UÇAK TEMİZLİK	Eksik yapılan temizlikten dolayı ekibin geri çağrılması
-35F	KONTROL DIŞI	GOPS/CRGO	Operasyon esnasında oluşan ilave temizlik talepleri
-35G	KONTROL DIŞI	TECH/CRGO	Kokpit camı temizliği
-35H	TGS	UÇAK TEMİZLİK	Operasyon tarafından uçağa yüklenen, temizlik ve uçak içi ürünlerin, uçak tipine ve sefere uygunsuz, eksik ya da geç teslimatı (uyku seti, battaniye, kulaklık, yastık vb.)
-35I	TGS	UÇAK TEMİZLİK	İlaçlama (geç veya hatalı)
-35T	KONTROL DIŞI	GOPS/CRGO	Temizlik ekibi tarafından secure cleaning uygulamasının geç bitirilmesi
-35W	KONTROL DIŞI	GOPS/CRGO	Hava durumundan dolayı ilave temizlik
-35X	KONTROL DIŞI	GOPS/CRGO	Bu nedenle slot kaçırma
-36A	KONTROL DIŞI	FUEL	Yakıt ikmal aracı olmaması/yetersiz olması
-36B	KONTROL DIŞI	FUEL	Yakıt ikmal aracının geç gelmesi
-36C	KONTROL DIŞI	FUEL	Operasyon esnasında yakıt ikmal aracının arızalanması
-36D	KONTROL DIŞI	FUEL	Geç yakıt çekilmesi
-36E	KONTROL DIŞI	FUEL	Çalışan sayısı eksikliği
-36F	KONTROL DIŞI	FUEL	Yakıt ikmal hatası
-36G	KONTROL DIŞI	TECH	Teknik nedenlerden dolayı özel prosedür uygulanması
-36H	KONTROL DIŞI	FUEL	Yakıt Hidrant Sistemi
-36I	KONTROL DIŞI	FUEL	Off-spec/kontamine yakıt olması
-36J	KONTROL DIŞI	FUEL	Yakıtın taşması
-36K	KONTROL DIŞI	FUEL	Uçağın yanlış park etmesinden dolayı yakıt alınamaması
-36L	KONTROL DIŞI	SFTY	Yakıt alımının emniyet gerekçesiyle uzun sürmesi
-36M	KONTROL DIŞI	FUEL	Varış meydanındaki yakıt sağlayıcı ile ilgili tüm problemler
-36X	KONTROL DIŞI	FUEL	Bu nedenle slot kaçırma
-37C	KONTROL DIŞI	CTRG	İkram teçhizatının arızalanması
-37D	KONTROL DIŞI	CTRG	İkramın geç gelmesi/geç yüklenmesi veya boşaltılması
-37E	KONTROL DIŞI	CTRG	Yanlış ya da yetersiz ikram yüklenmesi [kabin malzemeleri dâhil (gazete, relax set, amenity kit vb.)]
-37G	KONTROL DIŞI	CTRG	Dönüş ikramının eksik yüklenmesi
-37H	KONTROL DIŞI	CTRG	Uçağa yüklenecek Inflight malzemelerin depodan eksik veya geç teslim edilmesi (uyku seti, battaniye, kulaklık, yastık vb.)
-37R	KONTROL DIŞI	CTRG	Uçak değişikliği nedeniyle ikram yüklemesinin değişmesi
-37S	KONTROL DIŞI	CTRG	Uçağın yerde kalış süresinin ikram anlaşmasında bulunan ikram yükleme süresinin altında kalması
-37T	KONTROL DIŞI	CTRG	“Flying chef” ve “Flying service chef” uygulaması kapsamında yaşanan gecikmeler
-37U	KONTROL DIŞI	CTRG	“Flying chef” ve “Flying service chef” hastalanması veya yaralanması
-37X	KONTROL DIŞI	CTRG	Bu nedenle slot kaçırma
-38A	KONTROL DIŞI	GOPS	ULD eksikliği
-38B	KONTROL DIŞI	GOPS	Hasarlı veya hizmet dışı ULD
-38C	KONTROL DIŞI	GOPS	Handling birimine geç ULD tedariki
-38X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
-39A	TGS	RAMP	GPU eksikliği/geç gelişi/yeterli gelmemesi
-39B	TGS	RAMP	De-icing aracı eksikliği/geç gelişi
-39C	TGS	RAMP	Towbar eksikliği/geç gelişi
-39D	TGS	RAMP	Air starter aracı eksikliği/geç gelişi/yeterli gelmemesi
-39E	TGS	RAMP	Air conditioner aracı eksikliği/geç gelişi/yeterli gelmemesi
-39F	TGS	RAMP	Push-back aracı eksikliği/geç gelişi
-39G	TGS	RAMP	Çalışan sayısı eksikliği
-39H	TGS	RAMP	Diğer teknik teçhizatın eksikliği/geç gelişi
-39I	KONTROL DIŞI	GOPS/CRGO	Varış meydanında teçhizat eksikliği
-39J	TGS	ATÖLYE	GPU'nun arızalı olması
-39K	TGS	ATÖLYE	De-icing aracının arızalı olması
-39L	TGS	ATÖLYE	Towbar'ın arızalı olması
-39M	TGS	ATÖLYE	Air starter aracının arızalı olması
-39N	TGS	ATÖLYE	Air conditioner aracının arızalı olması
-39O	TGS	ATÖLYE	Push-back aracının arızalı olması
-39P	TGS	RAMP	Diğer teknik teçhizatın arızalı olması
-39X	TGS	RAMP	Bu nedenle slot kaçırma
-41A	KONTROL DIŞI	TECH	Uçak sistemleri ve motor arızaları
-41B	KONTROL DIŞI	TECH	Kabin içi teçhizat arızaları (koltuk, galley vb.)
-41C	KONTROL DIŞI	TECH	Uçak içi eğlence cihazları arızaları
-41D	KONTROL DIŞI	TECH	Uçak yükleme sistem arızası
-41E	KONTROL DIŞI	TECH	Gidiş donanım beklemesi
-41N	KONTROL DIŞI	TECH	Kabin-kokpit arıza defteri beklenmesi
-41O	KONTROL DIŞI	TECH	MEL veya CDL oluru beklenmesi (go to)
-41P	KONTROL DIŞI	TECH	MEL durumunun değişmesi (go-to dan no-go ya geçiş)
-41Q	KONTROL DIŞI	TECH	Çalışan sayısı eksikliği
-41R	KONTROL DIŞI	TECH	“Emergency equipment” ların arızalı olması/tekrar doldurulması
-41S	KONTROL DIŞI	TECH	Teknik dokümanların kaybolması
-41T	KONTROL DIŞI	TECH	Teknik arızanın teknisyen tarafından geç bildirilmesi
-41V	KONTROL DIŞI	TECH	Arıza nedeni ile yapılan Return to Ramp
-41X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-42A	KONTROL DIŞI	TECH	Geç dokümantasyon
-42B	KONTROL DIŞI	TECH	Bakımdan geç teslim
-42X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-43A	KONTROL DIŞI	TECH	Çalışan yetersizliği
-43B	KONTROL DIŞI	TECH	Geç dokümantasyon
-43C	KONTROL DIŞI	TECH	Periyot dışı özel bakımlar
-43N	KONTROL DIŞI	TECH	Yerde yapılan check işleminin geç yapılması
-43P	KONTROL DIŞI	TECH	Lastik/fren değişimi
-43X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-44A	KONTROL DIŞI	TECH	Yedek parça eksikliği
-44B	KONTROL DIŞI	TECH	Bakım teçhizatının eksikliği ya da bozulması
-44C	KONTROL DIŞI	TECH	Yedek parça geç teslimi (depodan geç çekim)
-44N	KONTROL DIŞI	TECH	Mefruşat eksikliği (koltuk kılıfı, perde vb.)
-44Q	KONTROL DIŞI	TECH	Depodan gelen parçanın uygun olmaması
-44X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-45A	KONTROL DIŞI	TECH	Yedek parçanın uçağa geç gönderimi/geç gelmesi
-45B	KONTROL DIŞI	TECH	AOG parçaların dokümanlarının geç/yanlış gelmesi
-45D	KONTROL DIŞI	TECH	Parçanın uçağa yüklenmesi/uçağın tekrar yüklenmesi
-45F	KONTROL DIŞI	TECH	Third Party için AOG
-45N	KONTROL DIŞI	TECH	Arızalı uçağın bulunduğu istasyona teknik çalışan gönderilmesi
-45X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-46E	KONTROL DIŞI	TECH	Planlı bakımdan (Harf Bakımı ve slotu önden girilmiş MEL & Hold Item giderim işlemleri dahil) geç teslim nedeniyle uçak değişikliği
-46N	KONTROL DIŞI	TECH	Teknik arıza veya plansız arıza bakımından (Arıza AOG süreçlerinin uzaması veya slotu önden girilmemiş MEL giderim işlemleri dahil) geç teslim nedeniyle uçak değişikliği
-46X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-47A	KONTROL DIŞI	TECH	Yedek uçak
-47X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-48A	TGS	HAREKAT	Kabin ayırıcı/yer düzenlenmesi (C/CL perde ve koltuk ayarı)
-48B	KONTROL DIŞI	TECH	Sedye kurulması
-48C	KONTROL DIŞI	TECH/MDCL	Tıbbi teçhizat
-48D	KONTROL DIŞI	TECH	Ekip istirahat yeri
-48X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-51A	KONTROL DIŞI	SFTY	Yıldırım çarpması
-51B	KONTROL DIŞI	SFTY	Kuş çarpması
-51C	KONTROL DIŞI	SFTY	Uçuş esnasında diğer hasarlanmalar (kargo ve bagaj hasarlamaları dâhil)
-51D	KONTROL DIŞI	SFTY	Kötü/ hava koşulları nedeniyle
-51E	KONTROL DIŞI	SFTY	Fazla yüklenme (sert iniş)
-51F	KONTROL DIŞI	SFTY	Taksi sırasında çarpışma
-51G	KONTROL DIŞI	SFTY	Uçağın pistten ya da taksi yolundan çıkması
-51H	KONTROL DIŞI	SFTY	FOD hasarı
-51I	KONTROL DIŞI	CCPT	Uçağın kokpit ekibi tarafından hasarlanması
-51J	KONTROL DIŞI	TECH	Uçağın yolcu tarafından hasarlanması (tuvalet ve lavabo tıkanması dâhil)
-51K	KONTROL DIŞI	TECH	Uçağın frenlerinin soğuması
-51L	KONTROL DIŞI	SFTY	Uçağın geliş istasyonundan hasarlı gelmesi
-51M	KONTROL DIŞI	CBN	Uçağın kabin ekibi tarafından hasarlanması
-51N	KONTROL DIŞI	IOCC	Havada hasarlanmadan dolayı uçak değişikliği
-51U	KONTROL DIŞI	SFTY	Kuş çarpması nedeni ile yapılan Return to Ramp
-51V	KONTROL DIŞI	SFTY	Yıldırım çarpması nedeni ile yapılan Return to Ramp
-51X	KONTROL DIŞI	SFTY	Bu nedenle slot kaçırma
-52A	KONTROL DIŞI	GOPS/TECH	Çarpışma (taksi hariç), çekme sırasında hasarlanması
-52B	KONTROL DIŞI	IOCC/GOPS	Kötü hava koşulları nedeniyle hasarlanması
-52C	TGS	RAMP	Yer teçhizatı ve apron araçları tarafından hasarlanması
-52D	KONTROL DIŞI	ARPT	Köprü tarafından hasarlanması
-52F	KONTROL DIŞI	FUEL	Yakıt teçhizatı tarafından hasarlanması
-52G	KONTROL DIŞI	TECH	Teknik destek teçhizatı tarafından hasarlanması
-52H	KONTROL DIŞI	CTRG	İkram teçhizatı tarafından hasarlanması
-52I	KONTROL DIŞI	CCPT	Uçağın yerde kokpit ekibi tarafından hasarlanması
-52K	KONTROL DIŞI	SFTY	Kazara kaçış slide’ının açılması (düşmesi, patlaması)
-52M	KONTROL DIŞI	CBN	Uçağın yerde kabin ekibi tarafından hasarlanması
-52N	KONTROL DIŞI	TECH	Teknik çalışan tarafından hasarlanması
-52P	KONTROL DIŞI	IOCC	Yerde hasarlanma nedeniyle uçak değişikliği
-52X	KONTROL DIŞI	TECH	Bu nedenle slot kaçırma
-55A	KONTROL DIŞI	ITEC	Local DCS arızaları (TROYA hariç)
-55B	KONTROL DIŞI	ITEC	DCS host arızası
-55C	KONTROL DIŞI	ITEC	Host/network arızası
-55D	KONTROL DIŞI	ITEC	Lokal network arızası
-55E	KONTROL DIŞI	ITEC	Self servis cihazlarının arızalanması
-55F	KONTROL DIŞI	ITEC	Üçüncü taraf firmaların sebep olduğu sistem aksaklıkları
-55N	KONTROL DIŞI	ITEC	Trafik sistem arızası (check-in, boarding, APIS vb.)
-55O	KONTROL DIŞI	ITEC	Harekat sistem arızası
-55P	KONTROL DIŞI	ITEC	Bagaj eşleştirme sistem arızası
-55S	KONTROL DIŞI	ITEC	Operasyon takip sistemleri arızası
-55T	KONTROL DIŞI	ITEC	Bilet satış/rezervasyon sistem arızası
-55U	KONTROL DIŞI	ITEC	Haberleşme sistem arızası
-55X	KONTROL DIŞI	ITEC	Bu nedenle slot kaçırma
-56A	KONTROL DIŞI	ITEC	Lokal teçhizat arızaları
-56B	KONTROL DIŞI	ITEC	Host/network arızası
-56D	KONTROL DIŞI	ITEC	Lokal network arızası
-56E	KONTROL DIŞI	ITEC	Otomatik gümrük muayene sistem arızası
-56X	KONTROL DIŞI	ITEC	Bu nedenle slot kaçırma
-57A	KONTROL DIŞI	ITEC	Lokal teçhizat arızaları
-57B	KONTROL DIŞI	ITEC	Host/network arızası
-57D	KONTROL DIŞI	ITEC	Lokal network arızası
-57E	KONTROL DIŞI	ITEC	ATC Sistemi ile iletişim aksaklıkları
-57X	KONTROL DIŞI	ITEC	Bu nedenle slot kaçırma
-58A	TGS	ITEC	Handling firmasının kullandığı kendine ait sistem hatası veya arızası
-58B	KONTROL DIŞI	ITEC	Diğer sistem hataları veya arızaları (Teknik, ikram, yakıt vb.)
-58C	KONTROL DIŞI	ITEC	Acars arızası
-58X	KONTROL DIŞI	ITEC	Bu nedenle slot kaçırma
-61A	KONTROL DIŞI	IOCC	FMS – OFP uyuşmazlığı nedeniyle ilave yakıt ikmal talebi
-61B	KONTROL DIŞI	IOCC	Dispeç uçuş dokümanlarının geç veya hatalı tamamlanması/gönderilmesi, geç "release"
-61D	KONTROL DIŞI	IOCC	Operasyon başladıktan sonra ATC uçuş planının geç bildirilmesi veya hatalı bildirilmesi/geç güncellenmesi
-61F	KONTROL DIŞI	IOCC	Brifingden sonra operasyonel sebeplerle uçuş planı değişikliği (release)
-61G	KONTROL DIŞI	IOCC	Çalışan sayısı eksikliği
-61H	KONTROL DIŞI	IOCC	Uçak hard copy doküman eksikliği (MEL, QRH, FCOM vb.)
-61X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
-62B	KONTROL DIŞI	IOCC/GOPS	Son ağırlığın beklenmesi (yakıt kritik uçuşlar)
-62D	KONTROL DIŞI	IOCC/CCPT	Brifing sonrasında operasyonel sebeplerle yakıt değişimi
-62E	KONTROL DIŞI	IOCC/CCPT	Brifing sonrasında operasyonel sebeplerle yük değişimi
-62M	KONTROL DIŞI	GOPS	Planlamadan sonra son anda meydana gelen ağırlık değişimleri
-62N	KONTROL DIŞI	IOCC	Uçuş işletme talimatları
-62X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
-63A	KONTROL DIŞI	CCPT/CBN	Tüm ekibin uçağa geç gelişi
-63B	KONTROL DIŞI	CCPT	Kokpit ekibinin uçağa geç gelişi
-63C	TGS	RAMP	Ekip aracı nedeniyle tüm ekibin uçağa geç gelmesi
-63D	TGS	RAMP	Ekip aracı nedeniyle kokpit ekibinin uçağa geç gelmesi
-63F	KONTROL DIŞI	CCPT/CBN	Havalimanı ulaşım/giriş yoğunluğu/kapalılık
-63G	KONTROL DIŞI	CCPT	Güvenlik usulleri (tüm ekip brifingi vb.)
-63H	KONTROL DIŞI	CCPT/CBN	Uçuş öncesi tüm ekip sorumluluğundaki işlemler
-63J	KONTROL DIŞI	CCPT	Uçuş öncesi kokpit ekibinin sorumluluğundaki işlemler
-63K	KONTROL DIŞI	GOPS	Ekibin havalimanına geç intikali (Ekip aracı hazır olmadığı durumlarda)
-63L	KONTROL DIŞI	CCPT/CBN	Ekibin havalimanına geç intikali (Ekip aracı hazır olmasına rağmen)
-63M	KONTROL DIŞI	CCPT/CBN	Geliş ekibinin uçağı geç teslimi
-63X	KONTROL DIŞI	CCPT/CBN	Bu nedenle slot kaçırma
-64A	KONTROL DIŞI	CCPT/CRWP	Hastalık/yaralanma
-64B	KONTROL DIŞI	CRWP	Yedek ekip beklenmesi
-64C	KONTROL DIŞI	CCPT/CRWP	Operasyonel aksaklık sebebi ile uçuş zamanı sınırlandırması
-64D	KONTROL DIŞI	CCPT	Seyahat evrakları
-64E	KONTROL DIŞI	CRWP	Ekip planlaması veya ekip kontrol hatası
-64H	KONTROL DIŞI	IOCC/CCPT/CRWP	Operasyonel oranlama yetersizliği (CAT 1- CAT 2 vb.)
-64R	KONTROL DIŞI	CCPT/CRWP	Operasyonel aksaklık sebebi ile zorunlu/minimum ekip dinlenme süresi
-64V	KONTROL DIŞI	CRWP	Kokpit ekibi görev süresinin aşılması nedeni ile yapılan Return to Ramp
-64X	KONTROL DIŞI	CCPT/CRWP	Bu nedenle slot kaçırma
-65A	KONTROL DIŞI	CCPT	Ekip tarafından yolcu boarding anonsunun bekletilmesi
-65B	KONTROL DIŞI	CCPT	Minimum Teçhizat Listesi’nde olmayan bakım kontrolleri
-65C	KONTROL DIŞI	CCPT	Özel veya ilave ikram talebi
-65D	KONTROL DIŞI	CCPT	Bildirilmiş teknik arızanın mevcudiyetinin teşhis edilememesi
-65E	KONTROL DIŞI	CCPT	Arızanın geç bildirilmesi
-65N	KONTROL DIŞI	CCPT	Kokpitin (harekat, dispatch oluruna rağmen) değişiklik talebi
-65O	KONTROL DIŞI	CCPT	Ekip yakınlarının yedek, pass problemleri
-65P	KONTROL DIŞI	CCPT	Hasta yolcu kabul şartlarına uygun yolcunun kabul edilmemesi
-65R	KONTROL DIŞI	CCPT	Kokpit ekibinin özel sebeplerle uçuştan ayrılma ya da uçuş ekibinde değişiklik talebi
-65S	KONTROL DIŞI	CCPT	Geç clearance (Pushback ve motor çalıştırma) talebi
-65T	KONTROL DIŞI	CCPT	Alıştırma/kontrol uçuşu kaynaklı gecikmeler
-65X	KONTROL DIŞI	CCPT	Bu nedenle slot kaçırma
-65Y	KONTROL DIŞI	CCPT	Kokpit ekibi tarafından harekat koordinatörüne teslim edilecek dokümanların geç teslimi
-65Z	KONTROL DIŞI	CCPT	Diğer nedenler
-66A	KONTROL DIŞI	CBN	Kabin ekibi geç gelişi
-66B	TGS	RAMP	Ekip aracı nedeniyle kabin ekibinin uçağa geç gelmesi
-66D	KONTROL DIŞI	CBN	Havalimanı ulaşım/giriş yoğunluğu/kapalılık
-66E	KONTROL DIŞI	CBN	Güvenlik usulleri (kabin ekibi brifingi vb.)
-66F	KONTROL DIŞI	GOPS	Ekibin havalimanına geç intikali (Ekip aracı hazır olmadığı durumlarda)
-66G	KONTROL DIŞI	CBN	Ekibin havalimanına geç intikali (Ekip aracı hazır olmasına rağmen)
-66H	KONTROL DIŞI	CBN	Uçuş öncesi kabin ekibi sorumluluğundaki işlemler
-66X	KONTROL DIŞI	CBN	Bu nedenle slot kaçırma
-67A	KONTROL DIŞI	CBN/CRWP	Hastalık/yaralanma
-67B	KONTROL DIŞI	CRWP	Yedek ekip beklenmesi
-67C	KONTROL DIŞI	CBN/CRWP	Uçuş zamanı sınırlandırması
-67D	KONTROL DIŞI	CBN	Seyahat evrakları eksikliği
-67E	KONTROL DIŞI	CRWP	Ekip planlaması veya ekip kontrol hatası
-67R	KONTROL DIŞI	CBN/CRWP	Zorunlu/minimum ekip dinlenme süresi
-67V	KONTROL DIŞI	CRWP	Kabin ekibi görev süresinin aşılması nedeni ile yapılan Return to Ramp
-67X	KONTROL DIŞI	CBN/CRWP	Bu nedenle slot kaçırma
-68A	KONTROL DIŞI	CBN	Belirlenmiş sürelerden uzun süren yolcu sayımı
-68B	KONTROL DIŞI	CBN	Yanlış/geç talep-ikram
-68C	KONTROL DIŞI	CBN	Yanlış/geç talep-tuvalet servisi
-68D	KONTROL DIŞI	CBN	Yanlış/geç talep-temizlik
-68E	KONTROL DIŞI	CBN	Tahliye şutu açılması (slide)
-68G	KONTROL DIŞI	CBN	Belirlenmiş sürelerden uzun süren uçak güvenlik araması (ASSC) işlemi
-68H	KONTROL DIŞI	CBN	Ekipman (acil durum malzemeleri) kontrolünün belirlenen süreden uzun sürmesi
-68O	KONTROL DIŞI	CBN	Standart olmayan ihtiyaçların talebi (battaniye, kulaklık vb.)
-68R	KONTROL DIŞI	CBN	Kabin ekibinin özel sebeplerle uçuştan ayrılma ya da uçuş ekibinde değişiklik talebi
-68S	KONTROL DIŞI	CBN	Arızanın geç bildirilmesi
-68T	KONTROL DIŞI	FLTD	Alıştırma/kontrol uçuşu kaynaklı gecikmeler
-68X	KONTROL DIŞI	CBN	Bu nedenle slot kaçırma
-69A	KONTROL DIŞI	CCPT	Sorumlu kaptan pilotun güvenlik araması isteği
-69X	KONTROL DIŞI	CCPT	Bu nedenle slot kaçırma
-71A	KONTROL DIŞI	IOCC	Uçak limitleri dışında
-71B	KONTROL DIŞI	IOCC	Ekip limitleri dışında (CAT 1, CAT 2 vb.)
-71R	KONTROL DIŞI	IOCC	Operasyonel limitler dışındaki hava durumu
-71V	KONTROL DIŞI	IOCC	Kalkış meydanındaki hava durumu nedeni ile yapılan Return to Ramp
-71X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
-72A	KONTROL DIŞI	IOCC	Uçak limitleri dışında
-72B	KONTROL DIŞI	IOCC	Ekip limitleri dışında (CAT 1, CAT 2 vb.)
-72R	KONTROL DIŞI	IOCC	Operasyonel limitler dışındaki hava durumu
-72V	KONTROL DIŞI	IOCC	Varış meydanındaki hava durumu nedeni ile yapılan Return to Ramp
-72X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
-73A	KONTROL DIŞI	IOCC	Uçak limitleri dışında
-73B	KONTROL DIŞI	IOCC	Ekip limitleri dışında (CAT 1, CAT 2 vb.)
-73R	KONTROL DIŞI	IOCC	Operasyonel limitler dışındaki hava durumu
-73X	KONTROL DIŞI	ATFM	ETOPS (A/C tipine göre 2 ve 4 motor inebilecek meydanlar)
-73Y	KONTROL DIŞI	ATFM	Ekip limitleri dışında (CAT 1, CAT 2 vb.)
-73Z	KONTROL DIŞI	ATFM	Uçak limitleri dışında
-75A	KONTROL DIŞI	GOPS	Pist başı cep’te De-icing/Anti-icing işlemi uygulanması
-75B	KONTROL DIŞI	GOPS	Park yerinde De-icing/Anti-icing işlemi uygulanması
-75C	KONTROL DIŞI	GOPS	Koruma süresinin (HOT) aşılması durumunda tekrar De-icing/Anti-icing işlemi uygulaması
-75E	TGS	RAMP	Teçhizat arızası
-75F	TGS	RAMP	Çalışan yetersizliği
-75G	KONTROL DIŞI	GOPS	Sıvıların yetersizliği
-75H	KONTROL DIŞI	GOPS/TECH	Fan blade’lerin kar ve buzdan temizlenmesi
-75X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
-76A	KONTROL DIŞI	ARPT	Kötü hava koşulları nedeniyle havalimanının kapanması
-76B	KONTROL DIŞI	ARPT	Hava koşullarından dolayı park yeri olmaması
-76C	KONTROL DIŞI	ARPT	Havalimanından kar, buz, su ve kum temizlenmesi
-76X	KONTROL DIŞI	ARPT	Bu nedenle slot kaçırma
-77A	KONTROL DIŞI	ARPT	Yakıt veya hizmetin kesilmesi
-77B	KONTROL DIŞI	ARPT	Apron koşulları
-77C	KONTROL DIŞI	ARPT	Güçlü rüzgârlar-kapı operasyon limitleri
-77X	KONTROL DIŞI	ARPT	Bu nedenle slot kaçırma
-81G	KONTROL DIŞI	ATFM	Diğer
-81W	KONTROL DIŞI	ATFM	Hava durumu
-81X	KONTROL DIŞI	ATFM	Çevresel sorunlar
-81Y	KONTROL DIŞI	ATFM	Fazla talep veya kapasite
-81Z	KONTROL DIŞI	ATFM	ATC yol boyu kısıtlamalar
-82V	KONTROL DIŞI	ATFM	Özel olaylar
-82W	KONTROL DIŞI	ATFM	Askeri harekat
-82X	KONTROL DIŞI	ATFM	Uçuş güzergahındaki çalışan yetersizliği
-82Y	KONTROL DIŞI	ATFM	Uçuş güzergâhındaki ekipman kapasitesinin düşük/arızalı olması (radar, vor vb.)
-82Z	KONTROL DIŞI	ATFM	Endüstriyel hareketler
-83G	KONTROL DIŞI	ATFM	Diğer
-83L	KONTROL DIŞI	ATFM	Politik huzursuzluk
-83O	KONTROL DIŞI	ATFM	Havalimanı/pist kapalılığı
-83P	KONTROL DIŞI	ATFM	Fazla talep/Havalimanı olanakları
-83S	KONTROL DIŞI	ATFM	Gece uçuş/gürültü kısıtlaması
-83T	KONTROL DIŞI	ATFM	Özel olaylar
-83U	KONTROL DIŞI	ATFM	Askeri harekat
-83V	KONTROL DIŞI	ATFM	Kaza/olay
-83W	KONTROL DIŞI	ATFM	Çalışan yetersizliği
-83X	KONTROL DIŞI	ATFM	Ekipman arızaları
-83Y	KONTROL DIŞI	ATFM	Endüstriyel hareketler (grev vb.)
-83Z	KONTROL DIŞI	ATFM	Fazla talep/ATC kapasitesi
-84A	KONTROL DIŞI	ATFM	ATFM-varış meydanı hava durumu
-85A	KONTROL DIŞI	ARPT	Güvenlik noktasında yoğunluk
-85B	KONTROL DIŞI	SECR	Bagaj eşleştirme boarding’e müracaat etmeyen veya uçağa bindikten sonra inen yolcunun bagajının indirilmesi
-85C	KONTROL DIŞI	SECR	Ekstra/özel havaalanı güvenliği buluntu/sahipsiz paketler
-85D	KONTROL DIŞI	SECR	Bomba ihbarı
-85E	KONTROL DIŞI	SECR	Güvenlik ihlali
-85F	KONTROL DIŞI	SECR	Özel/ilave güvenlik araştırmaları
-85G	KONTROL DIŞI	SECR	Zorunlu yolcu indirimi
-85H	KONTROL DIŞI	SECR	Çalışan yetersizliği
-85I	KONTROL DIŞI	SECR	Teçhizat arızaları (bilgisayar, x-ray arızaları)
-85N	KONTROL DIŞI	SECR	Uçağa binmeden önce son kontrol noktasındaki güvenliğin geç açılması
-85O	KONTROL DIŞI	SECR	Güvenlik uyuşmazlıkları
-85P	KONTROL DIŞI	SECR	Havaalanı içerisinde özel güvenlik gereksinimleri (yolcu-bagaj-el bagajı)
-85Q	KONTROL DIŞI	SECR	Havacılık güvenlik operasyon çalışanı geç gelişi, eleman yetersizliği veya hatası
-85R	KONTROL DIŞI	SECR	Türk Hava Yolları Havacılık güvenlik operasyon çalışanı geç gelişi, yetersizliği veya hatası
-85S	KONTROL DIŞI	SECR	Şüpheli paket nedeniyle güvenlik araması (uçak içerisinde)
-85T	KONTROL DIŞI	SECR	Uçak altında bagajların x-ray’den geçmesi
-85U	KONTROL DIŞI	SECR	Yolcuya ait elektronik cihazların koltuk arasına düşmesi/sıkışması
-85V	KONTROL DIŞI	SECR	Güvenlik nedeni ile yapılan Return to Ramp
-85X	KONTROL DIŞI	SECR	Bu nedenle slot kaçırma
-86A	KONTROL DIŞI	ARPT	Göçmen (pasaport)/gümrük altyapı sistemi
-86B	KONTROL DIŞI	ARPT	Çalışan yetersizliği
-86C	KONTROL DIŞI	ARPT	Sağlık
-86D	KONTROL DIŞI	ARPT	Uygun olmayan/yetersiz dokümanlar ile seyahat eden yolcu (INAD/Deporte vb.)
-86E	KONTROL DIŞI	ARPT	Gelen/giden yolcu kontrolü
-86F	KONTROL DIŞI	ARPT	Uçak ilaçlanması
-86G	KONTROL DIŞI	ARPT	Uçak gümrük işlemleri
-86H	KONTROL DIŞI	ARPT	Karantina
-86J	KONTROL DIŞI	ARPT	Pasaport yoğunluğu
-86N	KONTROL DIŞI	ARPT	Dâhili/transfer bagajların gümrük tarafından kontrolü
-86O	KONTROL DIŞI	ARPT	Pasaport bilgisayar sistem arızası
-86T	KONTROL DIŞI	ARPT	Geç Deporte/INAD yolcu boarding’i
-86U	KONTROL DIŞI	GOPS	Canlı organ sevki
-86X	KONTROL DIŞI	ARPT	Bu nedenle slot kaçırma
-87G	KONTROL DIŞI	ARPT	Diğer
-87H	KONTROL DIŞI	ARPT	Push-back için follow-me araçlarının geç gelmesi veya yetersiz olması
-87I	KONTROL DIŞI	ARPT	Körük operatörü olmaması/geç gelmesi
-87J	KONTROL DIŞI	ARPT	Havalimanı yakıt sistemlerinin arızalanması
-87K	KONTROL DIŞI	ARPT	İnşaat nedeniyle push-back clearance verilmemesi
-87L	KONTROL DIŞI	ARPT	Yer iletişim sistem arızası
-87M	KONTROL DIŞI	ARPT	Yetersiz yangın söndürücü
-87N	KONTROL DIŞI	ARPT	Uçuş bilgi görüntüleme sistem arızası
-87P	KONTROL DIŞI	ARPT	Yolcu ulaşım sistem arızası
-87Q	KONTROL DIŞI	ARPT	Temiz su operatörünün olmaması/geç gelmesi
-87R	KONTROL DIŞI	ARPT	Elektrik sistem arızası
-87S	KONTROL DIŞI	ARPT	Check-in kontuarlarının yetersiz olması
-87T	KONTROL DIŞI	ARPT	Köprü arızası
-87U	KONTROL DIŞI	ARPT	Altyapı yetersizliğinden push-back yapılamaması
-87V	KONTROL DIŞI	ARPT	Bagaj Ayırma Sistemi arızası (durma ve yavaşlama) (şut sorter arızası)
-87W	KONTROL DIŞI	ARPT	Kapı sınırlandırmaları/kapı olmaması
-87X	KONTROL DIŞI	ARPT	Binalar
-87Y	KONTROL DIŞI	ARPT	Ramp karışıklığı
-87Z	KONTROL DIŞI	ARPT	Park yeri olmaması
-88A	KONTROL DIŞI	ARPT	Sokağa çıkma yasağı sebebiyle kısıtlamalar
-88B	KONTROL DIŞI	ARPT	Endüstriyel hareket (grev vb.)
-88C	KONTROL DIŞI	ARPT	Politik huzursuzluk
-88D	KONTROL DIŞI	ARPT	Havalimanı kapalılığı
-88E	KONTROL DIŞI	ARPT	Pist kapalılığı
-88F	KONTROL DIŞI	ARPT	Varış meydan iniş izinlerinin beklenmesi
-88N	KONTROL DIŞI	ARPT	Gürültü kısıtlamaları
-88O	KONTROL DIŞI	ARPT	Çalışan yetersizliği
-88P	KONTROL DIŞI	ARPT	Gece uçuşu kısıtlamaları
-88Q	KONTROL DIŞI	ARPT	Özel uçuşlar (VIP, askeri, kutlama amaçlı vb.)
-89F	KONTROL DIŞI	ARPT	“De-icing” sıralandırması
-89G	KONTROL DIŞI	ARPT	Diğer
-89H	KONTROL DIŞI	ARPT	İnşaat işleri/bakım
-89I	KONTROL DIŞI	ARPT	Altyapı dışı bir nedenle geç pushback verilmesi
-89J	KONTROL DIŞI	ARPT	Kayıp uçuş planları
-89K	KONTROL DIŞI	ARPT	Lokal ATC kaynaklı start-up/push-back clearance gecikmesi
-89L	KONTROL DIŞI	ARPT	Pist/taxi yolu kapalılığı
-89M	KONTROL DIŞI	ARPT	Havalimanı kapalılığı
-89N	KONTROL DIŞI	ARPT	ATC çevresel
-89O	KONTROL DIŞI	ARPT	Çevre Menfaati, Standart Taksi Süresinin Kısıtlanması Nedeniyle Gecikmeli Motor Çalıştırma/Pushback
-89P	KONTROL DIŞI	ARPT	Politik huzursuzluk
-89R	KONTROL DIŞI	ARPT	Havaalanı yasaklamalarından dolayı ATC kısıtlaması
-89S	KONTROL DIŞI	ARPT	ATC hava durumu
-89T	KONTROL DIŞI	ARPT	ATC özel olay
-89U	KONTROL DIŞI	ARPT	Askeri hareketlilik/Özel uçuşlar/VIP
-89V	KONTROL DIŞI	ARPT	ATC kaza/olay
-89W	KONTROL DIŞI	ARPT	ATC ekipman
-89X	KONTROL DIŞI	ARPT	ATC çalışanı
-89Y	KONTROL DIŞI	ARPT	Endüstriyel hareket (grev vb.)
-89Z	KONTROL DIŞI	ARPT	ATC talep/kapasitesi
-91N	KONTROL DIŞI	GOPS	Bağlantılı yolcu ve bagaj beklenmesi
-91O	KONTROL DIŞI	GOPS	Bağlantılı kargo veya posta beklenmesi
-91P	KONTROL DIŞI	GOPS	Short connection (yolcu/bagaj)
-91R	KONTROL DIŞI	GOPS	Marketing Carrier olduğumuz uçuştan yolcu ve bagaj beklenmesi
-91S	KONTROL DIŞI	GOPS	Yüklerin geliş istasyondan hatalı yüklenmesi/hatalı mesaj çekilmesi
-91T	KONTROL DIŞI	GOPS	Transfer yolcu/bagaj yönetimi hataları
-91X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
-92A	KONTROL DIŞI	GOPS	Through check-in işlemi yapılmaması-yanlış transit/transfer yolcu ve bagaj figürleri
-92B	KONTROL DIŞI	GOPS	Transit/transfer yüklerin yanlış (karışık) yüklenmesi
-92N	KONTROL DIŞI	GOPS	Check-in işlemi hatası-yolcu ve bagaj
-92O	KONTROL DIŞI	GOPS	Check-in işlemi hatası-yolcu ve bagaj (yetersiz doküman)
-92X	KONTROL DIŞI	GOPS	Bu nedenle slot kaçırma
-93U	KONTROL DIŞI	REAC	Teknik nedenlerden dolayı uçağın geç varışı
-93V	KONTROL DIŞI	REAC	Varış istasyonundaki hava durumundan dolayı uçağın geç varışı
-93W	KONTROL DIŞI	REAC	Varış istasyonundaki fazla kapasite talebinden ve/veya kısıtlamalardan dolayı uçağın geç varışı
-93X	KONTROL DIŞI	REAC	İnişten sonra yaşanan gecikmeden dolayı uçağın geç varışı
-93Y	KONTROL DIŞI	REAC	Yol boyundan dolayı uçağın geç varışı
-93Z	KONTROL DIŞI	REAC	Bir önceki istasyonda kalkışta yaşanan gecikmeden dolayı uçağın geç varışı
-94A	KONTROL DIŞI	CRWP	Seferin kendi kabin ekibinin beklenmesi
-94B	KONTROL DIŞI	CRWP	Seferden pass kabin ekibi/ekipleri beklenmesi
-94X	KONTROL DIŞI	CRWP	Bu nedenle slot kaçırma
-95A	KONTROL DIŞI	CRWP	Seferin kendi tüm ekibinin beklenmesi
-95B	KONTROL DIŞI	CRWP	Seferden pass ekip beklenmesi (tüm ekip)
-95C	KONTROL DIŞI	CRWP	Seferin kendi kokpit ekibinin beklenmesi
-95X	KONTROL DIŞI	CRWP	Bu nedenle slot kaçırma
-96A	KONTROL DIŞI	IOCC	Uçuş rotası değişikliği
-96B	KONTROL DIŞI	IOCC	Uçuşların birleştirilmesi (tevhid)
-96C	KONTROL DIŞI	IOCC	Uçak/teçhizat değişikliği-teknik neden dışı
-96D	KONTROL DIŞI	IOCC	Divert
-96E	KONTROL DIŞI	IOCC	Yerde kalış süresinin, belirlenen minimum yerde kalış süresinden daha az olarak tekrar planlanması
-96G	KONTROL DIŞI	IOCC	Kontroller/planlayıcı hatası
-96S	KONTROL DIŞI	IOCC	Teknik arıza veya hasar nedeniyle ikincil sebep oluşması
-96T	KONTROL DIŞI	IOCC	Zorunlu operasyonel değişiklik veya planlama
-96V	KONTROL DIŞI	IOCC	IOCC kararı nedeni ile yapılan Return to Ramp
-96X	KONTROL DIŞI	IOCC	Bu nedenle slot kaçırma
-97A	KONTROL DIŞI	KONTROL DIŞI	Yerel istasyon bünyesinde
-97B	KONTROL DIŞI	KONTROL DIŞI	Tüm şirket bünyesinde
-97C	KONTROL DIŞI	KONTROL DIŞI	Yolcu hizmetleri/handling bünyesinde
-97D	KONTROL DIŞI	KONTROL DIŞI	Ramp hizmetleri/handling bünyesinde
-97E	KONTROL DIŞI	KONTROL DIŞI	Kargo bünyesinde
-97F	KONTROL DIŞI	KONTROL DIŞI	İkram bünyesinde
-97G	KONTROL DIŞI	KONTROL DIŞI	Uçuş kokpit ekibi bünyesinde
-97H	KONTROL DIŞI	KONTROL DIŞI	Uçuş kabin ekibi bünyesinde
-97I	KONTROL DIŞI	KONTROL DIŞI	Teknik birim bünyesinde
-97J	KONTROL DIŞI	KONTROL DIŞI	Destek birimleri
-97K	KONTROL DIŞI	KONTROL DIŞI	Yakıt şirketi bünyesinde
-97L	KONTROL DIŞI	KONTROL DIŞI	Diğer operasyonel faaliyetler
-97X	KONTROL DIŞI	KONTROL DIŞI	Bu nedenle slot kaçırma
-98A	KONTROL DIŞI	KONTROL DIŞI	Ulusal grev
-98B	KONTROL DIŞI	KONTROL DIŞI	Handling şirketinin tüm birimleri
-98C	KONTROL DIŞI	KONTROL DIŞI	Yolcu hizmetleri/handling
-98D	KONTROL DIŞI	KONTROL DIŞI	Ramp hizmetleri/handling
-98E	KONTROL DIŞI	KONTROL DIŞI	Kargo
-98F	KONTROL DIŞI	KONTROL DIŞI	İkram
-98G	KONTROL DIŞI	KONTROL DIŞI	Teknik
-98H	KONTROL DIŞI	KONTROL DIŞI	Temizlik
-98I	KONTROL DIŞI	KONTROL DIŞI	Destek birimleri
-98J	KONTROL DIŞI	KONTROL DIŞI	Yakıt
-98K	KONTROL DIŞI	KONTROL DIŞI	Diğer operasyonel faaliyetler
-98L	KONTROL DIŞI	KONTROL DIŞI	Güvenlik
-98M	KONTROL DIŞI	KONTROL DIŞI	İtfaiye
-98N	KONTROL DIŞI	KONTROL DIŞI	Otoriteler
-98O	KONTROL DIŞI	KONTROL DIŞI	Havalimanı
-98X	KONTROL DIŞI	KONTROL DIŞI	Bu nedenle slot kaçırma
-99A	KONTROL DIŞI	KONTROL DIŞI	Diğer nedenler
-99V	KONTROL DIŞI	NULL	Diğer sebeplerle yapılan Return to Ramp
-N/A	TEHİR YOK	TEHİRYOK	#N/A
-</script>
+
 <script>
-const $=id=>document.getElementById(id);
-const norm=s=>String(s==null?"":s).trim().toUpperCase().replace(/\s+/g,"");
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function parseTsv(t){const rows=[];let r=[],c="",q=false;
- for(let i=0;i<t.length;i++){const ch=t[i];
-  if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
-  else if(ch==='"'&&c==="")q=true;
-  else if(ch==="\t"){r.push(c);c=""}
-  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&t[i+1]==="\n")i++;r.push(c);rows.push(r);r=[];c=""}
-  else c+=ch}
- if(c!==""||r.length){r.push(c);rows.push(r)}
- return rows.map(x=>x.map(s=>s.trim())).filter(x=>x[0]&&!/^TEH[İI]R/i.test(x[0])).map(x=>[x[0],x[1]||"",x[2]||"",x[3]||""])}
+var ADMIN_PW = "145314";
+var KEY = "tehir_kodlari_v2";
+var DEFAULTS = [{"kod":"01A","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. uçakları dışında kalanların teknik nedenle tehirleri"},{"kod":"01B","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. uçakları dışında kalanların teknik kaynaklı uçak değişiklik tehirleri"},{"kod":"01C","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. uçakları dışında kalanların planlama kaynaklı tehirleri"},{"kod":"01D","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş planı/Uçuş dokümanlarının geç tamamlanması ya da değişmesi"},{"kod":"01E","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. birimleri dışında kalan uçakların ekip (kokpit) kaynaklı uçağa geç gelişler"},{"kod":"01F","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. uçakları dışında kalanların ekip planlama (kokpit) kaynaklı rötarlar"},{"kod":"01G","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. uçakları dışında kalanların (kokpit) ekip kaynaklı diğer rötarlar"},{"kod":"01H","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. uçakları dışında kalan uçakların ekip (kabin) geç geçişi kaynaklı rötarlar"},{"kod":"01I","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. uçakları dışında kalanların (kabin) ekip kaynaklı diğer rötarlar"},{"kod":"01J","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kabin ekibi hatası veya özel isteği (Operasyonel gereklilikler dışında)"},{"kod":"01K","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Devir alacak kabin ekibinin gecikmesi (Diğer bir uçuştan kabin ekibinin beklenmesi)"},{"kod":"01L","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Devir alacak ekibin gecikmesi (Diğer bir uçuştan kokpit ekibinin veya pass ekip dahil tüm ekibin beklenmesi)"},{"kod":"01M","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"THY A.O. uçakları dışında kalanların teknik kaynaklı ikincil tehirleri"},{"kod":"01N","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kargo wetlease seferlerinde load master kaynaklı hatalar"},{"kod":"01O","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kargo wetlease seferlerinde uçak içi yükleme sistem arızası kaynaklı geçikmeler"},{"kod":"01X","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"01Y","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"RGFD/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer"},{"kod":"02A","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçağın APU'sunun gayri faal olması nedeniyle uçağın push-back öncesi park yerinde motor çalıştırması"},{"kod":"02B","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçağın park pozisyonundan kendi gücü ile harekete başlaması"},{"kod":"03A","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"QLTY","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Şirket içi denetim"},{"kod":"03B","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"QLTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Şirket dışı denetim"},{"kod":"03X","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"QLTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"04A","sorumlu":"KONTROL DIŞI","kategori":"HAVAYOLU BÜNYESİ","katsor":"GOPS/IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Üzerinde inceleme süren tehirler"},{"kod":"09B","sorumlu":"KONTROL DIŞI","kategori":"TARİFE","katsor":"SCHD","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ticari"},{"kod":"09C","sorumlu":"KONTROL DIŞI","kategori":"TARİFE","katsor":"SCHD","kdisi":"K.İÇİ","birim":"KONTROL DIŞI","aciklama":"Planlama"},{"kod":"09D","sorumlu":"KONTROL DIŞI","kategori":"TARİFE","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kargo Operasyon Kontrol Planlama"},{"kod":"09E","sorumlu":"KONTROL DIŞI","kategori":"TARİFE","katsor":"TECH","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Bakım uzaması nedeniyle planlanan uçuş tarifesinin değişikliği"},{"kod":"09F","sorumlu":"KONTROL DIŞI","kategori":"TARİFE","katsor":"TECH","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Uçak/Komponent arızası nedeniyle planlanan uçuş tarifesinin değişikliği"},{"kod":"09G","sorumlu":"KONTROL DIŞI","kategori":"TARİFE","katsor":"TECH","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Yerde/Havada hasarlanma nedeniyle planlanan uçuş tarifesinin değişikliği"},{"kod":"09X","sorumlu":"KONTROL DIŞI","kategori":"TARİFE","katsor":"SCHD","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"11A","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Transfer yolcuların geç check-in işlemi"},{"kod":"11B","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Yedek liste işlemleri"},{"kod":"11C","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Rezervasyonu onaylı yolcuların geç kabulü"},{"kod":"11D","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Çalışan hatası nedeniyle"},{"kod":"11E","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Grup check-in"},{"kod":"11F","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanına ulaşımda/girişde yaşanan gecikmeler (kapanma, birikme, kaza vb.)"},{"kod":"11G","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Fazla bagaj ücret alımı nedeniyle"},{"kod":"11O","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Operasyonel aksaklıklardan dolayı re-route işlemi"},{"kod":"11X","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"YHM","aciklama":"Bu nedenle slot kaçırma"},{"kod":"12A","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Check-in bölgesinde yoğunluk"},{"kod":"12B","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Çalışan eksikliği nedeniyle"},{"kod":"12C","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Transfer bölgesinde yolcu yoğunluğu"},{"kod":"12D","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Grup check-in"},{"kod":"12E","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"ARPT/GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanına ulaşımda/girişte yaşanan gecikmeler (kapanma, birikme, kaza vb.)"},{"kod":"12F","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Yedek liste işlemleri"},{"kod":"12X","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"YHM","aciklama":"Bu nedenle slot kaçırma"},{"kod":"13A","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"İstasyonda check-in işlemi hatası"},{"kod":"13J","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kontuar dışı check-in işlemi hatası"},{"kod":"13L","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"Dokümantasyon hatası (bilet/vize/pasaport vb.)"},{"kod":"13M","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"OCC","aciklama":"“Editing” hatası"},{"kod":"13X","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"YHM","aciklama":"Bu nedenle slot kaçırma"},{"kod":"14A","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"RESE","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ticari gerekçelerle uçağın overbook olması"},{"kod":"14B","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"RESE","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Rezervasyon hatası"},{"kod":"14O","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"“Overbook” sürecinde istasyon tarafından gerekli tedbirlerin alınmaması"},{"kod":"14P","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"RESE","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Fazla satış yapılan başka bir seferden yolcu alınması"},{"kod":"14T","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kontrol içi operasyonel nedenlerle overbook durumu oluşması"},{"kod":"14X","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"RESE","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"15A","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"VİZE - PASAPORT","aciklama":"“Boarding” hatası/yolcu figürleri uyuşmazlığı"},{"kod":"15B","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"VİZE - PASAPORT","aciklama":"“Boarding”e geç başlama"},{"kod":"15C","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"VİZE - PASAPORT","aciklama":"Yavaş “boarding”"},{"kod":"15D","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kaybolan/geç “check-in” işlemi yapılan yolcu"},{"kod":"15F","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"VİZE - PASAPORT","aciklama":"Dokümantasyon (bilet, pasaport, vize, sağlık raporu, pcr testi vb.)"},{"kod":"15G","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"VİZE - PASAPORT","aciklama":"Çalışan sayısının eksikliği"},{"kod":"15I","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"KONTROL DIŞI","aciklama":"Boarding esnasında kapıda el bagajı toplanması ve yüklenmesi veya “excess” kesimi"},{"kod":"15O","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"VİZE - PASAPORT","aciklama":"Bagaj ayırım bilgisinin bagaj eşleştirmeye geç/yanlış ikazı"},{"kod":"15Q","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"VİZE - PASAPORT","aciklama":"Gösterilmeyen bagajların yolcu anons edilerek yüklenmesi"},{"kod":"15R","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"VİZE - PASAPORT","aciklama":"Yolcunun yanlış park pozisyonuna/yanlış çıkış kapısına yönlendirilmesi"},{"kod":"15U","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçak konfigürasyonu ya da tip değişikliğinden dolayı yolculara yeni yer numarası verilmesi ve yolcuların yerleştirilmesi"},{"kod":"15X","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"VİZE - PASAPORT","aciklama":"Bu nedenle slot kaçırma"},{"kod":"16A","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"VIP “boarding”"},{"kod":"16B","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Rahatsız eden yolcu handling’i"},{"kod":"16D","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kaybolan şahsi eşyalar"},{"kod":"16E","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Deporte/INAD yolcu handling’i"},{"kod":"16F","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Aksaklık nedeniyle yolcuya yerde iken verilen ikram"},{"kod":"16G","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Kendi isteği ile uçaktan inen yolcu"},{"kod":"16H","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Uçak içerisinde yolcu rahatsızlığı/ölümü"},{"kod":"16K","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Yavaş deboarding"},{"kod":"16L","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Yavaş boarding"},{"kod":"16N","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Basın yayın organlarının uçaktaki faaliyetleri"},{"kod":"16P","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"KONTROL DIŞI","aciklama":"Pass yolcu problemleri"},{"kod":"16S","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer bir havayolundan ticari amaçlı bağlantısı olmayan yolcu kabulü"},{"kod":"16U","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Yolcu nedeni ile yapılan Return to Ramp"},{"kod":"16V","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Yolcu rahatsızlığı/ölümü nedeni ile yapılan Return to Ramp"},{"kod":"16X","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"17A","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"YHM","aciklama":"İkram geç talebi/yanlış talep"},{"kod":"17B","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"THY İkram Operasyon ve Kontrol Şefliği ikram geç talebi/yanlış talep"},{"kod":"17P","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Dönüş ikramlarına ilavenin karşı meydandan geç talebi"},{"kod":"17Q","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Rötar nedeniyle değişen ikram (kahvaltıdan öğle yemeğine çevirme vb.)"},{"kod":"17X","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"CTRG/GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"18A","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"BAGAJ HİZ.","aciklama":"Bagajların uçak altına geç teslimi"},{"kod":"18C","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"BAGAJ HİZ.","aciklama":"Bagaj eşleştirme ve ayırma problemleri"},{"kod":"18N","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"BAGAJ HİZ.","aciklama":"Bagajların “rush” etiketi takılarak sevkiyatı (diğer seferlerden kalan bagajlar dâhil)"},{"kod":"18O","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"BAGAJ HİZ.","aciklama":"Diğer hava yollarından alınan “rush” bagaj sevkiyatı"},{"kod":"18Q","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"BAGAJ HİZ.","aciklama":"Bagaj eşleştirme cihazlarının yetersizliği/eksikliği"},{"kod":"18R","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"BAGAJ HİZ.","aciklama":"Bagajların yanlış uçağa sevkiyatı"},{"kod":"18S","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"BAGAJ HİZ.","aciklama":"Bagaj Eşleştirme Koordinasyon Ofisi hataları"},{"kod":"18X","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"BAGAJ HİZ.","aciklama":"Bu nedenle slot kaçırma"},{"kod":"19A","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Hareket kabiliyeti kısıtlı yolcuların uçağa binişi"},{"kod":"19B","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Hareket kabiliyeti kısıtlı yolcuların uçaktan inişi"},{"kod":"19C","sorumlu":"TGS","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"AIR CLINIC","aciklama":"WCHR, STCR taşımasını gerçekleştiren yer hizmetleri kuruluşu kaynaklı gecikmeler"},{"kod":"19X","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"21A","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Geç/yanlış kargo figürü"},{"kod":"21C","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Geç/yanlış kargo dokümanları"},{"kod":"21E","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Loadmaster hatasından kaynaklanan gecikmeler"},{"kod":"21F","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Loadmaster kit arızaları"},{"kod":"21X","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"22A","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Apronda bulunamayan kargo/posta nedeniyle ramp firmasına geç teslim"},{"kod":"22D","sorumlu":"TGS","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"KARGO","aciklama":"Yanlış park yerine getirme, eksik getirme veya hiç getirilmemesi"},{"kod":"22N","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yükleme materyallerinin geç sağlanması"},{"kod":"22P","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Thru Palet kontür bilgilerinin geç gelmesi"},{"kod":"22R","sorumlu":"TGS","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"KARGO","aciklama":"Kargoların ramp transferinde yaşanan aksaklıklar"},{"kod":"22S","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Depo çıkış hatları yoğunluğu sebebiyle ramp firmasına geç teslim"},{"kod":"22X","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"23A","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Operasyonel sebepler nedeni ile kargonun geç kabulü/değiştirilmesi"},{"kod":"23C","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Çalışan sayısının eksikliği"},{"kod":"23D","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Expres kargo (VIC vb.)"},{"kod":"23E","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Diplomatik posta"},{"kod":"23X","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"24B","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"ULD içerisinde hasarlı Tehlikeli madde Tespiti (Depo hazırlık)"},{"kod":"24C","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"ULD içerisinde hasarlı Tehlikeli madde Tespiti (Thru)"},{"kod":"24D","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kargonun uçak altında hasarlı olarak tespiti (Depo hazırlık)"},{"kod":"24E","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kargonun uçak altında hasarlı olarak tespiti (Thru Palet)"},{"kod":"24F","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"ULD hasarı (Depo hazırlık)"},{"kod":"24G","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"ULD hasarı (Thru Palet)"},{"kod":"24H","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Tehlikeli Maddelerin hatalı hazırlanması (Depo hazırlık)"},{"kod":"24I","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Tehlikeli Maddelerin hatalı hazırlanması (Thru Palet)"},{"kod":"24J","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Hasarlı veya yanlış palet hazırlanması (Depo hazırlık)"},{"kod":"24K","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Hasarlı veya yanlış palet hazırlanması (Thru Palet)"},{"kod":"24X","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"25A","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Fazla satış/planlama"},{"kod":"25B","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Rezervasyon hataları"},{"kod":"25C","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ticari sebepler nedeni ile kargonun geç kabulü/değiştirilmesi"},{"kod":"25D","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Transit bağlantılı kargo veya posta beklenmesi"},{"kod":"25X","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"26C","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Depo yoğunluğu sebebi ile geç hazırlama"},{"kod":"26D","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçağa sevk edilen yükte değişiklik"},{"kod":"26E","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Özel kargo sebebiyle hazırlığın gecikmesi"},{"kod":"26F","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçak Tip değişikliği nedeni ile kargo hazırlığının değişmesi"},{"kod":"26G","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Bulunamayan kargo nedeniyle yeniden hazırlık"},{"kod":"26H","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Çalışan sayısının eksikliği"},{"kod":"26I","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kargo teçhizat yetersizliği/yokluğu (forklift, paletmaster, palet vb.)"},{"kod":"26J","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Sistem arızası yazılım (COMIS, workorder)"},{"kod":"26T","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Sistem arızası donanım (ASRS, PCHS, ETV)"},{"kod":"26X","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"27A","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Geç/yanlış posta figürleri"},{"kod":"27C","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Geç/yanlış posta dokümanları"},{"kod":"27D","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Sistem arızası"},{"kod":"27E","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Depo yoğunluğu sebebi ile geç hazırlama"},{"kod":"27F","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Hasarlı veya yanlış palet hazırlanması"},{"kod":"27X","sorumlu":"KONTROL DIŞI","kategori":"KARGO VE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"28A","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kaybolan posta nedeniyle yeniden yükleme"},{"kod":"28B","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Personel eksikliği/personel nedeniyle"},{"kod":"28C","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Teçhizat yetersizliği/yokluğu (Paletmaster, forklift vb.)"},{"kod":"28D","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yanlış park yerine getirme veya eksik getirme veya hiç getirilmemesi"},{"kod":"28X","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"29A","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Postanın geç kabulü-ticari nedenler"},{"kod":"29B","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yedek posta kabulü"},{"kod":"29X","sorumlu":"KONTROL DIŞI","kategori":"SADECE POSTA","katsor":"CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"31A","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Geç dokümantasyon"},{"kod":"31B","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Yanlış dokümantasyon"},{"kod":"31C","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Geç \"LOAD AND TRIM SHEET\""},{"kod":"31D","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Yanlış \"LOAD AND TRIM SHEET\""},{"kod":"31E","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"“Trim out” nedeniyle yolcu/yüklerin yer değiştirmesi"},{"kod":"31F","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"DCS’teki yanlış veri (oturma planı, “hold versiyon” vb.)"},{"kod":"31G","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Çalışan sayısının eksikliği"},{"kod":"31H","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Load plan hataları"},{"kod":"31N","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Son dakika değişiklikleri nedeniyle doküman yenilenmesi"},{"kod":"31P","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Harekat koordinatörü hatası"},{"kod":"31R","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Headset çalışanı hatası"},{"kod":"31S","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Sorumlu kaptan pilota uçuş dokümanlarının (uçuş planı, gümrük evrakları) geç teslimi"},{"kod":"31X","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"32A","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Kabin yükü, kuru yük, hacimli yük, şekilsiz yük, özel yük (HEA, PER, RRY, AVIH vb.)"},{"kod":"32B","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Geç yükleme"},{"kod":"32C","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Çalışan sayısının eksikliği"},{"kod":"32D","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Yanlış yükleme (Yük planı veya yükleme prensiplerine uygun olmayan)"},{"kod":"32E","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"ULD hasarı"},{"kod":"32F","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçak içi yükleme sistemlerinin çalışmaması"},{"kod":"32G","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Yükleme materyallerinin geç sağlanması"},{"kod":"32M","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Geç boşaltma"},{"kod":"32R","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Bagaj ayrımının hatalı yapılması veya uzun sürmesi"},{"kod":"32S","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Son dakika değişiklikleri nedeniyle yükleme değişiklikleri"},{"kod":"32T","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Varış meydanındaki ramp çalışanı /teçhizatı eksikliği"},{"kod":"32X","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"33A","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Geç teçhizat (forklift, traktör, high loader, konveyör vb.)"},{"kod":"33B","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Teçhizat eksikliği"},{"kod":"33C","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Teçhizat operatörü eksikliği"},{"kod":"33D","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Teçhizatın arızalı olması/ performansının yeterli olmaması"},{"kod":"33E","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Yanlış teçhizat"},{"kod":"33X","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.DIŞI","birim":"RAMP/ATÖLYE","aciklama":"Bu nedenle slot kaçırma"},{"kod":"34B","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Merdiven eksikliği/geç gelmesi"},{"kod":"34C","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Otobüs/midibüs eksikliği/geç gelmesi"},{"kod":"34D","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Su aracı eksikliği/geç gelmesi"},{"kod":"34E","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Foseptik aracı eksikliği/geç gelmesi"},{"kod":"34F","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Çalışan eksikliği"},{"kod":"34G","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Merdivenin arızalı olması"},{"kod":"34H","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Otobüsün/midibüsün arızalı olması"},{"kod":"34J","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Su aracının arızalı olması"},{"kod":"34K","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Foseptik aracının arızalı olması"},{"kod":"34L","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Harekat aracının arızalı olması"},{"kod":"34M","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Ambulift aracının arızalı olması"},{"kod":"34N","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Harekat aracı eksikliği/geç gelmesi"},{"kod":"34O","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Ambulift veya operatörün eksikliği/geç gelmesi"},{"kod":"34X","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.DIŞI","birim":"RAMP/ATÖLYE","aciklama":"Bu nedenle slot kaçırma"},{"kod":"35A","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Temizliği geç bitirme"},{"kod":"35B","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Eksik/yanlış temizlik teçhizatı"},{"kod":"35C","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Teçhizat arızası"},{"kod":"35D","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Çalışan sayısı eksikliği"},{"kod":"35E","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Eksik yapılan temizlikten dolayı ekibin geri çağrılması"},{"kod":"35F","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Operasyon esnasında oluşan ilave temizlik talepleri"},{"kod":"35G","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"TECH/CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kokpit camı temizliği"},{"kod":"35H","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"Operasyon tarafından uçağa yüklenen, temizlik ve uçak içi ürünlerin, uçak tipine ve sefere uygunsuz, eksik ya da geç teslimatı (uyku seti, battaniye, kulaklık, yastık vb.)"},{"kod":"35I","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"UÇAK TEMİZLİK","aciklama":"İlaçlama (geç veya hatalı)"},{"kod":"35T","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Temizlik ekibi tarafından secure cleaning uygulamasının geç bitirilmesi"},{"kod":"35W","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Hava durumundan dolayı ilave temizlik"},{"kod":"35X","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"36A","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yakıt ikmal aracı olmaması/yetersiz olması"},{"kod":"36B","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yakıt ikmal aracının geç gelmesi"},{"kod":"36C","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Operasyon esnasında yakıt ikmal aracının arızalanması"},{"kod":"36D","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Geç yakıt çekilmesi"},{"kod":"36E","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Çalışan sayısı eksikliği"},{"kod":"36F","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yakıt ikmal hatası"},{"kod":"36G","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Teknik nedenlerden dolayı özel prosedür uygulanması"},{"kod":"36H","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yakıt Hidrant Sistemi"},{"kod":"36I","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Off-spec/kontamine yakıt olması"},{"kod":"36J","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yakıtın taşması"},{"kod":"36K","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçağın yanlış park etmesinden dolayı yakıt alınamaması"},{"kod":"36L","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yakıt alımının emniyet gerekçesiyle uzun sürmesi"},{"kod":"36M","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Varış meydanındaki yakıt sağlayıcı ile ilgili tüm problemler"},{"kod":"36X","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"FUEL","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"37C","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"İkram teçhizatının arızalanması"},{"kod":"37D","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"İkramın geç gelmesi/geç yüklenmesi veya boşaltılması"},{"kod":"37E","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yanlış ya da yetersiz ikram yüklenmesi [kabin malzemeleri dâhil (gazete, relax set, amenity kit vb.)]"},{"kod":"37G","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Dönüş ikramının eksik yüklenmesi"},{"kod":"37H","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçağa yüklenecek Inflight malzemelerin depodan eksik veya geç teslim edilmesi (uyku seti, battaniye, kulaklık, yastık vb.)"},{"kod":"37R","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçak değişikliği nedeniyle ikram yüklemesinin değişmesi"},{"kod":"37S","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçağın yerde kalış süresinin ikram anlaşmasında bulunan ikram yükleme süresinin altında kalması"},{"kod":"37T","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"“Flying chef” ve “Flying service chef” uygulaması kapsamında yaşanan gecikmeler"},{"kod":"37U","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"“Flying chef” ve “Flying service chef” hastalanması veya yaralanması"},{"kod":"37X","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"CTRG","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"38A","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"ULD eksikliği"},{"kod":"38B","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Hasarlı veya hizmet dışı ULD"},{"kod":"38C","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Handling birimine geç ULD tedariki"},{"kod":"38X","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"39A","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"GPU eksikliği/geç gelişi/yeterli gelmemesi"},{"kod":"39B","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"De-icing aracı eksikliği/geç gelişi"},{"kod":"39C","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Towbar eksikliği/geç gelişi"},{"kod":"39D","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Air starter aracı eksikliği/geç gelişi/yeterli gelmemesi"},{"kod":"39E","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Air conditioner aracı eksikliği/geç gelişi/yeterli gelmemesi"},{"kod":"39F","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Push-back aracı eksikliği/geç gelişi"},{"kod":"39G","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Çalışan sayısı eksikliği"},{"kod":"39H","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Diğer teknik teçhizatın eksikliği/geç gelişi"},{"kod":"39I","sorumlu":"KONTROL DIŞI","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Varış meydanında teçhizat eksikliği"},{"kod":"39J","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"GPU'nun arızalı olması"},{"kod":"39K","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"De-icing aracının arızalı olması"},{"kod":"39L","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Towbar'ın arızalı olması"},{"kod":"39M","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Air starter aracının arızalı olması"},{"kod":"39N","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Air conditioner aracının arızalı olması"},{"kod":"39O","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"ATÖLYE","aciklama":"Push-back aracının arızalı olması"},{"kod":"39P","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Diğer teknik teçhizatın arızalı olması"},{"kod":"39X","sorumlu":"TGS","kategori":"UÇAK RAMP HİZ.","katsor":"GOPS/CRGO","kdisi":"K.DIŞI","birim":"RAMP","aciklama":"Bu nedenle slot kaçırma"},{"kod":"41A","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçak sistemleri ve motor arızaları"},{"kod":"41B","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kabin içi teçhizat arızaları (koltuk, galley vb.)"},{"kod":"41C","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçak içi eğlence cihazları arızaları"},{"kod":"41D","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçak yükleme sistem arızası"},{"kod":"41E","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Gidiş donanım beklemesi"},{"kod":"41N","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kabin-kokpit arıza defteri beklenmesi"},{"kod":"41O","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"MEL veya CDL oluru beklenmesi (go to)"},{"kod":"41P","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"MEL durumunun değişmesi (go-to dan no-go ya geçiş)"},{"kod":"41Q","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Çalışan sayısı eksikliği"},{"kod":"41R","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"“Emergency equipment” ların arızalı olması/tekrar doldurulması"},{"kod":"41S","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Teknik dokümanların kaybolması"},{"kod":"41T","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Teknik arızanın teknisyen tarafından geç bildirilmesi"},{"kod":"41V","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Arıza nedeni ile yapılan Return to Ramp"},{"kod":"41X","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"42A","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Geç dokümantasyon"},{"kod":"42B","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Bakımdan geç teslim"},{"kod":"42X","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"43A","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Çalışan yetersizliği"},{"kod":"43B","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Geç dokümantasyon"},{"kod":"43C","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Periyot dışı özel bakımlar"},{"kod":"43N","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yerde yapılan check işleminin geç yapılması"},{"kod":"43P","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Lastik/fren değişimi"},{"kod":"43X","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"44A","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yedek parça eksikliği"},{"kod":"44B","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Bakım teçhizatının eksikliği ya da bozulması"},{"kod":"44C","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yedek parça geç teslimi (depodan geç çekim)"},{"kod":"44N","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Mefruşat eksikliği (koltuk kılıfı, perde vb.)"},{"kod":"44Q","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Depodan gelen parçanın uygun olmaması"},{"kod":"44X","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"45A","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yedek parçanın uçağa geç gönderimi/geç gelmesi"},{"kod":"45B","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"AOG parçaların dokümanlarının geç/yanlış gelmesi"},{"kod":"45D","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Parçanın uçağa yüklenmesi/uçağın tekrar yüklenmesi"},{"kod":"45F","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Third Party için AOG"},{"kod":"45N","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Arızalı uçağın bulunduğu istasyona teknik çalışan gönderilmesi"},{"kod":"45X","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"46E","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Planlı bakımdan (Harf Bakımı ve slotu önden girilmiş MEL & Hold Item giderim işlemleri dahil) geç teslim nedeniyle uçak değişikliği"},{"kod":"46N","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Teknik arıza veya plansız arıza bakımından (Arıza AOG süreçlerinin uzaması veya slotu önden girilmemiş MEL giderim işlemleri dahil) geç teslim nedeniyle uçak değişikliği"},{"kod":"46X","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"47A","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yedek uçak"},{"kod":"47X","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"48A","sorumlu":"TGS","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH/GOPS","kdisi":"K.İÇİ","birim":"HAREKAT","aciklama":"Kabin ayırıcı/yer düzenlenmesi (C/CL perde ve koltuk ayarı)"},{"kod":"48B","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Sedye kurulması"},{"kod":"48C","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH/MDCL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Tıbbi teçhizat"},{"kod":"48D","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekip istirahat yeri"},{"kod":"48X","sorumlu":"KONTROL DIŞI","kategori":"TEKNİK VE UÇAK EKİPMANLARI","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"51A","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yıldırım çarpması"},{"kod":"51B","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kuş çarpması"},{"kod":"51C","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş esnasında diğer hasarlanmalar (kargo ve bagaj hasarlamaları dâhil)"},{"kod":"51D","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kötü/ hava koşulları nedeniyle"},{"kod":"51E","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Fazla yüklenme (sert iniş)"},{"kod":"51F","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Taksi sırasında çarpışma"},{"kod":"51G","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçağın pistten ya da taksi yolundan çıkması"},{"kod":"51H","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"FOD hasarı"},{"kod":"51I","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçağın kokpit ekibi tarafından hasarlanması"},{"kod":"51J","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçağın yolcu tarafından hasarlanması (tuvalet ve lavabo tıkanması dâhil)"},{"kod":"51K","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçağın frenlerinin soğuması"},{"kod":"51L","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçağın geliş istasyonundan hasarlı gelmesi"},{"kod":"51M","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçağın kabin ekibi tarafından hasarlanması"},{"kod":"51N","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havada hasarlanmadan dolayı uçak değişikliği"},{"kod":"51U","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Kuş çarpması nedeni ile yapılan Return to Ramp"},{"kod":"51V","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Yıldırım çarpması nedeni ile yapılan Return to Ramp"},{"kod":"51X","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"52A","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"GOPS/TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Çarpışma (taksi hariç), çekme sırasında hasarlanması"},{"kod":"52B","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"IOCC/GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kötü hava koşulları nedeniyle hasarlanması"},{"kod":"52C","sorumlu":"TGS","kategori":"UÇAK HASARLANMA","katsor":"GOPS","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Yer teçhizatı ve apron araçları tarafından hasarlanması"},{"kod":"52D","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"ARPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Köprü tarafından hasarlanması"},{"kod":"52F","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"FUEL","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yakıt teçhizatı tarafından hasarlanması"},{"kod":"52G","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Teknik destek teçhizatı tarafından hasarlanması"},{"kod":"52H","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"CTRG","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"İkram teçhizatı tarafından hasarlanması"},{"kod":"52I","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçağın yerde kokpit ekibi tarafından hasarlanması"},{"kod":"52K","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"SFTY","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kazara kaçış slide’ının açılması (düşmesi, patlaması)"},{"kod":"52M","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçağın yerde kabin ekibi tarafından hasarlanması"},{"kod":"52N","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"TECH","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Teknik çalışan tarafından hasarlanması"},{"kod":"52P","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yerde hasarlanma nedeniyle uçak değişikliği"},{"kod":"52X","sorumlu":"KONTROL DIŞI","kategori":"UÇAK HASARLANMA","katsor":"TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"55A","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Local DCS arızaları (TROYA hariç)"},{"kod":"55B","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"DCS host arızası"},{"kod":"55C","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Host/network arızası"},{"kod":"55D","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Lokal network arızası"},{"kod":"55E","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Self servis cihazlarının arızalanması"},{"kod":"55F","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Üçüncü taraf firmaların sebep olduğu sistem aksaklıkları"},{"kod":"55N","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Trafik sistem arızası (check-in, boarding, APIS vb.)"},{"kod":"55O","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Harekat sistem arızası"},{"kod":"55P","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Bagaj eşleştirme sistem arızası"},{"kod":"55S","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Operasyon takip sistemleri arızası"},{"kod":"55T","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Bilet satış/rezervasyon sistem arızası"},{"kod":"55U","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Haberleşme sistem arızası"},{"kod":"55X","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"56A","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Lokal teçhizat arızaları"},{"kod":"56B","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Host/network arızası"},{"kod":"56D","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Lokal network arızası"},{"kod":"56E","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Otomatik gümrük muayene sistem arızası"},{"kod":"56X","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"57A","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Lokal teçhizat arızaları"},{"kod":"57B","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Host/network arızası"},{"kod":"57D","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Lokal network arızası"},{"kod":"57E","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"ATC Sistemi ile iletişim aksaklıkları"},{"kod":"57X","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"58A","sorumlu":"TGS","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"GOPS","kdisi":"K.DIŞI","birim":"ITEC","aciklama":"Handling firmasının kullandığı kendine ait sistem hatası veya arızası"},{"kod":"58B","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Diğer sistem hataları veya arızaları (Teknik, ikram, yakıt vb.)"},{"kod":"58C","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Acars arızası"},{"kod":"58X","sorumlu":"KONTROL DIŞI","kategori":"EDP/OTOM. EKİPMAN ARIZALARI","katsor":"ITEC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"61A","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"FMS – OFP uyuşmazlığı nedeniyle ilave yakıt ikmal talebi"},{"kod":"61B","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Dispeç uçuş dokümanlarının geç veya hatalı tamamlanması/gönderilmesi, geç \"release\""},{"kod":"61D","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Operasyon başladıktan sonra ATC uçuş planının geç bildirilmesi veya hatalı bildirilmesi/geç güncellenmesi"},{"kod":"61F","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Brifingden sonra operasyonel sebeplerle uçuş planı değişikliği (release)"},{"kod":"61G","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Çalışan sayısı eksikliği"},{"kod":"61H","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçak hard copy doküman eksikliği (MEL, QRH, FCOM vb.)"},{"kod":"61X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"62B","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC/GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Son ağırlığın beklenmesi (yakıt kritik uçuşlar)"},{"kod":"62D","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC/CCPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Brifing sonrasında operasyonel sebeplerle yakıt değişimi"},{"kod":"62E","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC/CCPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Brifing sonrasında operasyonel sebeplerle yük değişimi"},{"kod":"62M","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Planlamadan sonra son anda meydana gelen ağırlık değişimleri"},{"kod":"62N","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş işletme talimatları"},{"kod":"62X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"63A","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Tüm ekibin uçağa geç gelişi"},{"kod":"63B","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kokpit ekibinin uçağa geç gelişi"},{"kod":"63C","sorumlu":"TGS","kategori":"UÇUŞ OPR. VE EKİP","katsor":"GOPS","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Ekip aracı nedeniyle tüm ekibin uçağa geç gelmesi"},{"kod":"63D","sorumlu":"TGS","kategori":"UÇUŞ OPR. VE EKİP","katsor":"GOPS","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Ekip aracı nedeniyle kokpit ekibinin uçağa geç gelmesi"},{"kod":"63F","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CBN","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanı ulaşım/giriş yoğunluğu/kapalılık"},{"kod":"63G","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Güvenlik usulleri (tüm ekip brifingi vb.)"},{"kod":"63H","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçuş öncesi tüm ekip sorumluluğundaki işlemler"},{"kod":"63J","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçuş öncesi kokpit ekibinin sorumluluğundaki işlemler"},{"kod":"63K","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekibin havalimanına geç intikali (Ekip aracı hazır olmadığı durumlarda)"},{"kod":"63L","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekibin havalimanına geç intikali (Ekip aracı hazır olmasına rağmen)"},{"kod":"63M","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Geliş ekibinin uçağı geç teslimi"},{"kod":"63X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CBN","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"64A","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Hastalık/yaralanma"},{"kod":"64B","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yedek ekip beklenmesi"},{"kod":"64C","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Operasyonel aksaklık sebebi ile uçuş zamanı sınırlandırması"},{"kod":"64D","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Seyahat evrakları"},{"kod":"64E","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekip planlaması veya ekip kontrol hatası"},{"kod":"64H","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"IOCC/CCPT/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Operasyonel oranlama yetersizliği (CAT 1- CAT 2 vb.)"},{"kod":"64R","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Operasyonel aksaklık sebebi ile zorunlu/minimum ekip dinlenme süresi"},{"kod":"64V","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CRWP","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Kokpit ekibi görev süresinin aşılması nedeni ile yapılan Return to Ramp"},{"kod":"64X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"65A","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekip tarafından yolcu boarding anonsunun bekletilmesi"},{"kod":"65B","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Minimum Teçhizat Listesi’nde olmayan bakım kontrolleri"},{"kod":"65C","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Özel veya ilave ikram talebi"},{"kod":"65D","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Bildirilmiş teknik arızanın mevcudiyetinin teşhis edilememesi"},{"kod":"65E","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Arızanın geç bildirilmesi"},{"kod":"65N","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kokpitin (harekat, dispatch oluruna rağmen) değişiklik talebi"},{"kod":"65O","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekip yakınlarının yedek, pass problemleri"},{"kod":"65P","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Hasta yolcu kabul şartlarına uygun yolcunun kabul edilmemesi"},{"kod":"65R","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kokpit ekibinin özel sebeplerle uçuştan ayrılma ya da uçuş ekibinde değişiklik talebi"},{"kod":"65S","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Geç clearance (Pushback ve motor çalıştırma) talebi"},{"kod":"65T","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Alıştırma/kontrol uçuşu kaynaklı gecikmeler"},{"kod":"65X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"65Y","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kokpit ekibi tarafından harekat koordinatörüne teslim edilecek dokümanların geç teslimi"},{"kod":"65Z","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Diğer nedenler"},{"kod":"66A","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kabin ekibi geç gelişi"},{"kod":"66B","sorumlu":"TGS","kategori":"UÇUŞ OPR. VE EKİP","katsor":"GOPS","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Ekip aracı nedeniyle kabin ekibinin uçağa geç gelmesi"},{"kod":"66D","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanı ulaşım/giriş yoğunluğu/kapalılık"},{"kod":"66E","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Güvenlik usulleri (kabin ekibi brifingi vb.)"},{"kod":"66F","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekibin havalimanına geç intikali (Ekip aracı hazır olmadığı durumlarda)"},{"kod":"66G","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekibin havalimanına geç intikali (Ekip aracı hazır olmasına rağmen)"},{"kod":"66H","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçuş öncesi kabin ekibi sorumluluğundaki işlemler"},{"kod":"66X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"67A","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Hastalık/yaralanma"},{"kod":"67B","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yedek ekip beklenmesi"},{"kod":"67C","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş zamanı sınırlandırması"},{"kod":"67D","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Seyahat evrakları eksikliği"},{"kod":"67E","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekip planlaması veya ekip kontrol hatası"},{"kod":"67R","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Zorunlu/minimum ekip dinlenme süresi"},{"kod":"67V","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CRWP","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Kabin ekibi görev süresinin aşılması nedeni ile yapılan Return to Ramp"},{"kod":"67X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN/CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"68A","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Belirlenmiş sürelerden uzun süren yolcu sayımı"},{"kod":"68B","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yanlış/geç talep-ikram"},{"kod":"68C","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yanlış/geç talep-tuvalet servisi"},{"kod":"68D","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yanlış/geç talep-temizlik"},{"kod":"68E","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Tahliye şutu açılması (slide)"},{"kod":"68G","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Belirlenmiş sürelerden uzun süren uçak güvenlik araması (ASSC) işlemi"},{"kod":"68H","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Ekipman (acil durum malzemeleri) kontrolünün belirlenen süreden uzun sürmesi"},{"kod":"68O","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Standart olmayan ihtiyaçların talebi (battaniye, kulaklık vb.)"},{"kod":"68R","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kabin ekibinin özel sebeplerle uçuştan ayrılma ya da uçuş ekibinde değişiklik talebi"},{"kod":"68S","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Arızanın geç bildirilmesi"},{"kod":"68T","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"FLTD","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Alıştırma/kontrol uçuşu kaynaklı gecikmeler"},{"kod":"68X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CBN","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"69A","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Sorumlu kaptan pilotun güvenlik araması isteği"},{"kod":"69X","sorumlu":"KONTROL DIŞI","kategori":"UÇUŞ OPR. VE EKİP","katsor":"CCPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"71A","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçak limitleri dışında"},{"kod":"71B","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ekip limitleri dışında (CAT 1, CAT 2 vb.)"},{"kod":"71R","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Operasyonel limitler dışındaki hava durumu"},{"kod":"71V","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Kalkış meydanındaki hava durumu nedeni ile yapılan Return to Ramp"},{"kod":"71X","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"72A","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçak limitleri dışında"},{"kod":"72B","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ekip limitleri dışında (CAT 1, CAT 2 vb.)"},{"kod":"72R","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Operasyonel limitler dışındaki hava durumu"},{"kod":"72V","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Varış meydanındaki hava durumu nedeni ile yapılan Return to Ramp"},{"kod":"72X","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"73A","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçak limitleri dışında"},{"kod":"73B","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ekip limitleri dışında (CAT 1, CAT 2 vb.)"},{"kod":"73R","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Operasyonel limitler dışındaki hava durumu"},{"kod":"73X","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ETOPS (A/C tipine göre 2 ve 4 motor inebilecek meydanlar)"},{"kod":"73Y","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ekip limitleri dışında (CAT 1, CAT 2 vb.)"},{"kod":"73Z","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçak limitleri dışında"},{"kod":"75A","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Pist başı cep’te De-icing/Anti-icing işlemi uygulanması"},{"kod":"75B","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Park yerinde De-icing/Anti-icing işlemi uygulanması"},{"kod":"75C","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Koruma süresinin (HOT) aşılması durumunda tekrar De-icing/Anti-icing işlemi uygulaması"},{"kod":"75E","sorumlu":"TGS","kategori":"HAVA","katsor":"GOPS","kdisi":"K.DIŞI","birim":"RAMP","aciklama":"Teçhizat arızası"},{"kod":"75F","sorumlu":"TGS","kategori":"HAVA","katsor":"GOPS","kdisi":"K.İÇİ","birim":"RAMP","aciklama":"Çalışan yetersizliği"},{"kod":"75G","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Sıvıların yetersizliği"},{"kod":"75H","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"GOPS/TECH","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Fan blade’lerin kar ve buzdan temizlenmesi"},{"kod":"75X","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"76A","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kötü hava koşulları nedeniyle havalimanının kapanması"},{"kod":"76B","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Hava koşullarından dolayı park yeri olmaması"},{"kod":"76C","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanından kar, buz, su ve kum temizlenmesi"},{"kod":"76X","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"77A","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yakıt veya hizmetin kesilmesi"},{"kod":"77B","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Apron koşulları"},{"kod":"77C","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Güçlü rüzgârlar-kapı operasyon limitleri"},{"kod":"77X","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"81G","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer"},{"kod":"81W","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Hava durumu"},{"kod":"81X","sorumlu":"KONTROL DIŞI","kategori":"HAVA","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Çevresel sorunlar"},{"kod":"81Y","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Fazla talep veya kapasite"},{"kod":"81Z","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ATC yol boyu kısıtlamalar"},{"kod":"82V","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Özel olaylar"},{"kod":"82W","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Askeri harekat"},{"kod":"82X","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş güzergahındaki çalışan yetersizliği"},{"kod":"82Y","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş güzergâhındaki ekipman kapasitesinin düşük/arızalı olması (radar, vor vb.)"},{"kod":"82Z","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Endüstriyel hareketler"},{"kod":"83G","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer"},{"kod":"83L","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Politik huzursuzluk"},{"kod":"83O","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanı/pist kapalılığı"},{"kod":"83P","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Fazla talep/Havalimanı olanakları"},{"kod":"83S","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Gece uçuş/gürültü kısıtlaması"},{"kod":"83T","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Özel olaylar"},{"kod":"83U","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Askeri harekat"},{"kod":"83V","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kaza/olay"},{"kod":"83W","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Çalışan yetersizliği"},{"kod":"83X","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ekipman arızaları"},{"kod":"83Y","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Endüstriyel hareketler (grev vb.)"},{"kod":"83Z","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Fazla talep/ATC kapasitesi"},{"kod":"84A","sorumlu":"KONTROL DIŞI","kategori":"HAVA TRAFİK AKIŞ YÖN","katsor":"ATFM","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ATFM-varış meydanı hava durumu"},{"kod":"85A","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Güvenlik noktasında yoğunluk"},{"kod":"85B","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Bagaj eşleştirme boarding’e müracaat etmeyen veya uçağa bindikten sonra inen yolcunun bagajının indirilmesi"},{"kod":"85C","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ekstra/özel havaalanı güvenliği buluntu/sahipsiz paketler"},{"kod":"85D","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bomba ihbarı"},{"kod":"85E","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Güvenlik ihlali"},{"kod":"85F","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Özel/ilave güvenlik araştırmaları"},{"kod":"85G","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Zorunlu yolcu indirimi"},{"kod":"85H","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Çalışan yetersizliği"},{"kod":"85I","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Teçhizat arızaları (bilgisayar, x-ray arızaları)"},{"kod":"85N","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçağa binmeden önce son kontrol noktasındaki güvenliğin geç açılması"},{"kod":"85O","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Güvenlik uyuşmazlıkları"},{"kod":"85P","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havaalanı içerisinde özel güvenlik gereksinimleri (yolcu-bagaj-el bagajı)"},{"kod":"85Q","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Havacılık güvenlik operasyon çalışanı geç gelişi, eleman yetersizliği veya hatası"},{"kod":"85R","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Türk Hava Yolları Havacılık güvenlik operasyon çalışanı geç gelişi, yetersizliği veya hatası"},{"kod":"85S","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Şüpheli paket nedeniyle güvenlik araması (uçak içerisinde)"},{"kod":"85T","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçak altında bagajların x-ray’den geçmesi"},{"kod":"85U","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yolcuya ait elektronik cihazların koltuk arasına düşmesi/sıkışması"},{"kod":"85V","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Güvenlik nedeni ile yapılan Return to Ramp"},{"kod":"85X","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"SECR","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"86A","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Göçmen (pasaport)/gümrük altyapı sistemi"},{"kod":"86B","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Çalışan yetersizliği"},{"kod":"86C","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Sağlık"},{"kod":"86D","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uygun olmayan/yetersiz dokümanlar ile seyahat eden yolcu (INAD/Deporte vb.)"},{"kod":"86E","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Gelen/giden yolcu kontrolü"},{"kod":"86F","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Uçak ilaçlanması"},{"kod":"86G","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçak gümrük işlemleri"},{"kod":"86H","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Karantina"},{"kod":"86J","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Pasaport yoğunluğu"},{"kod":"86N","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Dâhili/transfer bagajların gümrük tarafından kontrolü"},{"kod":"86O","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Pasaport bilgisayar sistem arızası"},{"kod":"86T","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Geç Deporte/INAD yolcu boarding’i"},{"kod":"86U","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Canlı organ sevki"},{"kod":"86X","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"87G","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer"},{"kod":"87H","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Push-back için follow-me araçlarının geç gelmesi veya yetersiz olması"},{"kod":"87I","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Körük operatörü olmaması/geç gelmesi"},{"kod":"87J","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanı yakıt sistemlerinin arızalanması"},{"kod":"87K","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"İnşaat nedeniyle push-back clearance verilmemesi"},{"kod":"87L","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yer iletişim sistem arızası"},{"kod":"87M","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yetersiz yangın söndürücü"},{"kod":"87N","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş bilgi görüntüleme sistem arızası"},{"kod":"87P","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yolcu ulaşım sistem arızası"},{"kod":"87Q","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Temiz su operatörünün olmaması/geç gelmesi"},{"kod":"87R","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Elektrik sistem arızası"},{"kod":"87S","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Check-in kontuarlarının yetersiz olması"},{"kod":"87T","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Köprü arızası"},{"kod":"87U","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Altyapı yetersizliğinden push-back yapılamaması"},{"kod":"87V","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bagaj Ayırma Sistemi arızası (durma ve yavaşlama) (şut sorter arızası)"},{"kod":"87W","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Kapı sınırlandırmaları/kapı olmaması"},{"kod":"87X","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Binalar"},{"kod":"87Y","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ramp karışıklığı"},{"kod":"87Z","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Park yeri olmaması"},{"kod":"88A","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Sokağa çıkma yasağı sebebiyle kısıtlamalar"},{"kod":"88B","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Endüstriyel hareket (grev vb.)"},{"kod":"88C","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Politik huzursuzluk"},{"kod":"88D","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanı kapalılığı"},{"kod":"88E","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Pist kapalılığı"},{"kod":"88F","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Varış meydan iniş izinlerinin beklenmesi"},{"kod":"88N","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Gürültü kısıtlamaları"},{"kod":"88O","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Çalışan yetersizliği"},{"kod":"88P","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Gece uçuşu kısıtlamaları"},{"kod":"88Q","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Özel uçuşlar (VIP, askeri, kutlama amaçlı vb.)"},{"kod":"89F","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"“De-icing” sıralandırması"},{"kod":"89G","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer"},{"kod":"89H","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"İnşaat işleri/bakım"},{"kod":"89I","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Altyapı dışı bir nedenle geç pushback verilmesi"},{"kod":"89J","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kayıp uçuş planları"},{"kod":"89K","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Lokal ATC kaynaklı start-up/push-back clearance gecikmesi"},{"kod":"89L","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Pist/taxi yolu kapalılığı"},{"kod":"89M","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanı kapalılığı"},{"kod":"89N","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ATC çevresel"},{"kod":"89O","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Çevre Menfaati, Standart Taksi Süresinin Kısıtlanması Nedeniyle Gecikmeli Motor Çalıştırma/Pushback"},{"kod":"89P","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Politik huzursuzluk"},{"kod":"89R","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havaalanı yasaklamalarından dolayı ATC kısıtlaması"},{"kod":"89S","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ATC hava durumu"},{"kod":"89T","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ATC özel olay"},{"kod":"89U","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Askeri hareketlilik/Özel uçuşlar/VIP"},{"kod":"89V","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ATC kaza/olay"},{"kod":"89W","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ATC ekipman"},{"kod":"89X","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"ATC çalışanı"},{"kod":"89Y","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Endüstriyel hareket (grev vb.)"},{"kod":"89Z","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"ARPT","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"ATC talep/kapasitesi"},{"kod":"91N","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Bağlantılı yolcu ve bagaj beklenmesi"},{"kod":"91O","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Bağlantılı kargo veya posta beklenmesi"},{"kod":"91P","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Short connection (yolcu/bagaj)"},{"kod":"91R","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Marketing Carrier olduğumuz uçuştan yolcu ve bagaj beklenmesi"},{"kod":"91S","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yüklerin geliş istasyondan hatalı yüklenmesi/hatalı mesaj çekilmesi"},{"kod":"91T","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Transfer yolcu/bagaj yönetimi hataları"},{"kod":"91X","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"92A","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Through check-in işlemi yapılmaması-yanlış transit/transfer yolcu ve bagaj figürleri"},{"kod":"92B","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Transit/transfer yüklerin yanlış (karışık) yüklenmesi"},{"kod":"92N","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Check-in işlemi hatası-yolcu ve bagaj"},{"kod":"92O","sorumlu":"KONTROL DIŞI","kategori":"YOLCU VE BAGAJ","katsor":"GOPS","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Check-in işlemi hatası-yolcu ve bagaj (yetersiz doküman)"},{"kod":"92X","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"GOPS","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"93U","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"REAC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Teknik nedenlerden dolayı uçağın geç varışı"},{"kod":"93V","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"REAC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Varış istasyonundaki hava durumundan dolayı uçağın geç varışı"},{"kod":"93W","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"REAC","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Varış istasyonundaki fazla kapasite talebinden ve/veya kısıtlamalardan dolayı uçağın geç varışı"},{"kod":"93X","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"REAC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"İnişten sonra yaşanan gecikmeden dolayı uçağın geç varışı"},{"kod":"93Y","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"REAC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yol boyundan dolayı uçağın geç varışı"},{"kod":"93Z","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"REAC","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Bir önceki istasyonda kalkışta yaşanan gecikmeden dolayı uçağın geç varışı"},{"kod":"94A","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Seferin kendi kabin ekibinin beklenmesi"},{"kod":"94B","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Seferden pass kabin ekibi/ekipleri beklenmesi"},{"kod":"94X","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"95A","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Seferin kendi tüm ekibinin beklenmesi"},{"kod":"95B","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Seferden pass ekip beklenmesi (tüm ekip)"},{"kod":"95C","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"CRWP","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Seferin kendi kokpit ekibinin beklenmesi"},{"kod":"95X","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"CRWP","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"96A","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçuş rotası değişikliği"},{"kod":"96B","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçuşların birleştirilmesi (tevhid)"},{"kod":"96C","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Uçak/teçhizat değişikliği-teknik neden dışı"},{"kod":"96D","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Divert"},{"kod":"96E","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Yerde kalış süresinin, belirlenen minimum yerde kalış süresinden daha az olarak tekrar planlanması"},{"kod":"96G","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Kontroller/planlayıcı hatası"},{"kod":"96S","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Teknik arıza veya hasar nedeniyle ikincil sebep oluşması"},{"kod":"96T","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.İÇİ","birim":"DİĞER","aciklama":"Zorunlu operasyonel değişiklik veya planlama"},{"kod":"96V","sorumlu":"KONTROL DIŞI","kategori":"HAVALİMANI VE HÜKÜMET YETK.","katsor":"IOCC","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"IOCC kararı nedeni ile yapılan Return to Ramp"},{"kod":"96X","sorumlu":"KONTROL DIŞI","kategori":"ZİNCİRLEME","katsor":"IOCC","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"97A","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yerel istasyon bünyesinde"},{"kod":"97B","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Tüm şirket bünyesinde"},{"kod":"97C","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yolcu hizmetleri/handling bünyesinde"},{"kod":"97D","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ramp hizmetleri/handling bünyesinde"},{"kod":"97E","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kargo bünyesinde"},{"kod":"97F","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"İkram bünyesinde"},{"kod":"97G","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş kokpit ekibi bünyesinde"},{"kod":"97H","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Uçuş kabin ekibi bünyesinde"},{"kod":"97I","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Teknik birim bünyesinde"},{"kod":"97J","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Destek birimleri"},{"kod":"97K","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yakıt şirketi bünyesinde"},{"kod":"97L","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer operasyonel faaliyetler"},{"kod":"97X","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"98A","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ulusal grev"},{"kod":"98B","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Handling şirketinin tüm birimleri"},{"kod":"98C","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yolcu hizmetleri/handling"},{"kod":"98D","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Ramp hizmetleri/handling"},{"kod":"98E","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Kargo"},{"kod":"98F","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"İkram"},{"kod":"98G","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Teknik"},{"kod":"98H","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Temizlik"},{"kod":"98I","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Destek birimleri"},{"kod":"98J","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Yakıt"},{"kod":"98K","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer operasyonel faaliyetler"},{"kod":"98L","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Güvenlik"},{"kod":"98M","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"İtfaiye"},{"kod":"98N","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Otoriteler"},{"kod":"98O","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Havalimanı"},{"kod":"98X","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Bu nedenle slot kaçırma"},{"kod":"99A","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"KONTROL DIŞI","kdisi":"K.DIŞI","birim":"DİĞER","aciklama":"Diğer nedenler"},{"kod":"99V","sorumlu":"KONTROL DIŞI","kategori":"ÇEŞİTLİ","katsor":"NULL","kdisi":"K.DIŞI","birim":"KONTROL DIŞI","aciklama":"Diğer sebeplerle yapılan Return to Ramp"},{"kod":"N/A","sorumlu":"TEHİR YOK","kategori":"TEHİR YOK","katsor":"TEHİRYOK","kdisi":"-","birim":"DİĞER","aciklama":"#N/A"}];
+var codes;
+try{ var s=localStorage.getItem(KEY); codes = s ? JSON.parse(s) : DEFAULTS.slice(); }catch(e){ codes = DEFAULTS.slice(); }
+if(!Array.isArray(codes)) codes = DEFAULTS.slice();
+var isAdmin=false;
+var $=function(i){return document.getElementById(i)};
 
-const SEED=parseTsv($("veri").textContent);
-let data=SEED,over=false,map;
-try{const s=localStorage.getItem("tehir-data");if(s){const d=JSON.parse(s);if(Array.isArray(d)){data=d;over=true}}}catch(e){}
-function save(){try{localStorage.setItem("tehir-data",JSON.stringify(data))}catch(e){}}
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(codes)); }catch(e){} }
+function esc(t){ var d=document.createElement("div"); d.textContent=t==null?"":t; return d.innerHTML; }
+function norm(t){ return (t||"").toLocaleUpperCase("tr").trim(); }
 
-function build(){map=new Map();data.forEach(r=>map.set(norm(r[0]),r));
- $("info").textContent=!data.length?"Liste boş":data.length+" tehir kodu"+(over?" (bu cihazda değiştirilmiş liste)":"");
- one()}
-function one(){const k=norm($("q").value),o=$("out");
- if(!k){o.innerHTML="";return}
- const r=map.get(k);
- o.innerHTML=r?'<div class="res"><div class="row"><b>TEHİR KODU</b><span>'+esc(r[0])+'</span></div><div class="row"><b>SORUMLU</b><span>'+esc(r[1])+'</span></div><div class="row"><b>BİRİM</b><span>'+esc(r[2])+'</span></div><div class="row"><b>AÇIKLAMA</b><span>'+esc(r[3])+'</span></div></div>':'<div class="none">Bulunamadı: '+esc($("q").value.trim())+'</div>'}
-$("q").oninput=one;
+function render(){
+  $("count").textContent = codes.length + " tehir kodu";
+  var q = norm($("q").value), out = $("out");
+  if(!q){ out.innerHTML=""; return; }
+  var exact = codes.find(function(c){ return norm(c.kod)===q; });
+  if(exact){
+    out.innerHTML = "<table><tr><th>TEHİR KODU</th><td>"+esc(exact.kod)+"</td></tr><tr><th>SORUMLU</th><td>"+esc(exact.sorumlu)+"</td></tr><tr><th>BİRİM</th><td>"+esc(exact.birim)+"</td></tr><tr><th>AÇIKLAMA</th><td>"+esc(exact.aciklama)+"</td></tr></table>";
+    fillForm(exact); return;
+  }
+  var m = codes.filter(function(c){ return norm(c.kod).indexOf(q)===0 || norm(c.aciklama).indexOf(q)>-1; }).slice(0,30);
+  if(!m.length){ out.innerHTML = '<div class="msg">Kayıt bulunamadı.</div>'; return; }
+  out.innerHTML = '<div class="list">'+m.map(function(c,i){ return '<div class="item" data-k="'+esc(c.kod)+'"><b>'+esc(c.kod)+'</b><span>'+esc(c.birim)+' · '+esc(c.aciklama)+'</span></div>'; }).join("")+'</div>';
+}
+function fillForm(c){ $("f_kod").value=c.kod; $("f_sor").value=c.sorumlu; $("f_bir").value=c.birim; $("f_ack").value=c.aciklama; }
 
-$("adm").onclick=()=>{if(!$("panel").hidden)return;$("login").hidden=!$("login").hidden;$("pw").focus()};
-$("ok").onclick=()=>{if($("pw").value==="1453"){$("login").hidden=true;$("panel").hidden=false;$("pw").value="";$("msg").textContent=""}else $("msg").textContent="Şifre yanlış."};
-$("pw").onkeydown=e=>{if(e.key==="Enter")$("ok").click()};
-$("exit").onclick=()=>{$("panel").hidden=true;$("msg").textContent=""};
+$("q").addEventListener("input", render);
+function aramaAck(){
+  var w = norm($("q2").value).replace(/\s+/g," "), o = $("out2");
+  if(!w){ o.innerHTML=""; return; }
+  var m = codes.filter(function(c){ return norm(c.aciklama).replace(/\s+/g," ").indexOf(w)>-1; });
+  if(!m.length){ o.innerHTML='<div class="msg">Kayıt bulunamadı.</div>'; return; }
+  o.innerHTML = '<div class="msg">'+m.length+' sonuç'+(m.length>100?' (ilk 100 gösteriliyor)':'')+'</div><div style="overflow-x:auto"><table class="rt"><tr><th>TEHİR KODU</th><th>SORUMLU</th><th>BİRİM</th><th>AÇIKLAMA</th></tr>'+
+    m.slice(0,100).map(function(c){ return '<tr data-k="'+esc(c.kod)+'"><td><b>'+esc(c.kod)+'</b></td><td>'+esc(c.sorumlu)+'</td><td>'+esc(c.birim)+'</td><td>'+esc(c.aciklama)+'</td></tr>'; }).join("")+'</table></div>';
+}
+$("q2").addEventListener("input", aramaAck);
+$("out2").addEventListener("click", function(e){
+  var r = e.target.closest("tr[data-k]"); if(!r) return;
+  $("q").value = r.getAttribute("data-k"); render(); window.scrollTo(0,0);
+});
+$("out").addEventListener("click", function(e){
+  var it = e.target.closest(".item"); if(!it) return;
+  $("q").value = it.getAttribute("data-k"); render();
+});
 
-let armed=false;
-$("del").onclick=()=>{
- if(!armed){armed=true;$("del").textContent="Emin misiniz? Tekrar basın";setTimeout(()=>{armed=false;$("del").textContent="Listeyi sil"},4000);return}
- armed=false;$("del").textContent="Listeyi sil";data=[];over=true;save();$("msg").textContent="Liste silindi.";build()};
-$("reset").onclick=()=>{data=SEED;over=false;try{localStorage.removeItem("tehir-data")}catch(e){}$("msg").textContent="Varsayılan liste geri yüklendi.";build()};
+function excelIndir(){
+  if(typeof XLSX==="undefined"){ $("ymsg").innerHTML='<span class="err">Excel kütüphanesi yüklenemedi.</span>'; return; }
+  if(!(window.claude && claude.use)){ $("ymsg").innerHTML='<span class="err">Bu görünümde indirme kapalı.</span>'; return; }
+  claude.use("downloads").then(function(dl){
+    if(!dl){ $("ymsg").innerHTML='<span class="err">Bu görünümde indirme kapalı.</span>'; return; }
+    var rows = codes.map(function(c){ return {"TEHİR KODLARI":c.kod,"SORUMLU":c.sorumlu,"TEHİR KATEGORİ":c.kategori||"","KATEGORİSORUMLUSU":c.katsor||"","KONTROL DIŞI":c.kdisi||"","BİRİM":c.birim,"AÇIKLAMA":c.aciklama}; });
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "LİSTE");
+    var buf = XLSX.write(wb,{bookType:"xlsx",type:"array"});
+    return dl.save({filename:"TEHIR_KODLARI.xlsx", data:new Blob([buf])});
+  }).catch(function(e){ if(e && e.code!=="declined") $("ymsg").innerHTML='<span class="err">İndirme başarısız.</span>'; });
+}
+$("xl").onclick = excelIndir;
+$("yb").onclick = function(){ if(!isAdmin){ $("login").style.display="flex"; $("pw").focus(); } };
+function login(){
+  if($("pw").value===ADMIN_PW){ isAdmin=true; $("admin").style.display="block"; $("login").style.display="none"; $("ymsg").textContent=""; $("pw").value=""; excelIndir(); }
+  else { $("ymsg").innerHTML='<span class="err">Şifre yanlış.</span>'; }
+}
+$("gb").onclick = login;
+$("pw").addEventListener("keydown", function(e){ if(e.key==="Enter") login(); });
+$("cikis").onclick = function(){ isAdmin=false; $("admin").style.display="none"; $("login").style.display="none"; };
+// başlangıçta giriş kutusu gizli
+$("login").style.display="none";
 
-$("load").onclick=()=>$("file").click();
-$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;
- const rd=new FileReader();
- rd.onload=()=>{try{
-  const wb=XLSX.read(rd.result,{type:"array"});
-  const name=wb.SheetNames.find(n=>n.toLocaleUpperCase("tr")==="LİSTE")||wb.SheetNames[0];
-  const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:""});
-  let h=rows.findIndex(r=>r.some(c=>/TEH[İI]R/i.test(String(c))));if(h<0)h=0;
-  const hdr=rows[h].map(c=>String(c).toLocaleUpperCase("tr"));
-  const ix=k=>hdr.findIndex(c=>c.includes(k));
-  let a=ix("TEHİR"),b=ix("SORUMLU"),c=ix("BİRİM"),d=ix("AÇIKLAMA");
-  if([a,b,c,d].some(x=>x<0)){const s=rows[h].findIndex(x=>String(x).trim()!=="");a=s;b=s+1;c=s+2;d=s+3}
-  const cl=v=>String(v==null?"":v).replace(/\s+/g," ").trim();
-  const out=rows.slice(h+1).filter(r=>cl(r[a])).map(r=>[cl(r[a]),cl(r[b]),cl(r[c]),cl(r[d])]);
-  if(!out.length)throw new Error("boş");
-  data=out;over=true;save();$("msg").textContent=out.length+" kod yüklendi ("+name+" sayfası).";build()
- }catch(x){$("msg").textContent="Dosya okunamadı. Sütunlar: Tehir Kodları, Sorumlu, Birim, Açıklama olmalı."}};
- rd.readAsArrayBuffer(f);e.target.value=""};
-build();
+$("save").onclick = function(){
+  var k = $("f_kod").value.trim(); if(!k) return;
+  var rec = {kod:k, sorumlu:$("f_sor").value.trim(), birim:$("f_bir").value.trim(), aciklama:$("f_ack").value.trim()};
+  var i = codes.findIndex(function(c){ return norm(c.kod)===norm(k); });
+  if(i>-1) codes[i]=Object.assign({},codes[i],rec); else codes.push(rec);
+  persist(); $("q").value=k; render();
+};
+$("del").onclick = function(){
+  var k = norm($("f_kod").value);
+  var i = codes.findIndex(function(c){ return norm(c.kod)===k; });
+  if(i>-1 && confirm(k+" silinsin mi?")){ codes.splice(i,1); persist(); $("q").value=""; render(); }
+};
+$("exp").onclick = function(){
+  $("bulk").value = codes.map(function(c){ return [c.kod,c.sorumlu,c.birim,c.aciklama].join(";"); }).join("\n");
+  $("bulk").select();
+};
+$("imp").onclick = function(){
+  var lines = $("bulk").value.split(/\r?\n/), n=0;
+  lines.forEach(function(l){
+    if(!l.trim()) return;
+    var p = l.split(/\t|;/).map(function(x){return x.trim();});
+    if(!p[0] || norm(p[0])==="TEHİR KODU" || norm(p[0])==="KOD") return;
+    var rec = {kod:p[0], sorumlu:p[1]||"", birim:p[2]||"", aciklama:p.slice(3).join(" ")};
+    var i = codes.findIndex(function(c){ return norm(c.kod)===norm(rec.kod); });
+    if(i>-1) codes[i]=rec; else codes.push(rec);
+    n++;
+  });
+  persist(); render(); $("bulk").value=""; $("ymsg").textContent = n+" kayıt işlendi.";
+};
+render();
 </script>
 </body>
 </html>
