@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ekip Vardiya Takvimi</title>
+<style>
+  :root {
+    --bg: #f7f9fd;
+    --card: #ffffff;
+    --ink: #14213d;
+    --muted: #6b7388;
+    --line: #e3e8f2;
+    --navy: #274b7a;
+    --soft: #eaf0fb;
+    --S: #e8b341;
+    --O: #dc6b42;
+    --G: #3550ae;
+    --I: #3f9b67;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Roboto, 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  }
+  .app { max-width: 480px; margin: 0 auto; padding: 22px 16px 40px; }
+  button { font-family: inherit; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .top small { display: block; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .top h1 { margin: 2px 0 0; font-size: 30px; font-weight: 800; line-height: 1.1; }
+  .badge {
+    flex: none; width: 54px; height: 54px; border-radius: 16px;
+    display: grid; place-items: center;
+    background: var(--navy); color: #fff; font-size: 26px; font-weight: 800;
+  }
+
+  .tabs {
+    margin-top: 18px; padding: 5px; border-radius: 18px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+    background: #e9ecf5;
+  }
+  .tabs button {
+    border: 0; background: transparent; border-radius: 14px;
+    height: 46px; font-size: 18px; font-weight: 700; color: var(--muted);
+  }
+  .tabs button[aria-selected="true"] { background: #fff; color: var(--navy); box-shadow: 0 1px 4px rgba(20,33,61,0.12); }
+
+  .today {
+    margin-top: 16px; padding: 14px 16px; border-radius: 18px;
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card); border: 1px solid var(--line);
+    border-left: 6px solid var(--c, var(--O));
+  }
+  .today-ico {
+    flex: none; width: 52px; height: 52px; border-radius: 14px;
+    display: grid; place-items: center; color: #fff; font-size: 24px; font-weight: 800;
+    background: var(--c, var(--O));
+  }
+  .today-txt { flex: 1; min-width: 0; }
+  .today-txt span { display: block; font-size: 14px; color: var(--muted); font-weight: 500; }
+  .today-txt b { display: block; font-size: 20px; font-weight: 800; margin-top: 2px; }
+  .today-chip {
+    flex: none; padding: 8px 14px; border-radius: 12px;
+    font-weight: 800; font-size: 18px; color: var(--c, var(--O));
+    background: color-mix(in srgb, var(--c, var(--O)) 14%, #fff);
+  }
+
+  .month { margin-top: 18px; display: flex; align-items: center; justify-content: space-between; }
+  .month h2 { margin: 0; font-size: 22px; font-weight: 800; }
+  .nav {
+    width: 48px; height: 48px; border: 0; border-radius: 14px;
+    background: var(--soft); color: var(--navy); font-size: 22px; font-weight: 800;
+  }
+
+  .counts {
+    margin-top: 14px; padding: 12px 6px; border-radius: 18px;
+    display: grid; grid-template-columns: repeat(4, 1fr); text-align: center;
+    background: var(--card); border: 1px solid var(--line);
+  }
+  .counts i { display: block; width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 4px; }
+  .counts b { display: block; font-size: 24px; font-weight: 800; }
+  .counts span { font-size: 13px; color: var(--muted); }
+
+  .dow, .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .dow { margin-top: 16px; text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .grid { margin-top: 8px; }
+  .day {
+    aspect-ratio: 1 / 1.02; border-radius: 12px; color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 17px; line-height: 1.15;
+  }
+  .day { border: 0; padding: 0; font-family: inherit; cursor: pointer; }
+  .day.sel-d { outline: 3px solid #111; outline-offset: -1px; }
+  .day.empty { cursor: default; }
+
+  .picker {
+    margin-top: 16px; padding: 12px 14px; border-radius: 18px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--line);
+  }
+  .picker label { flex: 1; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--muted); }
+  .picker input {
+    flex: 1; min-width: 0; height: 46px; padding: 0 12px;
+    border: 1px solid #cfd8ea; border-radius: 12px; background: #fff;
+    font: 600 17px Roboto, 'Segoe UI', system-ui, sans-serif; color: var(--ink);
+  }
+  .picker button {
+    height: 46px; padding: 0 16px; border: 0; border-radius: 12px;
+    background: var(--navy); color: #fff; font-size: 16px; font-weight: 700;
+  }
+  .all { margin-top: 12px; padding: 14px 16px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+  .all h3 { margin: 0 0 8px; font-size: 18px; font-weight: 800; }
+  .all-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 12px; font-size: 17px; }
+  .all-row i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); flex: none; }
+  .all-row span { flex: 1; color: var(--muted); font-weight: 500; }
+  .all-row b { font-weight: 800; }
+  .all-row.mine { background: color-mix(in srgb, var(--c) 14%, #fff); }
+  .all-row.mine span { color: var(--ink); }
+  .day.empty { visibility: hidden; }
+  .S { background: var(--S); } .O { background: var(--O); } .G { background: var(--G); } .I { background: var(--I); }
+
+  .legend, .export {
+    margin-top: 16px; padding: 14px 16px; border-radius: 18px;
+    background: var(--card); border: 1px solid var(--line);
+  }
+  .legend h3, .export h3 { margin: 0 0 10px; font-size: 18px; font-weight: 800; }
+  .legend ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 16px; }
+  .legend li::before { content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; vertical-align: -2px; background: var(--c); }
+  .export p { margin: -6px 0 12px; font-size: 14px; color: var(--muted); }
+  .export div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .export button { height: 50px; border-radius: 14px; font-size: 17px; font-weight: 700; border: 1px solid #cfd8ea; background: var(--soft); color: var(--navy); }
+  .export button.primary { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+  @media print {
+    body { background: #fff; }
+    .tabs, .nav, .export, .today, .picker, .all { display: none; }
+    .day { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .counts, .legend { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+
+  <div class="top">
+    <div>
+      <small>Ekip vardiya takvimi</small>
+      <h1>Vardiyanız hazır</h1>
+    </div>
+    <div class="badge" id="badge">A</div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Ekip seçimi" id="tabs"></div>
+
+  <div class="picker">
+    <label>Tarih <input type="date" id="dateIn" aria-label="Tarih seç"></label>
+    <button type="button" id="todayBtn">Bugün</button>
+  </div>
+
+  <div class="today" id="today"></div>
+
+  <div class="all" id="all"></div>
+
+  <div class="month">
+    <button class="nav" id="prev" aria-label="Önceki ay">‹</button>
+    <h2 id="monthTitle"></h2>
+    <button class="nav" id="next" aria-label="Sonraki ay">›</button>
+  </div>
+
+  <div class="counts" id="counts"></div>
+
+  <div class="dow" aria-hidden="true">
+    <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <div class="legend">
+    <h3>Vardiya renkleri</h3>
+    <ul>
+      <li style="--c:var(--S)">Sabah</li><li style="--c:var(--O)">Orta</li>
+      <li style="--c:var(--G)">Gece</li><li style="--c:var(--I)">İzin</li>
+    </ul>
+  </div>
+
+  <div class="export">
+    <h3>Aylık programı dışa aktar</h3>
+    <p id="exportSub"></p>
+    <div>
+      <button id="pdfBtn" type="button">PDF</button>
+      <button id="csvBtn" type="button" class="primary">Excel</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ---- AYARLAR ----
+  // Her ekip 8 günlük döngüyü izler: 2 gün Sabah, 2 gün Orta, 2 gün Gece, 2 gün İzin.
+  // Döngünün başlangıcı: A ekibi için 6 Kasım 2026 = Sabah'ın ilk günü (uygulamadan doğrulandı).
+  // B, C, D ekiplerinin kayma değerleri (gün) aşağıdadır. Uygulamayla farklıysa sadece bu sayıları değiştir.
+  const CYCLE = ['S','S','O','O','G','G','I','I'];
+  const ANCHOR = Date.UTC(2026, 10, 6);
+  const TEAMS = { A: 0, B: 2, C: 4, D: 6 };
+  // -----------------
+
+  const INFO = {
+    S: { name: 'Sabah', letter: 'S', color: 'var(--S)' },
+    O: { name: 'Orta',  letter: 'O', color: 'var(--O)' },
+    G: { name: 'Gece',  letter: 'G', color: 'var(--G)' },
+    I: { name: 'İzin',  letter: 'İ', color: 'var(--I)' }
+  };
+  const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+  const now = new Date();
+  let team = 'A';
+  try { const s = localStorage.getItem('vardiya-ekip'); if (s && TEAMS[s] !== undefined) team = s; } catch (e) {}
+  let year = now.getFullYear(), month = now.getMonth();
+
+  const mod = (n, m) => ((n % m) + m) % m;
+  function shiftOf(t, y, m, d) {
+    const days = Math.round((Date.UTC(y, m, d) - ANCHOR) / 86400000);
+    return CYCLE[mod(days + TEAMS[t], 8)];
+  }
+
+  const $ = id => document.getElementById(id);
+
+  function renderTabs() {
+    $('tabs').innerHTML = Object.keys(TEAMS).map(t =>
+      `<button role="tab" type="button" data-t="${t}" aria-selected="${t === team}">${t}</button>`).join('');
+    $('tabs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      team = b.dataset.t;
+      try { localStorage.setItem('vardiya-ekip', team); } catch (e) {}
+      render();
+    }));
+  }
+
+  const DOW = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  let sel = { y: now.getFullYear(), m: now.getMonth(), d: now.getDate() };
+  let followToday = true;
+  const pad = n => String(n).padStart(2, '0');
+
+  function isTodayDate(s) {
+    const n = new Date();
+    return s.y === n.getFullYear() && s.m === n.getMonth() && s.d === n.getDate();
+  }
+
+  function render() {
+    renderTabs();
+    $('badge').textContent = team;
+    $('dateIn').value = `${sel.y}-${pad(sel.m + 1)}-${pad(sel.d)}`;
+
+    // Seçilen gün kartı
+    const k = shiftOf(team, sel.y, sel.m, sel.d);
+    const i = INFO[k];
+    const isNow = isTodayDate(sel);
+    const wd = DOW[new Date(sel.y, sel.m, sel.d).getDay()];
+    const card = $('today');
+    card.style.setProperty('--c', i.color);
+    card.innerHTML =
+      `<div class="today-ico">◔</div>
+       <div class="today-txt"><span>${isNow ? 'Bugün · ' : ''}${sel.d} ${MONTHS[sel.m]} ${sel.y} ${wd}</span>
+       <b>${team} Ekibi · ${i.name}</b></div>
+       <div class="today-chip">${i.letter}</div>`;
+
+    // O gün hangi ekip hangi vardiyada
+    let rows = '';
+    ['S','O','G','I'].forEach(s => {
+      const who = Object.keys(TEAMS).filter(t2 => shiftOf(t2, sel.y, sel.m, sel.d) === s);
+      rows += `<div class="all-row${who.includes(team) ? ' mine' : ''}" style="--c:${INFO[s].color}"><i></i><span>${INFO[s].name}</span><b>${who.map(w => w + ' Ekibi').join(', ')}</b></div>`;
+    });
+    $('all').innerHTML = `<h3>${isNow ? 'Bugün çalışan ekipler' : sel.d + ' ' + MONTHS[sel.m] + ' günü ekipler'}</h3>${rows}`;
+
+    // Ay başlığı ve takvim
+    $('monthTitle').textContent = `${MONTHS[month]} ${year}`;
+    const dim = new Date(year, month + 1, 0).getDate();
+    const lead = (new Date(year, month, 1).getDay() + 6) % 7;
+    const counts = { S: 0, O: 0, G: 0, I: 0 };
+    let cells = '<div class="day empty"></div>'.repeat(lead);
+    for (let d = 1; d <= dim; d++) {
+      const s = shiftOf(team, year, month, d);
+      counts[s]++;
+      const isSel = d === sel.d && month === sel.m && year === sel.y;
+      cells += `<button type="button" class="day ${s}${isSel ? ' sel-d' : ''}" data-d="${d}" aria-label="${d} ${MONTHS[month]}, ${INFO[s].name}"><span>${d}</span><span>${INFO[s].letter}</span></button>`;
+    }
+    $('grid').innerHTML = cells;
+    $('grid').querySelectorAll('button.day').forEach(b => b.addEventListener('click', () => {
+      sel = { y: year, m: month, d: +b.dataset.d };
+      followToday = isTodayDate(sel);
+      render();
+    }));
+
+    $('counts').innerHTML = ['S','O','G','I'].map(s =>
+      `<div><i style="background:${INFO[s].color}"></i><b>${counts[s]}</b><span>${INFO[s].name}</span></div>`).join('');
+
+    $('exportSub').textContent = `${team} Ekibi · ${MONTHS[month]} ${year}`;
+  }
+
+  $('dateIn').addEventListener('change', e => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(e.target.value);
+    if (!m) return;
+    sel = { y: +m[1], m: +m[2] - 1, d: +m[3] };
+    year = sel.y; month = sel.m;
+    followToday = isTodayDate(sel);
+    render();
+  });
+
+  function goToday() {
+    const n = new Date();
+    sel = { y: n.getFullYear(), m: n.getMonth(), d: n.getDate() };
+    year = sel.y; month = sel.m;
+    followToday = true;
+    render();
+  }
+  $('todayBtn').addEventListener('click', goToday);
+
+  // Sayfa açık kalırsa ve gün değişirse (gece yarısı, telefon uykudan dönünce) bugüne güncelle
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && followToday && !isTodayDate(sel)) goToday(); });
+  setInterval(() => { if (followToday && !isTodayDate(sel)) goToday(); }, 60000);
+
+  $('prev').addEventListener('click', () => { month--; if (month < 0) { month = 11; year--; } render(); });
+  $('next').addEventListener('click', () => { month++; if (month > 11) { month = 0; year++; } render(); });
+
+  $('pdfBtn').addEventListener('click', () => window.print());
+
+  $('csvBtn').addEventListener('click', () => {
+    const dim = new Date(year, month + 1, 0).getDate();
+    const gun = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+    let csv = 'Tarih;Gün;Vardiya\r\n';
+    for (let d = 1; d <= dim; d++) {
+      const dt = new Date(year, month, d);
+      csv += `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year};${gun[dt.getDay()]};${INFO[shiftOf(team, year, month, d)].name}\r\n`;
+    }
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${team}-ekibi-${MONTHS[month]}-${year}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  render();
+</script>
+</body>
+</html>
