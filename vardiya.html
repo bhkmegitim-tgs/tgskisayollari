@@ -4,198 +4,231 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ekip Vardiya Takvimi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #f7f9fd;
-    --card: #ffffff;
-    --ink: #14213d;
-    --muted: #6b7388;
-    --line: #e3e8f2;
-    --navy: #274b7a;
-    --soft: #eaf0fb;
-    --S: #e8b341;
-    --O: #dc6b42;
-    --G: #3550ae;
-    --I: #3f9b67;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
+  html, body { height: 100%; margin: 0; background: #f7f9fd; }
+  #vardiyaApp { height: 100vh; height: 100dvh; font-family: 'Inter', Roboto, 'Segoe UI', system-ui, sans-serif; }
+  #vardiyaApp {
+    --bg: #f7f9fd; --card: #ffffff; --ink: #14213d; --muted: #6b7388; --line: #e3e8f2;
+    --navy: #274b7a; --soft: #eaf0fb;
+    --S: #e8b341; --O: #dc6b42; --G: #3550ae; --I: #3f9b67;
+    flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    background: var(--bg); color: var(--ink);
     font-family: Roboto, 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
   }
-  .app { max-width: 480px; margin: 0 auto; padding: 22px 16px 40px; }
-  button { font-family: inherit; cursor: pointer; }
-  button:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+  #vardiyaApp * { box-sizing: border-box; }
+  #vardiyaApp button { font-family: inherit; cursor: pointer; }
+  #vardiyaApp button:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
 
-  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .top small { display: block; font-size: 13px; font-weight: 600; color: var(--muted); }
-  .top h1 { margin: 2px 0 0; font-size: 30px; font-weight: 800; line-height: 1.1; }
-  .badge {
-    flex: none; width: 54px; height: 54px; border-radius: 16px;
-    display: grid; place-items: center;
-    background: var(--navy); color: #fff; font-size: 26px; font-weight: 800;
+  /* Masaüstü: tek ekrana sığan iki sütun */
+  #vardiyaApp .app {
+    height: 100%; max-width: 1280px; margin: 0 auto; padding: 14px 24px 16px;
+    display: grid; grid-template-columns: minmax(340px, 400px) 1fr; gap: 22px;
   }
+  #vardiyaApp .col-l { display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow-y: auto; padding-right: 2px; }
+  #vardiyaApp .col-r { display: flex; flex-direction: column; min-height: 0; }
 
-  .tabs {
-    margin-top: 18px; padding: 5px; border-radius: 18px;
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
-    background: #e9ecf5;
+  #vardiyaApp .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  #vardiyaApp .top small { display: block; font-size: 13px; font-weight: 600; color: var(--muted); }
+  #vardiyaApp .top h1 { margin: 2px 0 0; font-size: 26px; font-weight: 800; line-height: 1.1; }
+  #vardiyaApp .badge {
+    flex: none; width: 48px; height: 48px; border-radius: 14px;
+    display: grid; place-items: center; background: var(--navy); color: #fff; font-size: 24px; font-weight: 800;
   }
-  .tabs button {
-    border: 0; background: transparent; border-radius: 14px;
-    height: 46px; font-size: 18px; font-weight: 700; color: var(--muted);
+  #vardiyaApp .tabs {
+    padding: 4px; border-radius: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: #e9ecf5;
   }
-  .tabs button[aria-selected="true"] { background: #fff; color: var(--navy); box-shadow: 0 1px 4px rgba(20,33,61,0.12); }
+  #vardiyaApp .tabs button {
+    border: 0; background: transparent; border-radius: 12px; height: 40px; font-size: 17px; font-weight: 700; color: var(--muted);
+  }
+  #vardiyaApp .tabs button[aria-selected="true"] { background: #fff; color: var(--navy); box-shadow: 0 1px 4px rgba(20,33,61,0.12); }
 
-  .today {
-    margin-top: 16px; padding: 14px 16px; border-radius: 18px;
-    display: flex; align-items: center; gap: 14px;
+  #vardiyaApp .picker {
+    padding: 8px 12px; border-radius: 16px; display: flex; align-items: center; gap: 10px;
     background: var(--card); border: 1px solid var(--line);
-    border-left: 6px solid var(--c, var(--O));
   }
-  .today-ico {
-    flex: none; width: 52px; height: 52px; border-radius: 14px;
-    display: grid; place-items: center; color: #fff; font-size: 24px; font-weight: 800;
-    background: var(--c, var(--O));
+  #vardiyaApp .picker label { flex: 1; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--muted); }
+  #vardiyaApp .picker input {
+    flex: 1; min-width: 0; height: 40px; padding: 0 10px;
+    border: 1px solid #cfd8ea; border-radius: 10px; background: #fff;
+    font: 600 16px Roboto, 'Segoe UI', system-ui, sans-serif; color: var(--ink);
   }
-  .today-txt { flex: 1; min-width: 0; }
-  .today-txt span { display: block; font-size: 14px; color: var(--muted); font-weight: 500; }
-  .today-txt b { display: block; font-size: 20px; font-weight: 800; margin-top: 2px; }
-  .today-chip {
-    flex: none; padding: 8px 14px; border-radius: 12px;
-    font-weight: 800; font-size: 18px; color: var(--c, var(--O));
+  #vardiyaApp .picker button {
+    height: 40px; padding: 0 16px; border: 0; border-radius: 10px;
+    background: var(--navy); color: #fff; font-size: 15px; font-weight: 700;
+  }
+
+  #vardiyaApp .today {
+    padding: 10px 14px; border-radius: 16px; display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--c, var(--O));
+  }
+  #vardiyaApp .today-ico {
+    flex: none; width: 46px; height: 46px; border-radius: 12px;
+    display: grid; place-items: center; color: #fff; font-size: 22px; font-weight: 800; background: var(--c, var(--O));
+  }
+  #vardiyaApp .today-txt { flex: 1; min-width: 0; }
+  #vardiyaApp .today-txt span { display: block; font-size: 13px; color: var(--muted); font-weight: 500; }
+  #vardiyaApp .today-txt b { display: block; font-size: 19px; font-weight: 800; margin-top: 2px; }
+  #vardiyaApp .today-chip {
+    flex: none; padding: 6px 12px; border-radius: 10px; font-weight: 800; font-size: 17px; color: var(--c, var(--O));
     background: color-mix(in srgb, var(--c, var(--O)) 14%, #fff);
   }
 
-  .month { margin-top: 18px; display: flex; align-items: center; justify-content: space-between; }
-  .month h2 { margin: 0; font-size: 22px; font-weight: 800; }
-  .nav {
-    width: 48px; height: 48px; border: 0; border-radius: 14px;
-    background: var(--soft); color: var(--navy); font-size: 22px; font-weight: 800;
-  }
+  #vardiyaApp .all { padding: 10px 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+  #vardiyaApp .all h3 { margin: 0 0 4px; font-size: 16px; font-weight: 800; }
+  #vardiyaApp .all-row { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 10px; font-size: 16px; }
+  #vardiyaApp .all-row i { width: 13px; height: 13px; border-radius: 50%; background: var(--c); flex: none; }
+  #vardiyaApp .all-row span { flex: 1; color: var(--muted); font-weight: 500; }
+  #vardiyaApp .all-row b { font-weight: 800; }
+  #vardiyaApp .all-row.mine { background: color-mix(in srgb, var(--c) 14%, #fff); }
+  #vardiyaApp .all-row.mine span { color: var(--ink); }
 
-  .counts {
-    margin-top: 14px; padding: 12px 6px; border-radius: 18px;
+  #vardiyaApp .export { padding: 10px 14px 12px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); margin-top: auto; }
+  #vardiyaApp .export h3 { margin: 0 0 2px; font-size: 16px; font-weight: 800; }
+  #vardiyaApp .export p { margin: 0 0 8px; font-size: 13px; color: var(--muted); }
+  #vardiyaApp .export div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  #vardiyaApp .export button { height: 42px; border-radius: 12px; font-size: 15px; font-weight: 700; border: 1px solid #cfd8ea; background: var(--soft); color: var(--navy); }
+  #vardiyaApp .export button.primary { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+  /* Sağ sütun: takvim */
+  #vardiyaApp .month { display: flex; align-items: center; justify-content: space-between; }
+  #vardiyaApp .month h2 { margin: 0; font-size: 24px; font-weight: 800; }
+  #vardiyaApp .nav-btn {
+    width: 44px; height: 44px; border: 0; border-radius: 12px; background: var(--soft); color: var(--navy); font-size: 22px; font-weight: 800;
+  }
+  #vardiyaApp .counts {
+    margin-top: 10px; padding: 8px 6px; border-radius: 16px;
     display: grid; grid-template-columns: repeat(4, 1fr); text-align: center;
     background: var(--card); border: 1px solid var(--line);
   }
-  .counts i { display: block; width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 4px; }
-  .counts b { display: block; font-size: 24px; font-weight: 800; }
-  .counts span { font-size: 13px; color: var(--muted); }
-
-  .dow, .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .dow { margin-top: 16px; text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); }
-  .grid { margin-top: 8px; }
-  .day {
-    aspect-ratio: 1 / 1.02; border-radius: 12px; color: #fff;
+  #vardiyaApp .counts i { display: block; width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 3px; }
+  #vardiyaApp .counts b { display: block; font-size: 22px; font-weight: 800; line-height: 1.1; }
+  #vardiyaApp .counts span { font-size: 13px; color: var(--muted); }
+  #vardiyaApp .dow, #vardiyaApp .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  #vardiyaApp .dow { margin-top: 12px; text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); }
+  #vardiyaApp .grid { margin-top: 6px; flex: 1; min-height: 0; grid-auto-rows: 1fr; }
+  #vardiyaApp .day {
+    border: 0; padding: 0; border-radius: 12px; color: #fff; min-height: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 17px; line-height: 1.15;
+    font-weight: 800; font-size: clamp(14px, 2.3vh, 22px); line-height: 1.15;
   }
-  .day { border: 0; padding: 0; font-family: inherit; cursor: pointer; }
-  .day.sel-d { outline: 3px solid #111; outline-offset: -1px; }
-  .day.empty { cursor: default; }
+  #vardiyaApp .day { opacity: .72; transition: opacity .15s, transform .15s; }
+  #vardiyaApp .day:hover { opacity: 1; }
+  #vardiyaApp .day.sel-d {
+    opacity: 1; position: relative; z-index: 2; transform: scale(1.08);
+    outline: 4px solid #14213d; outline-offset: 1px;
+    box-shadow: 0 0 0 3px #fff, 0 8px 20px rgba(20,33,61,.45);
+    font-size: clamp(16px, 2.7vh, 26px);
+  }
+  #vardiyaApp .day.sel-d::after {
+    content: ""; position: absolute; top: 5px; right: 5px; width: 9px; height: 9px;
+    border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px #14213d;
+  }
+  #vardiyaApp .day.empty { visibility: hidden; cursor: default; }
+  #vardiyaApp .S { background: var(--S); }
+  #vardiyaApp .O { background: var(--O); }
+  #vardiyaApp .G { background: var(--G); }
+  #vardiyaApp .I { background: var(--I); }
+  #vardiyaApp .legend { margin-top: 10px; padding: 8px 14px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  #vardiyaApp .legend h3 { margin: 0; font-size: 15px; font-weight: 800; }
+  #vardiyaApp .legend ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 15px; }
+  #vardiyaApp .legend li::before { content: ""; display: inline-block; width: 13px; height: 13px; border-radius: 50%; margin-right: 6px; vertical-align: -2px; background: var(--c); }
 
-  .picker {
-    margin-top: 16px; padding: 12px 14px; border-radius: 18px;
-    display: flex; align-items: center; gap: 10px;
-    background: var(--card); border: 1px solid var(--line);
+  /* Kısa ekranlar: biraz daha sıkı */
+  @media (max-height: 760px) and (min-width: 900px) {
+    #vardiyaApp .app { padding-top: 8px; padding-bottom: 8px; }
+    #vardiyaApp .top h1 { font-size: 22px; }
+    #vardiyaApp .badge { width: 40px; height: 40px; font-size: 20px; }
+    #vardiyaApp .all-row { padding: 3px 10px; font-size: 15px; }
+    #vardiyaApp .legend { display: none; }
   }
-  .picker label { flex: 1; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--muted); }
-  .picker input {
-    flex: 1; min-width: 0; height: 46px; padding: 0 12px;
-    border: 1px solid #cfd8ea; border-radius: 12px; background: #fff;
-    font: 600 17px Roboto, 'Segoe UI', system-ui, sans-serif; color: var(--ink);
-  }
-  .picker button {
-    height: 46px; padding: 0 16px; border: 0; border-radius: 12px;
-    background: var(--navy); color: #fff; font-size: 16px; font-weight: 700;
-  }
-  .all { margin-top: 12px; padding: 14px 16px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
-  .all h3 { margin: 0 0 8px; font-size: 18px; font-weight: 800; }
-  .all-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 12px; font-size: 17px; }
-  .all-row i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); flex: none; }
-  .all-row span { flex: 1; color: var(--muted); font-weight: 500; }
-  .all-row b { font-weight: 800; }
-  .all-row.mine { background: color-mix(in srgb, var(--c) 14%, #fff); }
-  .all-row.mine span { color: var(--ink); }
-  .day.empty { visibility: hidden; }
-  .S { background: var(--S); } .O { background: var(--O); } .G { background: var(--G); } .I { background: var(--I); }
 
-  .legend, .export {
-    margin-top: 16px; padding: 14px 16px; border-radius: 18px;
-    background: var(--card); border: 1px solid var(--line);
+  /* Telefon / dar ekran: tek sütun, doğal kaydırma */
+  @media (max-width: 899px) {
+    #vardiyaApp .app { display: block; height: auto; max-width: 520px; padding: 18px 14px 36px; }
+    #vardiyaApp .col-l, #vardiyaApp .col-r { display: block; overflow: visible; }
+    #vardiyaApp .col-l > * { margin-bottom: 10px; }
+    #vardiyaApp .col-r { margin-top: 8px; }
+    #vardiyaApp .grid { grid-auto-rows: auto; }
+    #vardiyaApp .day { aspect-ratio: 1 / 1.02; font-size: 17px; }
+    #vardiyaApp .export { margin-top: 12px; }
+    #vardiyaApp .legend { margin-top: 12px; }
   }
-  .legend h3, .export h3 { margin: 0 0 10px; font-size: 18px; font-weight: 800; }
-  .legend ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 16px; }
-  .legend li::before { content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; vertical-align: -2px; background: var(--c); }
-  .export p { margin: -6px 0 12px; font-size: 14px; color: var(--muted); }
-  .export div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .export button { height: 50px; border-radius: 14px; font-size: 17px; font-weight: 700; border: 1px solid #cfd8ea; background: var(--soft); color: var(--navy); }
-  .export button.primary { background: var(--navy); border-color: var(--navy); color: #fff; }
+
 
   @media print {
-    body { background: #fff; }
-    .tabs, .nav, .export, .today, .picker, .all { display: none; }
-    .day { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .counts, .legend { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #vardiyaApp { height: auto; overflow: visible; background: #fff; }
+    #vardiyaApp .app { display: block; height: auto; }
+    #vardiyaApp .col-l, #vardiyaApp .nav-btn, #vardiyaApp .export { display: none; }
+    #vardiyaApp .grid { grid-auto-rows: auto; }
+    #vardiyaApp .day { opacity: 1; aspect-ratio: 1 / 0.8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #vardiyaApp .counts, #vardiyaApp .legend { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
 <body>
+<div id="vardiyaApp">
 <main class="app">
 
-  <div class="top">
-    <div>
-      <small>Ekip vardiya takvimi</small>
-      <h1>Vardiyanız hazır</h1>
-    </div>
-    <div class="badge" id="badge">A</div>
-  </div>
+      <div class="col-l">
+        <div class="top">
+          <div>
+            <small>Ekip vardiya takvimi</small>
+            <h1>Vardiyanız hazır</h1>
+          </div>
+          <div class="badge" id="badge">A</div>
+        </div>
 
-  <div class="tabs" role="tablist" aria-label="Ekip seçimi" id="tabs"></div>
+        <div class="tabs" role="tablist" aria-label="Ekip seçimi" id="tabs"></div>
 
-  <div class="picker">
-    <label>Tarih <input type="date" id="dateIn" aria-label="Tarih seç"></label>
-    <button type="button" id="todayBtn">Bugün</button>
-  </div>
+        <div class="picker">
+          <label>Tarih <input type="date" id="dateIn" aria-label="Tarih seç"></label>
+          <button type="button" id="todayBtn">Bugün</button>
+        </div>
 
-  <div class="today" id="today"></div>
+        <div class="today" id="today"></div>
 
-  <div class="all" id="all"></div>
+        <div class="all" id="all"></div>
 
-  <div class="month">
-    <button class="nav" id="prev" aria-label="Önceki ay">‹</button>
-    <h2 id="monthTitle"></h2>
-    <button class="nav" id="next" aria-label="Sonraki ay">›</button>
-  </div>
+        <div class="export">
+          <h3>Aylık programı dışa aktar</h3>
+          <p id="exportSub"></p>
+          <div>
+            <button id="pdfBtn" type="button">PDF</button>
+            <button id="csvBtn" type="button" class="primary">Excel</button>
+          </div>
+        </div>
+      </div>
 
-  <div class="counts" id="counts"></div>
+      <div class="col-r">
+        <div class="month">
+          <button class="nav-btn" id="prev" aria-label="Önceki ay">‹</button>
+          <h2 id="monthTitle"></h2>
+          <button class="nav-btn" id="next" aria-label="Sonraki ay">›</button>
+        </div>
 
-  <div class="dow" aria-hidden="true">
-    <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span>
-  </div>
-  <div class="grid" id="grid"></div>
+        <div class="counts" id="counts"></div>
 
-  <div class="legend">
-    <h3>Vardiya renkleri</h3>
-    <ul>
-      <li style="--c:var(--S)">Sabah</li><li style="--c:var(--O)">Orta</li>
-      <li style="--c:var(--G)">Gece</li><li style="--c:var(--I)">İzin</li>
-    </ul>
-  </div>
+        <div class="dow" aria-hidden="true">
+          <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span>
+        </div>
+        <div class="grid" id="grid"></div>
 
-  <div class="export">
-    <h3>Aylık programı dışa aktar</h3>
-    <p id="exportSub"></p>
-    <div>
-      <button id="pdfBtn" type="button">PDF</button>
-      <button id="csvBtn" type="button" class="primary">Excel</button>
-    </div>
-  </div>
+        <div class="legend">
+          <h3>Vardiya renkleri</h3>
+          <ul>
+            <li style="--c:var(--S)">Sabah</li><li style="--c:var(--O)">Orta</li>
+            <li style="--c:var(--G)">Gece</li><li style="--c:var(--I)">İzin</li>
+          </ul>
+        </div>
+      </div>
 
-</main>
+    </main>
+</div>
 
 <script>
+(function () {
+
   // ---- AYARLAR ----
   // Her ekip 8 günlük döngüyü izler: 2 gün Sabah, 2 gün Orta, 2 gün Gece, 2 gün İzin.
   // Döngünün başlangıcı: A ekibi için 6 Kasım 2026 = Sabah'ın ilk günü (uygulamadan doğrulandı).
@@ -251,7 +284,6 @@
     $('badge').textContent = team;
     $('dateIn').value = `${sel.y}-${pad(sel.m + 1)}-${pad(sel.d)}`;
 
-    // Seçilen gün kartı
     const k = shiftOf(team, sel.y, sel.m, sel.d);
     const i = INFO[k];
     const isNow = isTodayDate(sel);
@@ -264,7 +296,6 @@
        <b>${team} Ekibi · ${i.name}</b></div>
        <div class="today-chip">${i.letter}</div>`;
 
-    // O gün hangi ekip hangi vardiyada
     let rows = '';
     ['S','O','G','I'].forEach(s => {
       const who = Object.keys(TEAMS).filter(t2 => shiftOf(t2, sel.y, sel.m, sel.d) === s);
@@ -272,7 +303,6 @@
     });
     $('all').innerHTML = `<h3>${isNow ? 'Bugün çalışan ekipler' : sel.d + ' ' + MONTHS[sel.m] + ' günü ekipler'}</h3>${rows}`;
 
-    // Ay başlığı ve takvim
     $('monthTitle').textContent = `${MONTHS[month]} ${year}`;
     const dim = new Date(year, month + 1, 0).getDate();
     const lead = (new Date(year, month, 1).getDay() + 6) % 7;
@@ -315,7 +345,6 @@
   }
   $('todayBtn').addEventListener('click', goToday);
 
-  // Sayfa açık kalırsa ve gün değişirse (gece yarısı, telefon uykudan dönünce) bugüne güncelle
   document.addEventListener('visibilitychange', () => { if (!document.hidden && followToday && !isTodayDate(sel)) goToday(); });
   setInterval(() => { if (followToday && !isTodayDate(sel)) goToday(); }, 60000);
 
@@ -341,6 +370,8 @@
   });
 
   render();
+
+})();
 </script>
 </body>
 </html>
