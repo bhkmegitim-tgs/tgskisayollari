@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PAT Sahalar Deneme Sınavı</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Segoe UI,Arial,Helvetica,sans-serif;background:#eef2f7;margin:0;color:#1f2937}
+.ust{background:linear-gradient(135deg,#0b57d0,#1a73e8);color:#fff;padding:22px 16px;text-align:center}
+.ust h1{margin:0;font-size:22px}
+.ust div{opacity:.9;font-size:14px;margin-top:4px}
+.kap{max-width:760px;margin:0 auto;padding:14px}
+.kart{background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(15,23,42,.08)}
+.kart h2{margin:0 0 6px;font-size:19px}
+.alt{color:#6b7280;font-size:14px;margin-bottom:10px;line-height:1.5}
+label.alan{display:block;font-weight:600;margin:14px 0 5px;font-size:14px}
+input[type=text],input[type=password]{width:100%;padding:12px;font-size:16px;border:1.5px solid #cbd5e1;border-radius:8px;outline:none}
+input[type=text]:focus,input[type=password]:focus{border-color:#1a73e8}
+button{background:#1a73e8;color:#fff;border:0;border-radius:8px;padding:13px 26px;font-size:16px;font-weight:600;cursor:pointer;margin-top:18px;width:100%}
+button:disabled{background:#9aa0a6}
+button.ikinci{background:#e5e7eb;color:#111827}
+.hata{color:#c5221f;margin-top:12px;font-size:14px;min-height:18px}
+.ilerleme{position:sticky;top:0;background:#fff;z-index:5;padding:10px 16px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.ilerleme .yazi{max-width:760px;margin:0 auto 6px;font-weight:600;font-size:14px;display:flex;justify-content:space-between}
+.cubuk{max-width:760px;margin:0 auto;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+.cubuk div{height:100%;width:0;background:#1a73e8;transition:width .25s}
+.soru p{margin:0 0 12px;font-weight:600;line-height:1.45}
+.no{display:inline-block;background:#e8f0fe;color:#1a56c4;border-radius:6px;padding:2px 8px;margin-right:6px;font-size:13px}
+.sik{display:block;padding:11px 12px;border:1.5px solid #e2e8f0;border-radius:8px;margin-bottom:8px;cursor:pointer;line-height:1.4}
+.sik input{margin-right:10px}
+.sik.secili{background:#e8f0fe;border-color:#1a73e8}
+.halka{width:160px;height:160px;border-radius:50%;margin:8px auto 12px;display:flex;align-items:center;justify-content:center}
+.halka span{background:#fff;border-radius:50%;width:124px;height:124px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:38px;font-weight:700}
+.halka small{font-size:13px;color:#6b7280;font-weight:400}
+.ozet{text-align:center;color:#4b5563;font-size:16px}
+.o{padding:8px 10px;border-radius:6px;margin-bottom:6px;border:1.5px solid #e5e7eb;font-size:15px;line-height:1.4}
+.o.d{background:#e6f4ea;border-color:#188038;font-weight:600}
+.o.y{background:#fce8e6;border-color:#c5221f}
+.etk{font-size:12px;font-weight:700;margin-left:6px}
+</style></head><body>
+<div class="ust"><h1>PAT Sahalar Deneme Sınavı</h1><div>25 soru - her doğru 4 puan - toplam 100 puan</div></div>
+
+<div class="kap" id="giris"><div class="kart">
+<h2>Sınava Giriş</h2>
+<div class="alt">Bilgilerinizi yazıp sınavı başlatın. Sorular havuzdan rastgele seçilir. Bitirdiğinizde puanınızı ve doğru cevapları göreceksiniz.</div>
+<label class="alan" for="ad">Kullanıcı Adı (Ad Soyad)</label>
+<input type="text" id="ad" autocomplete="off">
+<label class="alan" for="sicil">Personel Sicil No</label>
+<input type="text" id="sicil" autocomplete="off">
+<div id="hata1" class="hata"></div>
+<button id="btnBasla" onclick="basla()">Sınava Başla</button>
+</div></div>
+
+<div id="sinav" style="display:none">
+<div class="ilerleme"><div class="yazi"><span id="sayac"></span><span id="yuzde"></span></div><div class="cubuk"><div id="cubuk"></div></div></div>
+<div class="kap"><div id="sorular"></div>
+<div class="kart"><div id="hata2" class="hata"></div><button id="btnBitir" onclick="bitir()">Sınavı Bitir</button></div></div>
+</div>
+
+<div class="kap" id="sonuc" style="display:none">
+<div class="kart"><div class="alt" style="text-align:center" id="kisi"></div>
+<div class="halka" id="halka"><span id="puan"></span></div>
+<div class="ozet" id="ozet"></div>
+<button class="ikinci" onclick="location.reload()">Çıkış</button></div>
+<div id="detay"></div>
+</div>
+
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbzjTEmmDBHuPJpwN9kxnCiogRHqfZpnJ-DWVCWeTkyiwVwXe_1Ak9VMuXaVcakHHKumDQ/exec';
+var d = {token:'', sorular:[], cevap:[]};
+function api(govde){
+  return fetch(API, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(govde)})
+    .then(function(r){ return r.json(); })
+    .then(function(j){ if(j && j.hata){ throw new Error(j.hata); } return j; });
+}
+function hataMetni(e){
+  var m = (e && e.message) ? e.message : '';
+  if(!m || m.indexOf('fetch') >= 0 || m.indexOf('Network') >= 0 || m.indexOf('JSON') >= 0){
+    return 'Bağlantı hatası. İnternetinizi kontrol edip tekrar deneyin.';
+  }
+  return m;
+}
+function $(id){return document.getElementById(id);}
+function ekran(id){
+  ['giris','sinav','sonuc'].forEach(function(x){ $(x).style.display = (x===id ? 'block' : 'none'); });
+  window.scrollTo(0,0);
+}
+function el(tur, sinif, metin){
+  var e = document.createElement(tur);
+  if(sinif) e.className = sinif;
+  if(metin !== undefined) e.textContent = metin;
+  return e;
+}
+function ilerleme(){
+  var n = 0;
+  for(var i=0;i<d.cevap.length;i++){ if(d.cevap[i]) n++; }
+  var y = Math.round(100 * n / d.sorular.length);
+  $('sayac').textContent = 'Cevaplanan: ' + n + ' / ' + d.sorular.length;
+  $('yuzde').textContent = '%' + y;
+  $('cubuk').style.width = y + '%';
+}
+function basla(){
+  var ad = $('ad').value.trim(), sicil = $('sicil').value.trim();
+  if(!ad || !sicil){ $('hata1').textContent = 'Kullanıcı adı ve sicil numarası zorunludur.'; return; }
+  $('hata1').textContent = '';
+  $('btnBasla').disabled = true; $('btnBasla').textContent = 'Sorular yükleniyor...';
+  api({islem:'baslat', ad:ad, sicil:sicil}).then(function(r){
+    d.token = r.token; d.sorular = r.sorular; d.cevap = [];
+    var kap = $('sorular'); kap.innerHTML = '';
+    r.sorular.forEach(function(s, i){
+      d.cevap.push(null);
+      var kart = el('div','kart soru');
+      var p = el('p','');
+      p.appendChild(el('span','no', String(i+1)));
+      p.appendChild(document.createTextNode(s.soru));
+      kart.appendChild(p);
+      s.secenekler.forEach(function(sec){
+        var lab = el('label','sik');
+        var inp = document.createElement('input');
+        inp.type = 'radio'; inp.name = 'q' + i;
+        inp.onchange = function(){
+          d.cevap[i] = sec;
+          var l = kart.getElementsByClassName('sik');
+          for(var k=0;k<l.length;k++){ l[k].className = 'sik'; }
+          lab.className = 'sik secili';
+          ilerleme();
+        };
+        lab.appendChild(inp);
+        lab.appendChild(document.createTextNode(sec));
+        kart.appendChild(lab);
+      });
+      kap.appendChild(kart);
+    });
+    ilerleme(); ekran('sinav');
+  }).catch(function(e){
+    $('hata1').textContent = hataMetni(e);
+    $('btnBasla').disabled = false; $('btnBasla').textContent = 'Sınava Başla';
+  });
+}
+function bitir(){
+  var bos = -1;
+  for(var i=0;i<d.cevap.length;i++){ if(!d.cevap[i]){ bos = i; break; } }
+  if(bos >= 0){
+    $('hata2').textContent = 'Cevaplanmamış soru var: ' + (bos+1) + '. soru. Lütfen tüm soruları cevaplayın.';
+    var k = document.getElementsByClassName('soru')[bos];
+    if(k){ k.scrollIntoView(); }
+    return;
+  }
+  $('hata2').textContent = '';
+  $('btnBitir').disabled = true; $('btnBitir').textContent = 'Gönderiliyor...';
+  api({islem:'bitir', token:d.token, cevaplar:d.cevap}).then(function(r){
+    $('kisi').textContent = r.ad + ' - Sicil: ' + r.sicil;
+    $('puan').innerHTML = '';
+    $('puan').appendChild(document.createTextNode(String(r.puan)));
+    $('puan').appendChild(el('small','', '/ 100'));
+    $('halka').style.background = 'conic-gradient(#1a73e8 ' + r.puan + '%, #dfe3e8 0)';
+    $('ozet').textContent = 'Doğru: ' + r.dogru + '   Yanlış: ' + r.yanlis;
+    var kap = $('detay'); kap.innerHTML = '';
+    r.detay.forEach(function(q, i){
+      var kart = el('div','kart');
+      var p = el('p','');
+      p.style.fontWeight = '600';
+      p.appendChild(el('span','no', String(i+1)));
+      p.appendChild(document.createTextNode(q.soru));
+      kart.appendChild(p);
+      q.secenekler.forEach(function(sec){
+        var dogru = (sec === q.dogru), secilen = (sec === q.secim);
+        var o = el('div', 'o' + (dogru ? ' d' : (secilen ? ' y' : '')), sec);
+        if(dogru){ o.appendChild(el('span','etk', ' DOĞRU CEVAP')); }
+        if(secilen){ o.appendChild(el('span','etk', dogru ? ' (Sizin cevabınız)' : ' YANLIŞ - Sizin cevabınız')); }
+        kart.appendChild(o);
+      });
+      kap.appendChild(kart);
+    });
+    ekran('sonuc');
+  }).catch(function(e){
+    $('hata2').textContent = hataMetni(e);
+    $('btnBitir').disabled = false; $('btnBitir').textContent = 'Sınavı Bitir';
+  });
+}
+</script></body></html>
