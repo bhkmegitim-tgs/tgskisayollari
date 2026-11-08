@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TGS Kurumsal Web Portalı</title>
+<title>TGS Yardımlaşma</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -238,11 +238,208 @@
 
   .hidden { display: none !important; }
 
-  footer {
-    text-align: center;
-    color: var(--muted-dim);
-    font-size: 11px;
-    padding: 40px 0;
+  /* VARDİYA SEÇİM PENCERESİ */
+  .choice-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    background: rgba(5, 10, 25, 0.7);
+    backdrop-filter: blur(4px);
+  }
+  .choice-box {
+    width: 100%; max-width: 420px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 20px 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+  }
+  .choice-box h3 { margin: 0 0 4px; font-size: 18px; }
+  .choice-box p { margin: 0 0 16px; font-size: 13px; color: var(--muted); }
+  .choice-btn {
+    display: block;
+    text-decoration: none;
+    color: var(--ink);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel-2);
+    transition: border-color 0.2s ease;
+  }
+  .choice-btn:hover { border-color: var(--amber); }
+  .choice-btn b { display: block; font-size: 15px; }
+  .choice-btn span { font-size: 12.5px; color: var(--muted); }
+  .choice-close {
+    width: 100%;
+    margin-top: 4px;
+    padding: 10px;
+    border: 0; border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font: 600 14px 'Inter', sans-serif;
+    cursor: pointer;
+  }
+
+  /* ---- VARDİYA TAKVİMİ (portal içinde) ---- */
+  #vardiyaView { position: fixed; inset: 0; z-index: 1500; overflow-y: auto; background: #f7f9fd; -webkit-overflow-scrolling: touch; }
+  .vbar {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    background: #14213d; color: #fff;
+    border-bottom: 3px solid #f6c945;
+  }
+  .vbar button {
+    border: 0; border-radius: 10px; padding: 9px 14px;
+    background: rgba(255,255,255,0.16); color: #fff;
+    font: 600 15px 'Inter', sans-serif; cursor: pointer;
+  }
+  .vbar span { font-weight: 700; font-size: 16px; }
+#vardiyaApp {
+    --bg: #f7f9fd;
+    --card: #ffffff;
+    --ink: #14213d;
+    --muted: #6b7388;
+    --line: #e3e8f2;
+    --navy: #274b7a;
+    --soft: #eaf0fb;
+    --S: #e8b341;
+    --O: #dc6b42;
+    --G: #3550ae;
+    --I: #3f9b67;
+  }
+#vardiyaApp * { box-sizing: border-box; }
+#vardiyaApp {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Roboto, 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  }
+#vardiyaApp .app { max-width: 480px; margin: 0 auto; padding: 22px 16px 40px; }
+#vardiyaApp button { font-family: inherit; cursor: pointer; }
+#vardiyaApp button:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+#vardiyaApp .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#vardiyaApp .top small { display: block; font-size: 13px; font-weight: 600; color: var(--muted); }
+#vardiyaApp .top h1 { margin: 2px 0 0; font-size: 30px; font-weight: 800; line-height: 1.1; }
+#vardiyaApp .badge {
+    flex: none; width: 54px; height: 54px; border-radius: 16px;
+    display: grid; place-items: center;
+    background: var(--navy); color: #fff; font-size: 26px; font-weight: 800;
+  }
+#vardiyaApp .tabs {
+    margin-top: 18px; padding: 5px; border-radius: 18px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+    background: #e9ecf5;
+  }
+#vardiyaApp .tabs button {
+    border: 0; background: transparent; border-radius: 14px;
+    height: 46px; font-size: 18px; font-weight: 700; color: var(--muted);
+  }
+#vardiyaApp .tabs button[aria-selected="true"] { background: #fff; color: var(--navy); box-shadow: 0 1px 4px rgba(20,33,61,0.12); }
+#vardiyaApp .today {
+    margin-top: 16px; padding: 14px 16px; border-radius: 18px;
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card); border: 1px solid var(--line);
+    border-left: 6px solid var(--c, var(--O));
+  }
+#vardiyaApp .today-ico {
+    flex: none; width: 52px; height: 52px; border-radius: 14px;
+    display: grid; place-items: center; color: #fff; font-size: 24px; font-weight: 800;
+    background: var(--c, var(--O));
+  }
+#vardiyaApp .today-txt { flex: 1; min-width: 0; }
+#vardiyaApp .today-txt span { display: block; font-size: 14px; color: var(--muted); font-weight: 500; }
+#vardiyaApp .today-txt b { display: block; font-size: 20px; font-weight: 800; margin-top: 2px; }
+#vardiyaApp .today-chip {
+    flex: none; padding: 8px 14px; border-radius: 12px;
+    font-weight: 800; font-size: 18px; color: var(--c, var(--O));
+    background: color-mix(in srgb, var(--c, var(--O)) 14%, #fff);
+  }
+#vardiyaApp .month { margin-top: 18px; display: flex; align-items: center; justify-content: space-between; }
+#vardiyaApp .month h2 { margin: 0; font-size: 22px; font-weight: 800; }
+#vardiyaApp .nav {
+    width: 48px; height: 48px; border: 0; border-radius: 14px;
+    background: var(--soft); color: var(--navy); font-size: 22px; font-weight: 800;
+  }
+#vardiyaApp .counts {
+    margin-top: 14px; padding: 12px 6px; border-radius: 18px;
+    display: grid; grid-template-columns: repeat(4, 1fr); text-align: center;
+    background: var(--card); border: 1px solid var(--line);
+  }
+#vardiyaApp .counts i { display: block; width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 4px; }
+#vardiyaApp .counts b { display: block; font-size: 24px; font-weight: 800; }
+#vardiyaApp .counts span { font-size: 13px; color: var(--muted); }
+#vardiyaApp .dow,
+#vardiyaApp .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+#vardiyaApp .dow { margin-top: 16px; text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); }
+#vardiyaApp .grid { margin-top: 8px; }
+#vardiyaApp .day {
+    aspect-ratio: 1 / 1.02; border-radius: 12px; color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 17px; line-height: 1.15;
+  }
+#vardiyaApp .day { border: 0; padding: 0; font-family: inherit; cursor: pointer; }
+#vardiyaApp .day.sel-d { outline: 3px solid #111; outline-offset: -1px; }
+#vardiyaApp .day.empty { cursor: default; }
+#vardiyaApp .picker {
+    margin-top: 16px; padding: 12px 14px; border-radius: 18px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--line);
+  }
+#vardiyaApp .picker label { flex: 1; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--muted); }
+#vardiyaApp .picker input {
+    flex: 1; min-width: 0; height: 46px; padding: 0 12px;
+    border: 1px solid #cfd8ea; border-radius: 12px; background: #fff;
+    font: 600 17px Roboto, 'Segoe UI', system-ui, sans-serif; color: var(--ink);
+  }
+#vardiyaApp .picker button {
+    height: 46px; padding: 0 16px; border: 0; border-radius: 12px;
+    background: var(--navy); color: #fff; font-size: 16px; font-weight: 700;
+  }
+#vardiyaApp .all { margin-top: 12px; padding: 14px 16px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+#vardiyaApp .all h3 { margin: 0 0 8px; font-size: 18px; font-weight: 800; }
+#vardiyaApp .all-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 12px; font-size: 17px; }
+#vardiyaApp .all-row i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); flex: none; }
+#vardiyaApp .all-row span { flex: 1; color: var(--muted); font-weight: 500; }
+#vardiyaApp .all-row b { font-weight: 800; }
+#vardiyaApp .all-row.mine { background: color-mix(in srgb, var(--c) 14%, #fff); }
+#vardiyaApp .all-row.mine span { color: var(--ink); }
+#vardiyaApp .day.empty { visibility: hidden; }
+#vardiyaApp .S { background: var(--S); }
+#vardiyaApp .O { background: var(--O); }
+#vardiyaApp .G { background: var(--G); }
+#vardiyaApp .I { background: var(--I); }
+#vardiyaApp .legend,
+#vardiyaApp .export {
+    margin-top: 16px; padding: 14px 16px; border-radius: 18px;
+    background: var(--card); border: 1px solid var(--line);
+  }
+#vardiyaApp .legend h3,
+#vardiyaApp .export h3 { margin: 0 0 10px; font-size: 18px; font-weight: 800; }
+#vardiyaApp .legend ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 16px; }
+#vardiyaApp .legend li::before { content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; vertical-align: -2px; background: var(--c); }
+#vardiyaApp .export p { margin: -6px 0 12px; font-size: 14px; color: var(--muted); }
+#vardiyaApp .export div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#vardiyaApp .export button { height: 50px; border-radius: 14px; font-size: 17px; font-weight: 700; border: 1px solid #cfd8ea; background: var(--soft); color: var(--navy); }
+#vardiyaApp .export button.primary { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+
+  
+  @media print {
+    body > *:not(#vardiyaView) { display: none !important; }
+    #vardiyaView { position: static; overflow: visible; }
+    .vbar { display: none; }
+#vardiyaApp { background: #fff; }
+#vardiyaApp .tabs,
+#vardiyaApp .nav,
+#vardiyaApp .export,
+#vardiyaApp .today,
+#vardiyaApp .picker,
+#vardiyaApp .all { display: none; }
+#vardiyaApp .day { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#vardiyaApp .counts,
+#vardiyaApp .legend { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  
   }
 </style>
 </head>
@@ -268,8 +465,8 @@
   <!-- ANA PORTAL EKRANI -->
   <div id="mainPortalView">
     <div class="hero">
-      <div class="mono" style="color:var(--amber); font-size:12px; letter-spacing:2px;">SİSTEM PORTALI</div>
-      <h1>Erişmek İstediğiniz Portalı Seçin</h1>
+      <div class="mono" style="color:var(--amber); font-size:12px; letter-spacing:2px;">TGS YARDIMLAŞMA</div>
+      <h1>Erişmek İstediğiniz Bölümü Seçin</h1>
       <p>Modüllere ve ilgili bağlantılara ulaşmak için bir kategoriye tıklayın.</p>
     </div>
 
@@ -299,7 +496,7 @@
       <div class="portal-card" onclick="openSection('giris')">
         <div class="icon-circle">🚪</div>
         <div class="portal-title">Giriş Portalı</div>
-        <div class="portal-subtitle">MyPass & Fiori Sistemleri</div>
+        <div class="portal-subtitle">MyPass & Vardiya Programı</div>
       </div>
 
       <!-- 05 DOKÜMAN -->
@@ -313,7 +510,7 @@
       <div class="portal-card" onclick="openSection('operasyon')">
         <div class="icon-circle">⚙️</div>
         <div class="portal-title">Operasyon Portalı</div>
-        <div class="portal-subtitle">Uçuşlar & Vardiya APK</div>
+        <div class="portal-subtitle">Uçuşlar & Vardiya Takvimi</div>
       </div>
     </div>
   </div>
@@ -322,7 +519,7 @@
   <div id="detailView" class="hidden">
     
     <div class="view-header">
-      <button class="back-btn" onclick="showMainPortal()">← Ana Portala Dön</button>
+      <button class="back-btn" onclick="showMainPortal()">← Ana Sayfaya Dön</button>
       <h2 id="detailTitle" style="margin:0; font-size:22px;">Kategori Başlığı</h2>
     </div>
 
@@ -402,9 +599,9 @@
           <span class="row-title">MyPass Portal Girişi</span>
           <span class="row-arrow">↗</span>
         </a>
-        <a class="row" href="https://mobil.tgs.aero/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html?sap-client=100&sap-language=TR" target="_blank">
+        <a class="row" href="https://drive.google.com/file/d/1w7gU_FhL6SV2eNO8nk1WpncgmlRxNjzN/view?usp=sharing" target="_blank">
           <span class="row-code">G2</span>
-          <span class="row-title">Fiori Sistem Girişi</span>
+          <span class="row-title">Vardiya Programı</span>
           <span class="row-arrow">↗</span>
         </a>
       </div>
@@ -454,19 +651,271 @@
           <span class="row-title">Departure (Giden Uçuşlar)</span>
           <span class="row-arrow">↗</span>
         </a>
-        <a class="row" href="https://mobil.tgs.aero/" target="_blank">
+        <a class="row" href="#vardiya" onclick="openVardiyaChoice(event)">
           <span class="row-code">O3</span>
-          <span class="row-title">Vardiya / Roaster APK İndir</span>
-          <span class="row-arrow">↗</span>
+          <span class="row-title">Vardiya / Roaster (Web veya APK)</span>
+          <span class="row-arrow">›</span>
         </a>
       </div>
     </div>
 
   </div>
 
-  <footer class="mono">TGS // KURUMSAL WEB PORTALI</footer>
-
 </div>
+
+<!-- VARDİYA TAKVİMİ -->
+<div id="vardiyaView" class="hidden" role="dialog" aria-modal="true" aria-label="Vardiya takvimi">
+  <div class="vbar">
+    <button type="button" id="vardiyaBack">← Ana sayfaya dön</button>
+    <span>Vardiya takvimi</span>
+  </div>
+  <div id="vardiyaApp">
+    <main class="app">
+
+  <div class="top">
+    <div>
+      <small>Ekip vardiya takvimi</small>
+      <h1>Vardiyanız hazır</h1>
+    </div>
+    <div class="badge" id="badge">A</div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Ekip seçimi" id="tabs"></div>
+
+  <div class="picker">
+    <label>Tarih <input type="date" id="dateIn" aria-label="Tarih seç"></label>
+    <button type="button" id="todayBtn">Bugün</button>
+  </div>
+
+  <div class="today" id="today"></div>
+
+  <div class="all" id="all"></div>
+
+  <div class="month">
+    <button class="nav" id="prev" aria-label="Önceki ay">‹</button>
+    <h2 id="monthTitle"></h2>
+    <button class="nav" id="next" aria-label="Sonraki ay">›</button>
+  </div>
+
+  <div class="counts" id="counts"></div>
+
+  <div class="dow" aria-hidden="true">
+    <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <div class="legend">
+    <h3>Vardiya renkleri</h3>
+    <ul>
+      <li style="--c:var(--S)">Sabah</li><li style="--c:var(--O)">Orta</li>
+      <li style="--c:var(--G)">Gece</li><li style="--c:var(--I)">İzin</li>
+    </ul>
+  </div>
+
+  <div class="export">
+    <h3>Aylık programı dışa aktar</h3>
+    <p id="exportSub"></p>
+    <div>
+      <button id="pdfBtn" type="button">PDF</button>
+      <button id="csvBtn" type="button" class="primary">Excel</button>
+    </div>
+  </div>
+
+</main>
+  </div>
+</div>
+
+<!-- VARDİYA / ROASTER SEÇİM PENCERESİ -->
+<div id="vardiyaChoice" class="choice-overlay hidden" onclick="if(event.target===this) closeVardiyaChoice()">
+  <div class="choice-box" role="dialog" aria-modal="true" aria-labelledby="choiceTitle">
+    <h3 id="choiceTitle">Vardiya / Roaster</h3>
+    <p>Nasıl açmak istersin?</p>
+    <a class="choice-btn" href="#vardiya" onclick="openVardiyaWeb(event)">
+      <b>Web'den aç</b>
+      <span>iPhone, bilgisayar ve Android. Kurulum gerekmez.</span>
+    </a>
+    <a class="choice-btn" href="https://mobil.tgs.aero/" target="_blank">
+      <b>APK indir</b>
+      <span>Sadece Android telefonlar için.</span>
+    </a>
+    <button class="choice-close" onclick="closeVardiyaChoice()">Vazgeç</button>
+  </div>
+</div>
+
+<script>
+(function () {
+
+  // ---- AYARLAR ----
+  // Her ekip 8 günlük döngüyü izler: 2 gün Sabah, 2 gün Orta, 2 gün Gece, 2 gün İzin.
+  // Döngünün başlangıcı: A ekibi için 6 Kasım 2026 = Sabah'ın ilk günü (uygulamadan doğrulandı).
+  // B, C, D ekiplerinin kayma değerleri (gün) aşağıdadır. Uygulamayla farklıysa sadece bu sayıları değiştir.
+  const CYCLE = ['S','S','O','O','G','G','I','I'];
+  const ANCHOR = Date.UTC(2026, 10, 6);
+  const TEAMS = { A: 0, B: 2, C: 4, D: 6 };
+  // -----------------
+
+  const INFO = {
+    S: { name: 'Sabah', letter: 'S', color: 'var(--S)' },
+    O: { name: 'Orta',  letter: 'O', color: 'var(--O)' },
+    G: { name: 'Gece',  letter: 'G', color: 'var(--G)' },
+    I: { name: 'İzin',  letter: 'İ', color: 'var(--I)' }
+  };
+  const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+  const now = new Date();
+  let team = 'A';
+  try { const s = localStorage.getItem('vardiya-ekip'); if (s && TEAMS[s] !== undefined) team = s; } catch (e) {}
+  let year = now.getFullYear(), month = now.getMonth();
+
+  const mod = (n, m) => ((n % m) + m) % m;
+  function shiftOf(t, y, m, d) {
+    const days = Math.round((Date.UTC(y, m, d) - ANCHOR) / 86400000);
+    return CYCLE[mod(days + TEAMS[t], 8)];
+  }
+
+  const $ = id => document.getElementById(id);
+
+  function renderTabs() {
+    $('tabs').innerHTML = Object.keys(TEAMS).map(t =>
+      `<button role="tab" type="button" data-t="${t}" aria-selected="${t === team}">${t}</button>`).join('');
+    $('tabs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      team = b.dataset.t;
+      try { localStorage.setItem('vardiya-ekip', team); } catch (e) {}
+      render();
+    }));
+  }
+
+  const DOW = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  let sel = { y: now.getFullYear(), m: now.getMonth(), d: now.getDate() };
+  let followToday = true;
+  const pad = n => String(n).padStart(2, '0');
+
+  function isTodayDate(s) {
+    const n = new Date();
+    return s.y === n.getFullYear() && s.m === n.getMonth() && s.d === n.getDate();
+  }
+
+  function render() {
+    renderTabs();
+    $('badge').textContent = team;
+    $('dateIn').value = `${sel.y}-${pad(sel.m + 1)}-${pad(sel.d)}`;
+
+    // Seçilen gün kartı
+    const k = shiftOf(team, sel.y, sel.m, sel.d);
+    const i = INFO[k];
+    const isNow = isTodayDate(sel);
+    const wd = DOW[new Date(sel.y, sel.m, sel.d).getDay()];
+    const card = $('today');
+    card.style.setProperty('--c', i.color);
+    card.innerHTML =
+      `<div class="today-ico">◔</div>
+       <div class="today-txt"><span>${isNow ? 'Bugün · ' : ''}${sel.d} ${MONTHS[sel.m]} ${sel.y} ${wd}</span>
+       <b>${team} Ekibi · ${i.name}</b></div>
+       <div class="today-chip">${i.letter}</div>`;
+
+    // O gün hangi ekip hangi vardiyada
+    let rows = '';
+    ['S','O','G','I'].forEach(s => {
+      const who = Object.keys(TEAMS).filter(t2 => shiftOf(t2, sel.y, sel.m, sel.d) === s);
+      rows += `<div class="all-row${who.includes(team) ? ' mine' : ''}" style="--c:${INFO[s].color}"><i></i><span>${INFO[s].name}</span><b>${who.map(w => w + ' Ekibi').join(', ')}</b></div>`;
+    });
+    $('all').innerHTML = `<h3>${isNow ? 'Bugün çalışan ekipler' : sel.d + ' ' + MONTHS[sel.m] + ' günü ekipler'}</h3>${rows}`;
+
+    // Ay başlığı ve takvim
+    $('monthTitle').textContent = `${MONTHS[month]} ${year}`;
+    const dim = new Date(year, month + 1, 0).getDate();
+    const lead = (new Date(year, month, 1).getDay() + 6) % 7;
+    const counts = { S: 0, O: 0, G: 0, I: 0 };
+    let cells = '<div class="day empty"></div>'.repeat(lead);
+    for (let d = 1; d <= dim; d++) {
+      const s = shiftOf(team, year, month, d);
+      counts[s]++;
+      const isSel = d === sel.d && month === sel.m && year === sel.y;
+      cells += `<button type="button" class="day ${s}${isSel ? ' sel-d' : ''}" data-d="${d}" aria-label="${d} ${MONTHS[month]}, ${INFO[s].name}"><span>${d}</span><span>${INFO[s].letter}</span></button>`;
+    }
+    $('grid').innerHTML = cells;
+    $('grid').querySelectorAll('button.day').forEach(b => b.addEventListener('click', () => {
+      sel = { y: year, m: month, d: +b.dataset.d };
+      followToday = isTodayDate(sel);
+      render();
+    }));
+
+    $('counts').innerHTML = ['S','O','G','I'].map(s =>
+      `<div><i style="background:${INFO[s].color}"></i><b>${counts[s]}</b><span>${INFO[s].name}</span></div>`).join('');
+
+    $('exportSub').textContent = `${team} Ekibi · ${MONTHS[month]} ${year}`;
+  }
+
+  $('dateIn').addEventListener('change', e => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(e.target.value);
+    if (!m) return;
+    sel = { y: +m[1], m: +m[2] - 1, d: +m[3] };
+    year = sel.y; month = sel.m;
+    followToday = isTodayDate(sel);
+    render();
+  });
+
+  function goToday() {
+    const n = new Date();
+    sel = { y: n.getFullYear(), m: n.getMonth(), d: n.getDate() };
+    year = sel.y; month = sel.m;
+    followToday = true;
+    render();
+  }
+  $('todayBtn').addEventListener('click', goToday);
+
+  // Sayfa açık kalırsa ve gün değişirse (gece yarısı, telefon uykudan dönünce) bugüne güncelle
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && followToday && !isTodayDate(sel)) goToday(); });
+  setInterval(() => { if (followToday && !isTodayDate(sel)) goToday(); }, 60000);
+
+  $('prev').addEventListener('click', () => { month--; if (month < 0) { month = 11; year--; } render(); });
+  $('next').addEventListener('click', () => { month++; if (month > 11) { month = 0; year++; } render(); });
+
+  $('pdfBtn').addEventListener('click', () => window.print());
+
+  $('csvBtn').addEventListener('click', () => {
+    const dim = new Date(year, month + 1, 0).getDate();
+    const gun = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+    let csv = 'Tarih;Gün;Vardiya\r\n';
+    for (let d = 1; d <= dim; d++) {
+      const dt = new Date(year, month, d);
+      csv += `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year};${gun[dt.getDay()]};${INFO[shiftOf(team, year, month, d)].name}\r\n`;
+    }
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${team}-ekibi-${MONTHS[month]}-${year}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  render();
+
+  // ---- Portal ile bağlantı ----
+  const view = document.getElementById('vardiyaView');
+  function showView() {
+    if (followToday && !isTodayDate(sel)) goToday(); else render();
+    view.classList.remove('hidden');
+    view.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+    try { history.replaceState(null, '', '#vardiya'); } catch (e) {}
+  }
+  function hideView() {
+    view.classList.add('hidden');
+    document.body.style.overflow = '';
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  }
+  document.getElementById('vardiyaBack').addEventListener('click', hideView);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !view.classList.contains('hidden')) hideView(); });
+  window.openVardiyaWeb = function (e) {
+    if (e) e.preventDefault();
+    document.getElementById('vardiyaChoice').classList.add('hidden');
+    showView();
+  };
+  if (location.hash === '#vardiya') showView();
+
+})();
+</script>
 
 <script>
   const mainPortalView = document.getElementById('mainPortalView');
@@ -502,6 +951,15 @@
     mainPortalView.classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  function openVardiyaChoice(e) {
+    e.preventDefault();
+    document.getElementById('vardiyaChoice').classList.remove('hidden');
+  }
+  function closeVardiyaChoice() {
+    document.getElementById('vardiyaChoice').classList.add('hidden');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVardiyaChoice(); });
 
   const themeToggle = document.getElementById('themeToggle');
   themeToggle.addEventListener('click', () => {
