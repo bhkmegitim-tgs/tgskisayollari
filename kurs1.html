@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Havacılık Güvenliği Kurs 1 Deneme Sınavı</title>
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#14213d;--mut:#5b6678;--line:#d3d9e1;--acc:#14213d;--onacc:#fff;--hi:#e8b923;--ok:#1b7f4b;--bad:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1624;--card:#18233a;--ink:#e8edf6;--mut:#9aa7bd;--line:#2c3b58;--acc:#e8b923;--onacc:#14213d;--ok:#4cc38a;--bad:#ff7b72;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+h1{font:700 1.7rem/1.2 Georgia,serif;margin:8px 0 6px}
+.sub{color:var(--mut);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input[type=text]{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink)}
+button{font:inherit;font-weight:600;padding:11px 20px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:var(--onacc);cursor:pointer;margin:16px 8px 0 0}
+button.g{background:transparent;color:var(--ink);border-color:var(--line)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.q{font-weight:600;margin:0 0 10px}
+.o{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:8px;margin:6px 0;cursor:pointer}
+.o:has(input:checked){border-color:var(--hi);box-shadow:inset 3px 0 0 var(--hi)}
+.o input{margin-top:6px}
+.o.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.o.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;color:var(--mut);font-size:.95rem;z-index:5}
+.score{font:700 3rem/1 Georgia,serif;margin:6px 0}
+.pass{color:var(--ok)}.fail{color:var(--bad)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Havacılık Güvenliği – Kurs 1 Deneme Sınavı</h1>
+<p class="sub">20 soru · her doğru 5 puan · toplam 100 puan · geçme notu 60</p>
+
+<section id="giris" class="card">
+<p>Bilgilerinizi yazıp sınavı başlatın. Sorular havuzdan rastgele seçilir; şıkların sırası da her seferinde değişir.</p>
+<label for="ad">Ad Soyad</label><input type="text" id="ad" autocomplete="name">
+<label for="sicil">Personel Sicil No</label><input type="text" id="sicil" inputmode="numeric">
+<button id="basla">Sınava başla</button>
+</section>
+
+<section id="sinav" class="hide">
+<div class="bar" id="bar"></div>
+<div id="liste"></div>
+<button id="bitir">Sınavı bitir</button>
+<button class="g" id="cik1">Çıkış</button>
+</section>
+
+<section id="sonuc" class="hide card">
+<div id="kim" class="sub"></div>
+<div class="score" id="puan"></div>
+<div id="durum"></div>
+<div id="yanlis"></div>
+<button id="yeni">Yeni deneme</button>
+<button class="g" id="cik2">Çıkış</button>
+</section>
+</main>
+<script>
+const SORULAR=`Bireysel tehdidin genel özelliği hangisidir?|Öngörülemez olması; kaynak, eğitim ve uzmanlığının az olması|Çok iyi örgütlenmiş olması|Geniş kaynaklara sahip olması|Yüksek eğitim ve uzmanlığa sahip olması|Devlet desteğiyle hareket etmesi
+Organize tehdit, bireysel tehdide göre nasıl özellikler taşır?|Daha öngörülebilir; kaynak, eğitim ve uzmanlığı daha fazla|Daha öngörülemez; kaynağı daha az|Eğitimi ve uzmanlığı daha az|Yalnızca tek kişiden oluşur|Hiçbir plan yapmaz
+İç tehdidin kaynağı kimdir?|Personel|Yolcu|Ziyaretçi|Tedarikçi araç şoförü|Basın mensubu
+Tarihteki ilk hava korsanlığı eylemi nerede ve ne zaman gerçekleşmiştir?|1930 – Peru|1947 – Romanya|1963 – Japonya|1970 – Hollanda|2001 – ABD
+İlk ölümlü uçak kaçırma eylemi hangi yıl ve nerede yaşanmıştır?|1947 – Romanya|1930 – Peru|1944 – ABD|1971 – Kanada|1991 – Kanada
+Havacılıkta kasıtlı eylemleri (sabotaj, rehin alma gibi) kapsayan kavram hangisidir?|Güvenlik (security)|Emniyet (safety)|Kaza|Arıza|Bakım
+Havacılıkta kasıtsız olayları (kaza gibi) kapsayan kavram hangisidir?|Emniyet (safety)|Güvenlik (security)|Sabotaj|Rehin alma|Hava korsanlığı
+Aşağıdakilerden hangisi güvenlik (security) kapsamında bir tehdittir?|Sabotaj|Teknik arıza sonucu kaza|Kasıtsız hata|Hava koşulları nedeniyle iniş|Kuş çarpması
+Ülkeye kabul edilmeyen yolcuya ne ad verilir?|İnat yolcu|Deport yolcu|Kural dışı yolcu|Mahkum yolcu|Transit yolcu
+Sınır dışı edilen yolcuya ne ad verilir?|Deport yolcu|İnat yolcu|Kural dışı yolcu|Hukuki işlemlere maruz yolcu|Transfer yolcu
+Hukuki işlemlere maruz yolcu kimdir?|Mahkum|Ülkeye kabul edilmeyen yolcu|Sınır dışı edilen yolcu|Kurallara uymayan yolcu|Transit yolcu
+Kurallara uymayan yolcuya ne ad verilir?|Kural dışı yolcu|İnat yolcu|Deport yolcu|Mahkum yolcu|VIP yolcu
+Aşağıdakilerden hangisi patlayıcı düzeneğin bileşenlerinden biri değildir?|Radar|Fünye|Zamanlayıcı|Güç kaynağı|Ateşleyici
+Atatürk Havalimanı’na yönelik saldırı hangi tarihte gerçekleşmiştir?|28.06.2016|11.09.2001|07.12.1944|28.06.2010|01.01.2017
+11 Eylül 2001 saldırılarını gerçekleştiren örgüt hangisidir?|El Kaide|ICAO|IATA|ECAC|EUROCONTROL
+11 Eylül 2001 saldırılarında kaç uçak kullanılmıştır?|4|2|3|5|6
+11 Eylül sonrasında kokpit kapıları için hangi önlem alınmıştır?|Bombaya karşı güçlendirilmiş ve kilitli hale getirilmiştir|Kaldırılmıştır|Cam yapılmıştır|Açık bırakılmıştır|Sadece yolcu kabinine taşınmıştır
+11 Eylül saldırıları havacılık güvenliğine hangi yeni boyutu getirmiştir?|Hava aracının silah olarak kullanılması|Uçakların bakımının aksaması|Havalimanı ücretlerinin artması|Rötar sorunlarının artması|Kuş çarpması riskinin artması
+Şikago Ana Anlaşması hangi tarihte imzalanmıştır?|7.12.1944|28.06.2016|11.09.2001|01.01.1963|14.09.1963
+1963 Tokyo Sözleşmesi ile uçak içindeki saldırılarda kime yetki verilmiştir?|Pilota|Yolcuya|Havalimanı müdürüne|Hosteslere|Polis memuruna
+Uçak kaçırma ile ilgili 1970 tarihli anlaşma hangisidir?|Lahey|Tokyo|Şikago|Pekin|Montreal
+Hukuka aykırı eylemlerin önlenmesi ile ilgili anlaşma hangisidir?|Montreal (1971, protokol 1988)|Tokyo|Lahey|Şikago|MEX
+1971 Montreal Anlaşması ve 1988 Protokolü’nün yerine hangi sözleşme geçmiştir?|2010 Pekin Sözleşmesi|1963 Tokyo Sözleşmesi|1970 Lahey Sözleşmesi|1944 Şikago Sözleşmesi|1991 MEX Sözleşmesi
+Plastik patlayıcıların işaretlenmesi ile ilgili 1991 tarihli sözleşme hangisidir?|MEX Sözleşmesi|Lahey Sözleşmesi|Tokyo Sözleşmesi|Pekin Sözleşmesi|Şikago Sözleşmesi
+Havacılık güvenliği ile ilgili ICAO Ek’i (Annex) hangisidir?|Annex 17|Annex 1|Annex 9|Annex 19|Annex 30
+ICAO Doc 8973 neyi içerir?|Güvenlik konusunun detaylı anlatımını|Annex 17’nin kısa özetini|Havalimanı ücret tarifesini|Yalnızca eğitim programını|Sadece tehdit listesini
+Ulusal Sivil Havacılık Güvenlik Programı’nın (USHGP) yetkili otoritesi hangisidir?|SHGM|MİA|HGK|USHGK|IATA
+UHGKKP neyi ifade eder?|Ulusal Havacılık Güvenliği Kalite Kontrol Programı|Ulusal Eğitim Programı|Havaalanı Güvenlik Programı|Ulusal Sivil Havacılık Güvenlik Programı|Giriş Kartı Programı
+Ulusal sivil havacılık güvenliği eğitim programı hangisidir?|USGHEP|USHGP|UHGKKP|HGP|HGK
+Havaalanı Güvenlik Programı (HGP) kim tarafından hazırlanır?|Havaalanı işletmecisi (kendisi tarafından yapılan plan)|ICAO|IATA|EASA|EUROCONTROL
+ICAO’nun üyeleri kimlerdir?|Devletler|Sivil havayolu firmaları|Yolcular|Havalimanı personeli|Kargo şirketleri
+ICAO’nun üye sayısı kaçtır?|193|19|45|30|90
+ICAO hangi yıl kurulmuştur?|1945|1930|1963|1970|1991
+ICAO genel toplantısı kaç yılda bir yapılır?|3 yılda bir|Her yıl|2 yılda bir|5 yılda bir|10 yılda bir
+ICAO tarafından şimdiye kadar yayınlanan Annex sayısı kaçtır?|19|17|9|30|193
+Sivil firmaları (havayolu şirketlerini) temsil eden kuruluş hangisidir?|IATA|ICAO|EASA|ECAC|JAA
+Aşağıdakilerden hangisi Avrupa’daki yapılanmalardan biridir?|EUROCONTROL|ICAO|IATA|SHGM|HGK
+Ulusal yapılanmada yer alan dört yapıdan biri olmayan hangisidir?|EADUK|Yetkili otorite|Yerel otorite|USHGK|HHK
+Ulusal düzeydeki otorite hangisidir?|SHGM|MİA|HGK|USHGK|IATA
+Yerel otorite hangisidir?|MİA|SHGM|USHGK|IATA|ICAO
+USHGK’nın görevi nedir?|Tavsiye ve danışmanlık|Havalimanı işletmek|Uçuş yapmak|Bilet satmak|Giriş kartı basmak
+HGK nedir?|Paydaşların yer aldığı komisyon|Ulusal otorite|Uluslararası örgüt|Yalnızca bir yolcu sınıfı|Eğitim sertifikası
+Güvenlik tehditli alanlar nerelerdir?|Gidiş yolcularının bulunduğu alanlar|Geliş yolcularının bulunduğu alanlar|Yalnızca otopark|Yalnızca kargo deposu|Yalnızca yönetim binası
+Demarke alan nedir?|İndirilmesi gereken yolcu olduğunda uçakların güvenlik kontrolü için çekildiği alan|Yolcu bekleme salonu|Bagaj teslim bandı|Otopark alanı|Yakıt ikmal deposu
+Giriş kontrolünde hangi belge kullanılır?|Biniş kartı veya apron kartı|Yalnızca pasaport|Bagaj etiketi|Sürücü belgesi|Fatura
+Kontrol türleri hangisidir?|Görsel, elektronik, hibrit, biyometrik|Görsel, sözlü, yazılı, işitsel|Elektronik, mekanik, manuel, optik|Biyometrik, kimyasal, termal, fiziksel|Hibrit, sözlü, mekanik, görsel
+Geçici giriş kartı en fazla kaç gün geçerlidir?|90 gün|1 gün|30 gün|180 gün|365 gün
+Hangi giriş kartı 1 günlüktür?|Geçici (günlük) kart|Daimi kart|Tüm meydanlar kartı|Personel kartı|Biyometrik kart
+Personel giriş kartı ile ilgili hangisi doğrudur?|Soğuk damga bulunmaz|Soğuk damga bulunur|Yalnızca yolcular kullanır|Sadece 1 gün geçerlidir|Biniş kartı yerine geçer`.split('\n').map(l=>l.split('|'));
+const $=id=>document.getElementById(id);
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const L='ABCDE';let sec=[];
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function goster(id){['giris','sinav','sonuc'].forEach(x=>$(x).classList.toggle('hide',x!==id));window.scrollTo(0,0)}
+function baslat(){
+  if(!$('ad').value.trim()||!$('sicil').value.trim()){alert('Ad soyad ve sicil no alanlarını doldurun.');return}
+  sec=sh(SORULAR).slice(0,20).map(q=>({q:q[0],o:sh(q.slice(1).map((t,i)=>({t,c:i===0})))}));
+  $('liste').innerHTML=sec.map((s,i)=>`<div class="card"><p class="q">${i+1}. ${esc(s.q)}</p>`+s.o.map((o,k)=>`<label class="o"><input type="radio" name="q${i}" value="${k}"><span>${L[k]}) ${esc(o.t)}</span></label>`).join('')+`</div>`).join('');
+  $('liste').oninput=sayac;sayac();goster('sinav');
+}
+function sayac(){const n=sec.filter((_,i)=>document.querySelector(`input[name=q${i}]:checked`)).length;$('bar').textContent=`${n} / ${sec.length} soru cevaplandı`}
+function bitir(){
+  const bos=sec.filter((_,i)=>!document.querySelector(`input[name=q${i}]:checked`)).length;
+  if(bos&&!confirm(`${bos} soru boş. Yine de bitirmek istiyor musunuz?`))return;
+  let d=0,y='';
+  sec.forEach((s,i)=>{
+    const c=document.querySelector(`input[name=q${i}]:checked`),k=c?+c.value:-1,dog=s.o.findIndex(o=>o.c);
+    if(k===dog)d++;
+    else y+=`<div class="card"><p class="q">${i+1}. ${esc(s.q)}</p>`+s.o.map((o,j)=>`<div class="o ${j===dog?'ok':j===k?'bad':''}">${L[j]}) ${esc(o.t)}${j===dog?' (doğru cevap)':j===k?' (cevabınız)':''}</div>`).join('')+(k<0?'<p class="sub">Boş bırakıldı.</p>':'')+`</div>`;
+  });
+  const p=d*5,g=p>=60;
+  $('kim').textContent=`${$('ad').value.trim()} · Sicil: ${$('sicil').value.trim()}`;
+  $('puan').textContent=`${p} / 100`;
+  $('durum').innerHTML=`<strong class="${g?'pass':'fail'}">${g?'GEÇTİ':'KALDI'}</strong> · ${d} doğru, ${sec.length-d} yanlış/boş`;
+  $('yanlis').innerHTML=y?`<h2>Yanlış ve boş sorular</h2>${y}`:'<p>Tüm soruları doğru yanıtladınız.</p>';
+  goster('sonuc');
+}
+function cikis(){$('ad').value='';$('sicil').value='';sec=[];goster('giris')}
+$('basla').onclick=baslat;$('bitir').onclick=bitir;$('yeni').onclick=()=>{baslat()};$('cik1').onclick=cikis;$('cik2').onclick=cikis;
+</script>
+</body>
+</html>
