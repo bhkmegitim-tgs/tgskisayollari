@@ -38,3 +38,251 @@ input[type=radio]{margin-right:8px}
     <span><b>25 soru</b> (havuzdan rastgele)</span>
     <span><b>5 şık</b> (A-E)</span>
     <span><b>Soru başı 4 puan</b></span>
+    <span><b>Toplam 100 puan</b></span>
+    <span><b>Geçme notu: 90</b></span>
+  </div>
+  <p class="note">Her girişte soru seti yeniden karıştırılır. Sınav bitince puanınız, yanlış cevaplarınız ve doğru cevaplar gösterilir.</p>
+  <div><label>Ad Soyad <input id="ad" type="text" style="width:100%;padding:8px;margin-top:4px"></label></div>
+  <div><label>Sicil No <input id="sicil" type="text" style="width:100%;padding:8px;margin-top:4px"></label></div>
+  <button id="startBtn" onclick="startExam()">Sınavı Başlat</button>
+</div>
+
+<div id="exam" class="hidden">
+  <div class="card info"><span id="progress"></span><span id="who" class="note"></span></div>
+  <form id="form" onsubmit="return false"></form>
+  <div class="card"><button onclick="finish()">Sınavı Bitir ve Sonucu Gör</button></div>
+</div>
+
+<div id="result" class="hidden">
+  <div class="card" style="text-align:center">
+    <div class="score" id="score"></div>
+    <div id="verdict"></div>
+    <p id="counts" class="note"></p>
+    <button onclick="startExam()">Yeni Sınav (yeni rastgele set)</button>
+  </div>
+  <div id="review"></div>
+</div>
+
+</div>
+
+<script>
+const POOL = [
+// 1
+["ICAO Ek 19'a göre emniyet (safety) en doğru hangisidir?",
+ ["Hiçbir riskin bulunmadığı mutlak emniyet durumudur","Sivil havacılığın yasa dışı müdahalelere karşı korunmasıdır","Hava aracı işletmesine katkı sağlayan risklerin kabul edilebilir düzeye indirilmesi ve kontrol altında tutulmasıdır","Yalnızca kazaların soruşturulmasıdır"], 2],
+// 2
+["Tehlike (hazard) için hangisi doğrudur?",
+ ["Tehlikenin gerçekleşme olasılığı ile şiddetinin çarpımıdır","Yalnızca doğal afetlerden oluşur","İnsan, ekipman veya yapılara zarar verme ya da belirlenmiş bir işlevi engelleme potansiyeli olan durum, nesne veya eylemdir","Havacılıkta tamamen ortadan kaldırılabilir"], 2],
+// 3
+["Emniyet risk yönetiminde risk nasıl ifade edilir?",
+ ["Risk = Olasılık + Şiddet","Risk = Şiddet / Olasılık","Risk = Tehlike x Maliyet","Risk = Olasılık x Şiddet"], 3],
+// 4
+["Havacılıkta güvenlik (security) ICAO tarafından nasıl tanımlanır?",
+ ["Sivil havacılığın yasa dışı müdahalelere karşı korunmasıdır","Risklerin kabul edilebilir düzeyde tutulmasıdır","Hataların cezalandırılmamasıdır","Hava aracının teknik uygunluğudur"], 0],
+// 5
+["Hata ile ihlal arasındaki temel fark nedir?",
+ ["Hata cezalandırılırken ihlal cezalandırılmaz","Hata yalnızca yöneticiler tarafından yapılır","Hatada kasıt yokken ihlalde kasıt (bilinçli aykırı davranış) vardır","Hata ve ihlal arasında hiçbir fark yoktur"], 2],
+// 6
+["Rutin ihlal aşağıdakilerden hangisidir?",
+ ["Zaman baskısı veya yüksek iş yükünden doğan anlık ihlallerdir","Hiç kimsenin bilmediği gizli hatalardır","İş akışı içinde sürekli tekrarlandığı için zamanla işi yapmanın normal yolu gibi görülmeye başlanan ihlallerdir","Yalnızca ekipman arızasından doğan ihlallerdir"], 2],
+// 7
+["Emniyet eksikliğinin dolaylı maliyetlerinden biri hangisidir?",
+ ["Yaralanmalar","Gelecek dönem sigorta primlerinin yükselmesi","Mal kaybı","Ekipman onarımları"], 1],
+// 8
+["Emniyet yönetimi anlayışının dört dönemi doğru sıralanmış hangisidir?",
+ ["İnsan Faktörleri, Teknik, Toplam Sistem, Organizasyonel","Organizasyonel, Teknik, İnsan Faktörleri, Toplam Sistem","Teknik, İnsan Faktörleri, Organizasyonel, Toplam Sistem","Toplam Sistem, Organizasyonel, İnsan Faktörleri, Teknik"], 2],
+// 9
+["\"Organizasyonel kaza\" kavramı hangi dönemde öne çıkmıştır?",
+ ["1900'lerin başındaki Teknik Dönem","1970'lerin başındaki İnsan Faktörleri Dönemi","1990'ların ortalarında başlayan Organizasyonel Dönem","2010'lardaki Toplam Sistem Dönemi"], 2],
+// 10
+["EYS'nin dört ana bileşeni hangisidir?",
+ ["Emniyet politikası ve amaçları, emniyet risk yönetimi, emniyet güvencesi, emniyetin teşvik edilmesi","Tehlike kaydı, denetim, cezalandırma, istatistik","Risk analizi, acil durum planı, bakım, eğitim","Emniyet kültürü, SHELL modeli, TEM, 5M"], 0],
+// 11
+["Emniyet politikası hangi yetkili tarafından imzalanır?",
+ ["Emniyet yöneticisi","Hava trafik kontrolörü","İşletme sorumlu müdürü (Accountable Manager)","Denetim personeli"], 2],
+// 12
+["Emniyet yöneticisinin temel görevi aşağıdakilerden hangisidir?",
+ ["Emniyet politikasını tek başına imzalamak","Tüm operasyonel kararları vermek","Etkin bir EYS'nin geliştirilmesinden ve sürdürülmesinden sorumlu olup sistemin ana odak noktası olarak görev yapmak","Yalnızca kaza soruşturması yapmak"], 2],
+// 13
+["Risk değerlendirme matrisinde olasılık \"Nadiren\" ise sayısal değeri kaçtır?",
+ ["5","4","3","1"], 2],
+// 14
+["FOD vaka çalışmasında olasılık Nadiren (3), şiddet Büyük (C) ise risk matrisindeki sonuç nedir?",
+ ["3C - Kabul Edilemez","3C - Gözden Geçirme","3C - Kabul Edilebilir","5A - Kabul Edilemez"], 1],
+// 15
+["Risk azaltıcı tedbir alternatifleri değerlendirilirken ilk sorulması gereken soru hangisidir?",
+ ["Tedbir en pahalı seçenek midir?","Tedbiri kim önermiştir?","Öngörülen tedbir gerçekten etkili olacak mıdır ve riski ne kadar azaltacaktır?","Tedbir yalnızca yöneticileri mi kapsamaktadır?"], 2],
+// 16
+["Tehlike belirleme sürecinin aşamaları hangisidir?",
+ ["Tehlikeyi anlama, tanımlama, tehlike analizi ve tehlikenin kayıt altına alınması","Tehlikeyi cezalandırma, gizleme ve arşivleme","Yalnızca kaza sonrası raporlama","Denetim yapma ve sonuçları yayınlama"], 0],
+// 17
+["Reason'ın pozitif emniyet kültürünün beş öğesinden biri OLMAYAN hangisidir?",
+ ["Adil kültür","Raporlama kültürü","Rekabet kültürü","Öğrenme kültürü"], 2],
+// 18
+["Adil kültürün temelini aşağıdakilerden hangisi oluşturur?",
+ ["Her hatanın cezalandırılması","Raporlamanın gizli tutulması","Karşılıklı güven","Yalnızca denetimin sıklaştırılması"], 2],
+// 19
+["Scott Snook'un uygulama sapması (practical drift) kavramı neyi anlatır?",
+ ["Personelin kasten kural ihlali yapmasını","Tasarlanan ideal performansın, günlük uygulamalar nedeniyle zamanla uzaklaşmasını","Emniyet raporlarının gecikmesini","Sistemin tasarım aşamasında hatalı kurulmasını"], 1],
+// 20
+["SHELL modelinde L-L arayüzü neyi ifade eder?",
+ ["İnsan ile ekipmanın fiziksel özellikleri arasındaki bağı","İnsan ile fiziksel çevre arasındaki bağı","Çalışma ortamındaki bireyler arasındaki ilişki ve etkileşimleri","İnsan ile yazılım arasındaki bağı"], 2],
+// 21
+["Reason Modelinde \"aktif kırılmalar\" nedir?",
+ ["Yönetim kararlarından kaynaklanan, uzun süre görünmeyen koşullardır","Ön saflarda çalışanların hata ve ihlalleri sonucu ortaya çıkan, etkisi hemen görülen olumsuzluklardır","Yalnızca doğal olaylardır","Savunma katmanlarının hiç delinmemesidir"], 1],
+// 22
+["Tehdit ve Hata Yönetimi (TEM) modelinde BEKLENEN tehdit hangisidir?",
+ ["Hava trafik talimatları","Sistemden kaynaklanan arızalar","Havaalanı koşulları","Operasyonel baskı kaynaklı konular"], 2],
+// 23
+["1989 Kuala Lumpur \"Two Four Zero Zero\" olayında temel sorun neydi?",
+ ["Motor arızası","Pistin buzlanması","Yakıtın tükenmesi","Pilotun yanlış geri bildirimini kule kontrolörünün yakalayamaması (iletişim hatası)"], 3],
+// 24
+["Avrupa'da ESARR (Eurocontrol Safety Regulatory Requirements) düzenlemelerini hangi kuruluş yayınlar?",
+ ["ICAO","EASA","FAA","EUROCONTROL"], 3],
+// 25
+["Acil Durum Eylem Planının (ADEP / ERP) temel amacı nedir?",
+ ["Kazaların sorumlularını cezalandırmak","Sigorta primlerini düşürmek","Yalnızca medya ilişkilerini yönetmek","Operasyonların emniyetli biçimde devamını sağlamak ve en kısa sürede normal düzene dönmek","Kaza sonrası araç ve ekipmanı yenilemek"], 3],
+// 26
+["Emniyet Yönetim Sistemi (EYS) ICAO Ek 19 ve Emniyet Yönetimi El Kitabına uygun olarak dört ana bileşeni içermek zorundadır. Organizasyonun büyüklüğü ne olursa olsun bu bileşenlerle ilgili en doğru ifade hangisidir?",
+ ["Yalnızca büyük organizasyonlar için geçerlidir","Tüm bileşenler uygulanır, uygulama yöntemi organizasyonun yapısına ve faaliyetlerinin niteliğine göre uyarlanır","Küçük organizasyonlar bileşenlerden birini atlayabilir","Sadece risk yönetimi bileşeni zorunludur"], 1],
+// 27
+["ICAO'ya göre kaza nedir?",
+ ["Bir kişinin uçmak üzere hava aracına binmesinden inene kadar geçen süre içinde ölüm, ciddi yaralanma veya hava aracına ciddi hasar ile sonuçlanan olaydır","Yalnızca hava aracının tamamen kaybolmasıdır","Her türlü küçük teknik arızadır","Yalnızca yolcuların yaralandığı durumlardır"], 0],
+// 28
+["Emniyet olayı (incident) kazadan nasıl ayrılır?",
+ ["Emniyet olayı, kaza sınırına ulaşmamakla birlikte emniyeti etkileyen ve kazaya yol açabilecek durumlardır","Emniyet olayında mutlaka yolcu ölmüştür","Emniyet olayı, kazadan daha şiddetlidir","Emniyet olayları raporlanmaz"], 0],
+// 29
+["SHELL modelinde \"S\" harfi neyi temsil eder?",
+ ["Donanım (Hardware)","Yazılım (Software: prosedür, eğitim, kılavuz)","Çevre (Environment)","Sistem (System) tanımı"], 1],
+// 30
+["Hawkins ve Asby Değişim Gerekliliği modeli ne öngörür?",
+ ["Sistem dışı değişikliklerin yapılmaması","Sistemdeki bir bileşende yapılan değişikliğin diğer bileşenlerde de uygun ve zamanlı değişiklikleri gerektirmesi","Değişikliğin yalnızca yöneticilerce yapılması","Değişimin emniyet performansını hiç etkilemediği"], 1],
+// 31
+["Tehdit ve Hata Yönetiminde hatalar, Emniyet Modelinde kaç temel başlık altında sınıflandırılır?",
+ ["3","4","5","6"], 2],
+// 32
+["İsviçre Peyniri (Swiss Cheese) modelinde savunma katmanlarının delikleri ne zaman hizalanırsa kaza oluşur?",
+ ["Tüm katmanlardaki aktif hata ve gizli koşullar aynı anda hizalandığında","Yalnızca ilk katman delindiğinde","Hiçbir zaman, çünkü katmanlar sağlamdır","Yalnızca doğal afetlerde"], 0],
+// 33
+["5M modelinde yer alan faktörler hangileridir?",
+ ["İnsan, Makine, Çevre, Görev, Yönetim","Uçak, Pilot, Hava, Yakıt, Pist","Eğitim, Bakım, Finans, Hukuk, Veri","Risk, Olasılık, Şiddet, Tehlike, Tedbir"], 0],
+// 34
+["Emniyet güvencesi (safety assurance) bileşeninin amacı nedir?",
+ ["Sistemin emniyet performansına güven sağlanması","Yalnızca kazaların sigortalanması","Tehlikelerin hiç belirlenmemesi","Personelin disiplin işlemleri"], 0],
+// 35
+["Emniyetin teşvik edilmesi bileşeni neyi kapsar?",
+ ["Yalnızca ödül ve cezaların uygulanmasını","Pozitif emniyet kültürünü güçlendiren, emniyet davranışını destekleyen ve bireysel katılımı ödüllendiren uygulamaları","Sadece kaza sonrası kamu açıklamalarını","Yalnızca personelin ücret politikasını"], 1],
+// 36
+["Devletin, ICAO Ek 19 kapsamında sorumluluğu nedir?",
+ ["Yalnızca hava aracı üretimini düzenlemek","Ülkesinde emniyet yönetimini yürütmek ve hizmet sağlayıcıların EYS uygulamasını denetlemek","Yalnızca askeri havacılığı yönetmek","Havalimanı ticari işletmesini yönetmek"], 1],
+// 37
+["Avrupa Birliği Havacılık Emniyeti Ajansı hangisidir?",
+ ["ICAO","EUROCONTROL","EASA","CAA UK"], 2],
+// 38
+["Devletler ve hizmet sağlayıcılar arasında emniyet yönetimi nasıl bir ilişki içindedir?",
+ ["Yalnızca devlet sorumludur, hizmet sağlayıcı sorumlu değildir","Yalnızca hizmet sağlayıcı sorumludur, devlet denetim yapmaz","Devlet düzenler ve denetler, hizmet sağlayıcı emniyet yönetim sistemini kurar ve uygular","Her iki taraf da sorumluluk üstlenmez"], 2],
+// 39
+["Emniyet ile güvenlik (safety-security) ilişkisinde, güvenlik risklerinin emniyet risklerine neden olabilmesinin nedeni hangisidir?",
+ ["Güvenlik sorunları ortamda çalışanların hata yapma olasılığını artırabilir","Güvenlik risklerinin emniyetle hiçbir ilgisi yoktur","Emniyet risklerinin güvenlikten kaynaklanması imkansızdır","Güvenlik, yalnızca finansal risklerle ilgilidir"], 0],
+// 40
+["Emniyet yönetimi uygulamasının temel gerekçesi hangisidir?",
+ ["Yalnızca cezai yaptırım uygulamak","Operasyonel faydalar sağlamak, emniyet risklerinin kabul edilebilir seviyede tutulmasına katkıda bulunmak","Hava aracı sayısını artırmak","Yalnızca sigorta primlerini artırmak"], 1],
+// 41
+["Pozitif emniyet kültürünün beş temel öğesi hangileridir?",
+ ["Adil kültür, raporlama kültürü, bilinç kültürü, öğrenme kültürü, esnek kültür","Hiyerarşi, rekabet, ceza, denetim, kâr","Eğitim, bakım, finans, hukuk, veri","Risk, tehlike, olasılık, şiddet, tedbir"], 0],
+// 42
+["Rutin ihlal ve durumsal ihlal ayrımında durumsal ihlal hangisidir?",
+ ["İş akışı içinde sürekli tekrarlanan ihlal","Zaman baskısı veya yüksek iş yükü gibi anlık etkenlerden kaynaklanan ihlal","Yalnızca yöneticilerin yaptığı ihlal","Kasıtsız bir hata"], 1],
+// 43
+["Uygulama sapmasının yardımcı faktörleri arasında hangisi yer almaz?",
+ ["Denetimler, gözlemler ve emniyet performansı göstergeleri","Yerel çözümler ve geçici önlemler","Emniyet kültürü ve kaynakların yetersizliği","Hava aracının boyasının renginin değiştirilmesi"], 3],
+// 44
+["Emniyet yönetim sistemi çerçevesinde \"emniyet ara yüzleri\" ile ne kastedilir?",
+ ["Yalnızca havalimanı terminali","Farklı sistem bileşenleri, birimler ve taraflar arasındaki etkileşim noktaları (örn. hava trafik kontrolü, bakım, uçuş operasyonları)","Sadece uçağın dış yüzeyi","Yalnızca personelin ofis düzeni"], 1],
+// 45
+["Emniyet raporlaması kültüründe aşağıdaki ilke hangisidir?",
+ ["Hataların ve ihlallerin gizlenmesi","Hata ve kazaların cezalandırılmadan, öğrenme amacıyla raporlanması","Yalnızca yöneticilere rapor verilmesi","Raporların hiçbir zaman analiz edilmemesi"], 1],
+// 46
+["Emniyet verilerinin toplanmasının amacı nedir?",
+ ["Personeli cezalandırmak","Tehlikeleri tanımlamak, eğilimleri izlemek ve emniyet risklerini değerlendirerek önleyici tedbir almak","Yalnızca istatistik tutmak","Medya için haber üretmek"], 1],
+// 47
+["Emniyet tanımına göre risk nedir?",
+ ["Tehlikenin tek başına varlığıdır","Bir tehlikenin sonuçlarıyla karşılaşma olasılığı ve bu sonuçların etkisinin şiddetidir","Hata yapan personel sayısıdır","Kazaların toplam maliyetidir"], 1],
+// 48
+["ICAO Ek 19 Emniyet Yönetimi El Kitabında \"emniyet performansı\" neyi ifade eder?",
+ ["Yalnızca hava aracının hız performansını","Yerel ve uluslararası standartlar ile kültürel faktörler tarafından belirlenen emniyet düzeyini","Sadece pilotların uçuş saatlerini","Yalnızca bakım maliyetlerini"], 1],
+// 49
+["Emniyet Yönetim Sistemi (EYS) için gerekli kayıt ve dokümantasyonun amacı nedir?",
+ ["Yalnızca arşiv oluşturmak","Emniyet yönetiminin izlenebilirliğini sağlamak, kararların dayanağını oluşturmak ve sürekli iyileştirmeye veri sağlamak","Denetçileri oyalamak","Kağıt tüketimini artırmak"], 1],
+// 50
+["Emniyet yönetiminde sürekli iyileştirme döngüsünün doğru sırası hangisidir?",
+ ["Değişikliklerin emniyete etkisini belirleme, uygulamadan önce düzenlemeleri belirleme, etkisiz risk kontrollerini sonlandırma veya güncelleme","Ceza verme, kapatma, unutma, tekrar","Yalnızca raporlama ve arşivleme","Denetim yapma, sonuçları gizleme, kapatma"], 0]
+];
+
+const PASS = 90, PTS = 4, N = 25;
+let current = [];
+
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const L = "ABCDE";
+
+function startExam(){
+  const ad = document.getElementById('ad').value.trim();
+  const sicil = document.getElementById('sicil').value.trim();
+  if(!ad || !sicil){ alert('Lütfen ad soyad ve sicil numarası giriniz.'); return; }
+  const picked = shuffle(POOL).slice(0, N);
+  current = picked.map(q => {
+    // şıkları karıştır, doğru cevabın yeni yerini takip et
+    const idx = shuffle(q[1].map((_,i)=>i));
+    const opts = idx.map(i => q[1][i]);
+    const correct = idx.indexOf(q[2]);
+    return {q: q[0], opts, correct};
+  });
+  document.getElementById('who').textContent = ad + ' | Sicil: ' + sicil;
+  const f = document.getElementById('form');
+  f.innerHTML = current.map((item,i) =>
+    '<div class="q"><h3>' + (i+1) + '. ' + esc(item.q) + '</h3>' +
+    item.opts.map((o,k)=>'<label><input type="radio" name="q'+i+'" value="'+k+'">'+L[k]+') '+esc(o)+'</label>').join('') +
+    '</div>').join('');
+  document.getElementById('start').classList.add('hidden');
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('exam').classList.remove('hidden');
+  document.getElementById('progress').textContent = 'Toplam ' + N + ' soru | Her soru ' + PTS + ' puan';
+  window.scrollTo(0,0);
+}
+
+function esc(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function finish(){
+  const unanswered = current.findIndex((_,i)=> !document.querySelector('input[name="q'+i+'"]:checked'));
+  if(unanswered !== -1 && !confirm('Bazı sorular boş. Yine de bitirmek istiyor musunuz?')) return;
+  let correctCount = 0, review = [];
+  current.forEach((item,i)=>{
+    const sel = document.querySelector('input[name="q'+i+'"]:checked');
+    const chosen = sel ? parseInt(sel.value,10) : -1;
+    const ok = chosen === item.correct;
+    if(ok) correctCount++;
+    review.push('<div class="q"><h3>' + (i+1) + '. ' + esc(item.q) + '</h3>' +
+      item.opts.map((o,k)=>{
+        let cls = '';
+        if(k===item.correct) cls='res-ok';
+        else if(k===chosen) cls='res-bad';
+        return '<label class="'+cls+'">'+L[k]+') '+esc(o)+(k===item.correct?' ✔':'')+(k===chosen&&!ok?' ✘ (sizin cevabınız)':'')+'</label>';
+      }).join('') +
+      (chosen===-1 ? '<p class="note">Bu soru boş bırakıldı.</p>' : '') +
+      '<p class="explain"><b>Doğru cevap: '+L[item.correct]+')</b> '+(ok?'Doğru':'Yanlış')+'</p></div>');
+  });
+  const score = correctCount * PTS;
+  const wrong = N - correctCount;
+  document.getElementById('score').textContent = score + ' / 100';
+  document.getElementById('verdict').innerHTML = score >= PASS
+    ? '<span class="pass">GEÇTİNİZ (geçme notu '+PASS+')</span>'
+    : '<span class="fail">KALDINIZ (geçme notu '+PASS+')</span>';
+  document.getElementById('counts').textContent = 'Doğru: ' + correctCount + '  |  Yanlış/boş: ' + wrong;
+  document.getElementById('review').innerHTML = '<h2 style="color:var(--ac)">Sınav Değerlendirmesi</h2>' + review.join('');
+  document.getElementById('exam').classList.add('hidden');
+  document.getElementById('result').classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
